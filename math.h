@@ -27,6 +27,14 @@ struct lightray : public ray {
   lightray(vec o, vec d, vec c) : ray(o, d), color(c) {}
   lightray(vec o, vec d) : ray(o, d), color(1) {}
   lightray() : ray(vec(0), vec(0)), color(1) {}
+
+  bool isBlack() const {
+    return glm::length(color) < std::numeric_limits<float>::epsilon();
+  }
+
+  float energy() const {
+    return std::max(std::max(color.x, color.y), color.z);
+  }
 };
 
 struct intersection {

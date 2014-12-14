@@ -11,6 +11,9 @@
 #include "sphere.h"
 #include "plane.h"
 
+#define MAX_DEPTH 10
+#define RUSSIAN_ROULETTE_DEPTH 5
+
 geomptr intersect(const ray& r,
                   std::vector<geomptr> objs,
                   intersection* isect_out = nullptr) {
@@ -80,7 +83,8 @@ void render(int w, int h, Imf::Array2D<Imf::Rgba>& pixels) {
   }
 
   std::mt19937 rng(time(0));
-  std::uniform_int_distribution<int> dist;
+  std::uniform_int_distribution<int> intDist;
+  std::uniform_real_distribution<float> realDist;
   int iters = 0;
   std:: cout << "Press Ctrl-c to quit\n";
   while (true) {
@@ -91,7 +95,7 @@ void render(int w, int h, Imf::Array2D<Imf::Rgba>& pixels) {
     float oldFrac = (float)(iters - 1.0f) * newFrac;
 
     for (int y = 0; y < h; ++y) {
-      std::mt19937 rowRng(dist(rng));
+      std::mt19937 rowRng(intDist(rng));
 
       tbb::parallel_for(size_t(0), size_t(w), [&](size_t x) {
         vec pxColor;
@@ -103,19 +107,40 @@ void render(int w, int h, Imf::Array2D<Imf::Rgba>& pixels) {
             lightray r(cam.origin, corner_dir + (up * frac_y) + (right * frac_x));
             vec color(0);
 
-            int limit = 10;
-            while (!r.isZero()) {
-              limit--;
+            int depth = 0;
+            bool died = false;
+            while (!r.isZero() && !died) {
+              depth++;
+              died = false;
 
+              // Do Russian Roulette if this ray is "old".
+              if (depth > RUSSIAN_ROULETTE_DEPTH || r.isBlack()) {
+                float rv = realDist(rowRng);
+                float energy = r.energy();
+                if (rv < energy) {
+                  // The ray lives.
+                  // Increase its energy to balance out probabilities.
+                  r.color = r.color * (1.0f / energy);
+                } else {
+                  // The ray dies.
+                  died = true;
+                }
+              }
+
+              // Bounce ray (up to maximum depth only).
               intersection isect;
               geomptr g = intersect(r, objs, &isect);
 
-              if (g && limit >= 0) {
+              if (g && depth <= MAX_DEPTH) {
                 r = g->mat->propagate(r, isect, rowRng);
                 color = r.color;
               } else {
-                color = vec(0); // Hit empty space, which isn't a light source.
-                break;
+                died = true;
+              }
+
+              // Fill in black color if the ray died.
+              if (died) {
+                color = vec(0);
               }
             }
 
@@ -149,11 +174,6 @@ int main() {
 
   Imf::Array2D<Imf::Rgba> pixels(h, w);
   render(512, 384, pixels);
-/*
-  Imf::RgbaOutputFile file("/Users/Steve/Desktop/sample.exr", w, h,
-    Imf::WRITE_RGBA);
-  file.setFrameBuffer(&pixels[0][0], 1, w);
-  file.writePixels(h);
-*/
+
   return 0;
 }
