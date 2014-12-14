@@ -1,5 +1,6 @@
 #include <OpenEXR/ImfRgbaFile.h>
 #include <OpenEXR/ImfArray.h>
+#include <tbb/tbb.h>
 #include <limits>
 #include <vector>
 #include <memory>
@@ -40,7 +41,7 @@ void render(int w, int h, Imf::Array2D<Imf::Rgba>& pixels) {
   materialptr spec = std::make_shared<idealspecular>();
 
   std::vector<geomptr> objs;
-  objs.push_back(std::make_shared<sphere>(vec(0, -6, 0), 4.0f, spec));
+  objs.push_back(std::make_shared<sphere>(vec(0, -8, 0), 4.0f, spec));
   objs.push_back(std::make_shared<plane>(vec(0, -20, 0), vec(0, 1, 0), red)); // bottom
   objs.push_back(std::make_shared<plane>(vec(0, 20, 0), vec(0, -1, 0), red)); // top
   objs.push_back(std::make_shared<plane>(vec(0, 0, -50), vec(0, 0, 1), blue)); // back
@@ -79,6 +80,7 @@ void render(int w, int h, Imf::Array2D<Imf::Rgba>& pixels) {
   }
 
   std::mt19937 rng(time(0));
+  std::uniform_int_distribution<int> dist;
   int iters = 0;
   while (true) {
     iters++;
@@ -89,8 +91,9 @@ void render(int w, int h, Imf::Array2D<Imf::Rgba>& pixels) {
 
     for (int y = 0; y < h; ++y) {
       float frac_y = y / ((float)h - 1.0f);
+      std::mt19937 rowRng(dist(rng));
 
-      for (int x = 0; x < w; ++x) {
+      tbb::parallel_for(size_t(0), size_t(w), [&](size_t x) {
         float frac_x = x / ((float)w - 1.0f);
 
         lightray r(cam.origin, corner_dir + (up * frac_y) + (right * frac_x));
@@ -104,7 +107,7 @@ void render(int w, int h, Imf::Array2D<Imf::Rgba>& pixels) {
           geomptr g = intersect(r, objs, &isect);
 
           if (g && limit >= 0) {
-            r = g->mat->propagate(r, isect, rng);
+            r = g->mat->propagate(r, isect, rowRng);
             color = r.color;
           } else {
             color = vec(0); // Hit empty space, which isn't a light source.
@@ -122,9 +125,8 @@ void render(int w, int h, Imf::Array2D<Imf::Rgba>& pixels) {
           p.g = p.g * oldFrac + color.y * newFrac;
           p.b = p.b * oldFrac + color.z * newFrac;
         }
-      }
+      });
     }
-
 
     Imf::RgbaOutputFile file("/Users/Steve/Desktop/sample.exr", w, h,
     Imf::WRITE_RGBA);
