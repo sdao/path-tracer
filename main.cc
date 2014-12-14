@@ -34,19 +34,19 @@ geomptr intersect(const ray& r,
 }
 
 void render(int w, int h, Imf::Array2D<Imf::Rgba>& pixels) {
-  materialptr red = std::make_shared<idealdiffuse>(vec(1, 0.3, 0.3));
+  materialptr green = std::make_shared<idealdiffuse>(vec(0.5, 0.9, 0.4));
   materialptr white = std::make_shared<idealdiffuse>(vec(1, 1, 1));
-  materialptr blue = std::make_shared<idealdiffuse>(vec(0.3, 0.3, 1));
+  materialptr blue = std::make_shared<idealdiffuse>(vec(0.5, 0.6, 1));
   materialptr emit = std::make_shared<idealemitter>(vec(4, 4, 4));
   materialptr spec = std::make_shared<idealspecular>();
 
   std::vector<geomptr> objs;
-  objs.push_back(std::make_shared<sphere>(vec(0, -8, 0), 4.0f, spec));
-  objs.push_back(std::make_shared<plane>(vec(0, -20, 0), vec(0, 1, 0), red)); // bottom
-  objs.push_back(std::make_shared<plane>(vec(0, 20, 0), vec(0, -1, 0), red)); // top
-  objs.push_back(std::make_shared<plane>(vec(0, 0, -50), vec(0, 0, 1), blue)); // back
-  objs.push_back(std::make_shared<plane>(vec(-20, 0, 0), vec(1, 0, 0), white)); // left
-  objs.push_back(std::make_shared<plane>(vec(20, 0, 0), vec(-1, 0, 0), white)); // right
+  objs.push_back(std::make_shared<sphere>(vec(0, -12, -30), 6.0f, spec));
+  objs.push_back(std::make_shared<plane>(vec(0, -20, 0), vec(0, 1, 0), white)); // bottom
+  objs.push_back(std::make_shared<plane>(vec(0, 20, 0), vec(0, -1, 0), white)); // top
+  objs.push_back(std::make_shared<plane>(vec(0, 0, -50), vec(0, 0, 1), white)); // back
+  objs.push_back(std::make_shared<plane>(vec(-20, 0, 0), vec(1, 0, 0), blue)); // left
+  objs.push_back(std::make_shared<plane>(vec(20, 0, 0), vec(-1, 0, 0), green)); // right
   objs.push_back(std::make_shared<sphere>(vec(0, 48, -30), 30.0f, emit)); // light
 
   // origin = cam origin
@@ -82,6 +82,7 @@ void render(int w, int h, Imf::Array2D<Imf::Rgba>& pixels) {
   std::mt19937 rng(time(0));
   std::uniform_int_distribution<int> dist;
   int iters = 0;
+  std:: cout << "Press Ctrl-c to quit\n";
   while (true) {
     iters++;
     std::cout << "Iteration " << iters << "\n";
@@ -90,40 +91,47 @@ void render(int w, int h, Imf::Array2D<Imf::Rgba>& pixels) {
     float oldFrac = (float)(iters - 1.0f) * newFrac;
 
     for (int y = 0; y < h; ++y) {
-      float frac_y = y / ((float)h - 1.0f);
       std::mt19937 rowRng(dist(rng));
 
       tbb::parallel_for(size_t(0), size_t(w), [&](size_t x) {
-        float frac_x = x / ((float)w - 1.0f);
+        vec pxColor;
+        for (int sy = -1; sy < 1; ++sy) {
+          for (int sx = -1; sx < 1; ++sx) {
+            float frac_y = (y + 0.5f * sy) / (h - 1.0f);
+            float frac_x = (x + 0.5f * sx) / (w - 1.0f);
 
-        lightray r(cam.origin, corner_dir + (up * frac_y) + (right * frac_x));
-        vec color(0);
+            lightray r(cam.origin, corner_dir + (up * frac_y) + (right * frac_x));
+            vec color(0);
 
-        int limit = 10;
-        while (!r.isZero()) {
-          limit--;
+            int limit = 10;
+            while (!r.isZero()) {
+              limit--;
 
-          intersection isect;
-          geomptr g = intersect(r, objs, &isect);
+              intersection isect;
+              geomptr g = intersect(r, objs, &isect);
 
-          if (g && limit >= 0) {
-            r = g->mat->propagate(r, isect, rowRng);
-            color = r.color;
-          } else {
-            color = vec(0); // Hit empty space, which isn't a light source.
-            break;
+              if (g && limit >= 0) {
+                r = g->mat->propagate(r, isect, rowRng);
+                color = r.color;
+              } else {
+                color = vec(0); // Hit empty space, which isn't a light source.
+                break;
+              }
+            }
+
+            pxColor += color * 0.25f;
           }
         }
 
         Imf::Rgba &p = pixels[y][x];
         if (iters == 1) {
-          p.r = color.x;
-          p.g = color.y;
-          p.b = color.z;
+          p.r = pxColor.x;
+          p.g = pxColor.y;
+          p.b = pxColor.z;
         } else {
-          p.r = p.r * oldFrac + color.x * newFrac;
-          p.g = p.g * oldFrac + color.y * newFrac;
-          p.b = p.b * oldFrac + color.z * newFrac;
+          p.r = p.r * oldFrac + pxColor.x * newFrac;
+          p.g = p.g * oldFrac + pxColor.y * newFrac;
+          p.b = p.b * oldFrac + pxColor.z * newFrac;
         }
       });
     }
