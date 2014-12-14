@@ -1,16 +1,23 @@
 #pragma once
+#include <memory>
 #include "math.h"
 
-enum material_type {
-  DIFFUSE = 0
+class material {
+protected:
+  material(vec d) : debug_color(d) {}
+
+public:
+  vec debug_color;
+  virtual ~material() {}
+  virtual ray propagate(const ray& incoming, const intersection& isect) = 0;
 };
 
-struct material {
-  material_type type;
-  vec diffuse_color;
-  vec emission;
+typedef std::shared_ptr<material> materialptr;
 
-  material() : type(DIFFUSE), diffuse_color(0.0f), emission(0.0f) {}
-  material(material_type t, vec d, vec e = vec(0.0))
-    : type(t), diffuse_color(d), emission(e) {}
+class testmaterial : public material {
+public:
+  testmaterial(vec d) : material(d) {}
+  virtual ray propagate(const ray& incoming, const intersection& isect) {
+    return ray();
+  }
 };

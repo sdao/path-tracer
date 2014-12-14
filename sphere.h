@@ -6,10 +6,10 @@ public:
   vec origin;
   float radius;
 
-  sphere(vec o, float r, material m);
+  sphere(vec o, float r, materialptr m);
   sphere(vec o, float r);
   sphere();
   ~sphere();
 
-  virtual float intersect(const ray& r) const;
+  virtual intersection intersect(const ray& r) const;
 };

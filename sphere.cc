@@ -1,6 +1,6 @@
 #include "sphere.h"
 
-sphere::sphere(vec o, float r, material m)
+sphere::sphere(vec o, float r, materialptr m)
   : origin(o), radius(r), geom(m) {}
 
 sphere::sphere(vec o, float r)
@@ -10,9 +10,9 @@ sphere::sphere() : origin(0.0), radius(1.0f) {}
 
 sphere::~sphere() {}
 
-float sphere::intersect(const ray& r) const {
+intersection sphere::intersect(const ray& r) const {
   vec diff = r.origin - origin;
-  vec l = r.unitDirection();
+  vec l = r.unit().direction;
 
   // See Wikipedia:
   // <http://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection>
@@ -31,12 +31,12 @@ float sphere::intersect(const ray& r) const {
 
     // Neg before pos because we want to return closest isect first.
     if (resNeg > epsilon) {
-      return resNeg;
+      return intersection(r.unit().at(resNeg), resNeg);
     } else if (resPos > epsilon){
-      return resPos;
+      return intersection(r.unit().at(resPos), resPos);
     }
   }
 
   // Either no isect was found or it was behind us.
-  return 0.0f;
+  return intersection();
 }

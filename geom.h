@@ -1,15 +1,18 @@
 #pragma once
+#include <memory>
 #include "math.h"
 #include "material.h"
 
 class geom {
 protected:
   geom() : mat() {}
-  geom(material m) : mat(m) {}
+  geom(materialptr m) : mat(m) {}
 
 public:
-  material mat;
-  
+  materialptr mat;
+
   virtual ~geom() {}
-  virtual float intersect(const ray& r) const = 0;
+  virtual intersection intersect(const ray& r) const = 0;
 };
+
+typedef std::shared_ptr<geom> geomptr;
