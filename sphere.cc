@@ -31,9 +31,13 @@ intersection sphere::intersect(const ray& r) const {
 
     // Neg before pos because we want to return closest isect first.
     if (resNeg > epsilon) {
-      return intersection(r.unit().at(resNeg), resNeg);
-    } else if (resPos > epsilon){
-      return intersection(r.unit().at(resPos), resPos);
+      vec pt = r.unit().at(resNeg);
+      vec normal = glm::normalize(pt - origin);
+      return intersection(pt, normal, resNeg);
+    } else if (resPos > epsilon) {
+      vec pt = r.unit().at(resPos);
+      vec normal = glm::normalize(pt - origin);
+      return intersection(pt, normal, resPos);
     }
   }
 

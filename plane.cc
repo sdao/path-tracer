@@ -20,7 +20,7 @@ intersection plane::intersect(const ray& r) const {
     float epsilon = std::numeric_limits<float>::epsilon();
 
     if (d > epsilon) {
-      return intersection(r.unit().at(d), d);
+      return intersection(r.unit().at(d), normal, d);
     }
   }
 
