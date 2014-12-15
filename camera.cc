@@ -68,7 +68,7 @@ void camera::renderOnce(const std::vector<geomptr>& objs, std::string name) {
       tbb::mutex::scoped_lock lock(masterRngMutex);
       seed = masterRng.nextInt();
     }
-    randomness rng(masterRng);
+    randomness rng(seed);
 
     for (int x = 0; x < w; ++x) {
       dvec pxColor;
