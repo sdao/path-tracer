@@ -65,7 +65,7 @@ lightray materials::fresnel::propagate(
   }
 
   float cosTemp_5 = cosTemp * cosTemp * cosTemp * cosTemp * cosTemp;
-  float refl = (1.0f - r0) * cosTemp_5;
+  float refl = r0 + (1.0f - r0) * cosTemp_5;
   float refr = 1.0f - refl;
 
   // Importance sampling probabilities.
