@@ -1,10 +1,14 @@
 #pragma once
+#include <OpenEXR/ImfRgbaFile.h>
+#include <OpenEXR/ImfArray.h>
 #include <cmath>
 #include <limits>
+#include <vector>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
 typedef glm::vec3 vec;
+typedef glm::dvec3 dvec;
 
 struct ray {
   vec origin;
@@ -66,6 +70,21 @@ namespace math {
       *v2 = vec(0.0f, v1.z * invLen, -v1.y * invLen);
     }
     *v3 = glm::cross(v1, *v2);
+  }
+
+  inline void copyData(int w, int h,
+    std::vector<std::vector<dvec>>& data,
+    Imf::Array2D<Imf::Rgba>& exrData) {
+    for (int y = 0; y < h; ++y) {
+      for (int x = 0; x < w; ++x) {
+        Imf::Rgba& rgba = exrData[y][x];
+        dvec &p = data[y][x];
+        rgba.r = p.x;
+        rgba.g = p.y;
+        rgba.b = p.z;
+        rgba.a = 1.0;
+      }
+    }
   }
 
 }

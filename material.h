@@ -3,6 +3,8 @@
 #include <random>
 #include "math.h"
 
+#define IOR_VACUUM 1.0f
+
 class material {
 protected:
   material(vec d) : debug_color(d) {}
@@ -74,5 +76,25 @@ public:
     return lightray(isect.position + reflectVector * 0.01f,
       reflectVector,
       incoming.color * color);
+  }
+};
+
+class idealrefract : public material {
+  float idxRefract;
+
+public:
+  idealrefract(float ior = 1.5f) : material(vec(1)), idxRefract(ior) {}
+
+  virtual lightray propagate(const lightray& incoming,
+  const intersection& isect,
+  std::mt19937& rng) {
+    vec reflectVector = glm::reflect(incoming.unit().direction, isect.normal);
+    // Entering = are normal and ray in opposite directions?
+    bool entering = glm::dot(isect.normal, incoming.direction) < 0;
+    float snellsRatio =
+      entering ? IOR_VACUUM / idxRefract : idxRefract / IOR_VACUUM;
+
+    // If angle of incidence with normal is < critical angle, will reflect.
+    
   }
 };
