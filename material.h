@@ -80,6 +80,39 @@ public:
   }
 };
 
+class glossyspecular : public material {
+  std::normal_distribution<float> dist;
+
+public:
+  float glossiness;
+
+  glossyspecular(float g) : glossiness(g), dist(), material(vec(1)) {}
+
+  virtual lightray propagate(const lightray& incoming,
+  const intersection& isect,
+  std::mt19937& rng) {
+    // Generate random ray in hemisphere of normal.
+    // See <http://mathworld.wolfram.com/SpherePointPicking.html>
+    float x1 = dist(rng);
+    float x2 = dist(rng);
+    float x3 = dist(rng);
+    float denom = 1.0f / sqrt(x1 * x1 + x2 * x2 + x3 * x3);
+    float y1 = fabsf(x1 * denom);
+    float y2 = x2 * denom;
+    float y3 = x3 * denom;
+
+    vec v1 = isect.normal;
+    vec v2;
+    vec v3;
+    math::coordSystem(v1, &v2, &v3);
+    vec reflectVector = (v1 * y1) + (v2 * y2) + (v3 * y3);
+
+    return lightray(isect.position + reflectVector * 0.01f,
+    glossiness * reflectVector + (1.0f - glossiness) * isect.normal,
+    incoming.color);
+  }
+};
+
 class fresnelrefract : public material {
   float idxRefract;
   std::uniform_real_distribution<float> dist;
@@ -127,12 +160,13 @@ public:
     float r0_temp = (nIncident - nTransmit) / (nIncident + nTransmit);
     float r0 = r0_temp * r0_temp;
     float cos_temp;
-    if (nIncident > nTransmit) {
-      // Equivalent to condition: entering == false
+    if (nIncident < nTransmit) {
+      // Equivalent to condition: entering == true
+      // (e.g. nI = 1 (air), nT = 1.5 (glass))
       // Theta = angle of incidence.
       cos_temp = 1.0f - glm::dot(-incoming.unit().direction, alignedNormal);
     } else {
-      // Equivalent to condition: entering == true
+      // Equivalent to condition: entering == false
       // Theta = angle of refraction.
       cos_temp = 1.0f - glm::dot(refractVector, -alignedNormal);
     }
