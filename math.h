@@ -6,6 +6,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include "randomness.h"
 
 typedef glm::vec3 vec;
 typedef glm::dvec3 dvec;
@@ -31,12 +32,12 @@ namespace math {
   }
 
   inline void copyData(int w, int h,
-    std::vector<std::vector<dvec>>& data,
+    const std::vector<std::vector<dvec>>& data,
     Imf::Array2D<Imf::Rgba>& exrData) {
     for (int y = 0; y < h; ++y) {
       for (int x = 0; x < w; ++x) {
         Imf::Rgba& rgba = exrData[y][x];
-        dvec &p = data[y][x];
+        const dvec &p = data[y][x];
         rgba.r = p.x;
         rgba.g = p.y;
         rgba.b = p.z;
@@ -51,6 +52,25 @@ namespace math {
 
   inline bool isPositive(float x) {
     return x > std::numeric_limits<float>::epsilon();
+  }
+
+  inline vec uniformSampleHemisphere(const vec normal, randomness& rng) {
+    // Generate random ray in hemisphere of normal.
+    // See <http://mathworld.wolfram.com/SpherePointPicking.html>
+    float x1 = rng.nextNormalFloat();
+    float x2 = rng.nextNormalFloat();
+    float x3 = rng.nextNormalFloat();
+
+    float denom = 1.0f / sqrt(x1 * x1 + x2 * x2 + x3 * x3);
+    float y1 = fabsf(x1 * denom);
+    float y2 = x2 * denom;
+    float y3 = x3 * denom;
+
+    const vec v1 = normal;
+    vec v2;
+    vec v3;
+    coordSystem(v1, &v2, &v3);
+    return (v1 * y1) + (v2 * y2) + (v3 * y3);
   }
 
 }
@@ -99,6 +119,6 @@ struct intersection {
 
   intersection() : position(0), normal(0), distance(0.0f) {}
   intersection(vec p, vec n, float d)
-  : position(p), normal(glm::normalize(n)), distance(d) {}
+    : position(p), normal(glm::normalize(n)), distance(d) {}
   bool hit() const { return distance > 0.0f; }
 };
