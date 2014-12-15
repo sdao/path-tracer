@@ -1,16 +1,15 @@
 #include "sphere.h"
+#include <memory>
 
-sphere::sphere(vec o, float r, materialptr m)
+geoms::sphere::sphere(vec o, float r, materialptr m)
   : origin(o), radius(r), geom(m) {}
 
-sphere::sphere(vec o, float r)
+geoms::sphere::sphere(vec o, float r)
   : origin(o), radius(r), geom() {}
 
-sphere::sphere() : origin(0.0), radius(1.0f) {}
+geoms::sphere::sphere() : origin(0.0), radius(1.0f) {}
 
-sphere::~sphere() {}
-
-intersection sphere::intersect(const ray& r) const {
+intersection geoms::sphere::intersect(const ray& r) const {
   vec diff = r.origin - origin;
   vec l = r.unit().direction;
 
@@ -42,4 +41,16 @@ intersection sphere::intersect(const ray& r) const {
 
   // Either no isect was found or it was behind us.
   return intersection();
+}
+
+geomptr geoms::sphere::make(vec o, float r, materialptr m) {
+  return std::make_shared<sphere>(o, r, m);
+}
+
+geomptr geoms::sphere::make(vec o, float r) {
+  return std::make_shared<sphere>(o, r);
+}
+
+geomptr geoms::sphere::make() {
+  return std::make_shared<sphere>();
 }

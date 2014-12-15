@@ -31,9 +31,12 @@ namespace math {
     *v3 = glm::cross(v1, *v2);
   }
 
-  inline void copyData(int w, int h,
+  inline void copyData(
+    int w,
+    int h,
     const std::vector<std::vector<dvec>>& data,
-    Imf::Array2D<Imf::Rgba>& exrData) {
+    Imf::Array2D<Imf::Rgba>& exrData
+  ) {
     for (int y = 0; y < h; ++y) {
       for (int x = 0; x < w; ++x) {
         Imf::Rgba& rgba = exrData[y][x];
@@ -50,27 +53,16 @@ namespace math {
     return fabsf(x) < std::numeric_limits<float>::epsilon();
   }
 
-  inline bool isPositive(float x) {
-    return x > std::numeric_limits<float>::epsilon();
+  inline bool isNearlyZero(vec v) {
+    return isNearlyZero(glm::length2(v));
   }
 
-  inline vec uniformSampleHemisphere(const vec normal, randomness& rng) {
-    // Generate random ray in hemisphere of normal.
-    // See <http://mathworld.wolfram.com/SpherePointPicking.html>
-    float x1 = rng.nextNormalFloat();
-    float x2 = rng.nextNormalFloat();
-    float x3 = rng.nextNormalFloat();
+  inline bool isExactlyZero(vec v) {
+    return v.x == 0.0f && v.y == 0.0f && v.z == 0.0f;
+  }
 
-    float denom = 1.0f / sqrt(x1 * x1 + x2 * x2 + x3 * x3);
-    float y1 = fabsf(x1 * denom);
-    float y2 = x2 * denom;
-    float y3 = x3 * denom;
-
-    const vec v1 = normal;
-    vec v2;
-    vec v3;
-    coordSystem(v1, &v2, &v3);
-    return (v1 * y1) + (v2 * y2) + (v3 * y3);
+  inline bool isPositive(float x) {
+    return x > std::numeric_limits<float>::epsilon();
   }
 
 }
@@ -94,7 +86,7 @@ struct lightray : public ray {
   lightray() : ray(vec(0), vec(0)), color(1) {}
 
   bool isBlack() const {
-    return math::isNearlyZero(glm::length(color));
+    return math::isNearlyZero(color);
   }
 
   float energy() const {
@@ -102,7 +94,7 @@ struct lightray : public ray {
   }
 
   bool isZeroLength() const {
-    return math::isNearlyZero(glm::length(direction));
+    return math::isNearlyZero(direction);
   }
 
   void kill() {
@@ -115,10 +107,47 @@ struct lightray : public ray {
 struct intersection {
   vec position;
   vec normal;
+  vec tangent;
+  vec cotangent;
   float distance;
 
-  intersection() : position(0), normal(0), distance(0.0f) {}
+  intersection()
+    : position(0), normal(0), tangent(0), cotangent(0), distance(0.0f) {}
   intersection(vec p, vec n, float d)
-    : position(p), normal(glm::normalize(n)), distance(d) {}
+    : position(p), normal(glm::normalize(n)), tangent(0), cotangent(0),
+      distance(d) {}
+  intersection(vec p, vec n, vec tang, vec cotang, float d)
+    : position(p),
+      normal(glm::normalize(n)),
+      tangent(glm::normalize(tang)),
+      cotangent(glm::normalize(cotang)),
+      distance(d) {}
+
   bool hit() const { return distance > 0.0f; }
+
+  /**
+   * Generates a random ray in the hemisphere of normal by using a Gaussian
+   * distribution.
+   * See <http://mathworld.wolfram.com/SpherePointPicking.html>.
+   *
+   * If the tangent is exactly zero-length, we assume that it has not been
+   * computed and we will compute it and the cotangent.
+   * Otherwise, we trust that the tangent and cotangent are correct.
+   */
+  vec uniformSampleHemisphere(randomness& rng) {
+    if (math::isExactlyZero(tangent)) {
+      math::coordSystem(normal, &tangent, &cotangent);
+    }
+
+    float x1 = rng.nextNormalFloat();
+    float x2 = rng.nextNormalFloat();
+    float x3 = rng.nextNormalFloat();
+
+    float denom = 1.0f / sqrt(x1 * x1 + x2 * x2 + x3 * x3);
+    float y1 = fabsf(x1 * denom);
+    float y2 = x2 * denom;
+    float y3 = x3 * denom;
+
+    return (y1 * normal) + (y2 * tangent) + (y3 * cotangent);
+  }
 };

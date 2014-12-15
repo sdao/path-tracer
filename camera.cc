@@ -9,7 +9,8 @@
 
 camera::camera(ray e, int ww, int hh, float ff = M_PI / 4.0f)
   : eye(e.unit()), w(ww), h(hh), fovx2(0.5f * ff),
-    iters(0), data(h), exrData(hh, ww), masterRng(time(0)) {
+    iters(0), data(h), exrData(hh, ww), masterRng(time(0))
+{
   // Size of the image plane projected into world space
   // using the given fovx and cam focal length.
   float scale_right = 2.0f * glm::length(eye.direction) * tanf(fovx2);
@@ -31,9 +32,11 @@ camera::camera(ray e, int ww, int hh, float ff = M_PI / 4.0f)
   }
 }
 
-geomptr camera::intersect(const ray& r,
-    const std::vector<geomptr>& objs,
-    intersection* isect_out = nullptr) const {
+geomptr camera::intersect(
+  const ray& r,
+  const std::vector<geomptr>& objs,
+  intersection* isect_out
+) const {
   intersection winner_isect;
   geomptr winner;
 
