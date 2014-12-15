@@ -10,48 +10,6 @@
 typedef glm::vec3 vec;
 typedef glm::dvec3 dvec;
 
-struct ray {
-  vec origin;
-  vec direction;
-
-  ray(vec o, vec d) : origin(o), direction(d) {}
-  ray() : origin(0.0), direction(0.0) {}
-
-  ray unit() const { return ray(origin, glm::normalize(direction)); }
-  vec at(float d) const { return origin + direction * d; }
-
-  bool isZero() const {
-    return glm::length(direction) < std::numeric_limits<float>::epsilon();
-  }
-};
-
-struct lightray : public ray {
-  vec color;
-
-  lightray(vec o, vec d, vec c) : ray(o, d), color(c) {}
-  lightray(vec o, vec d) : ray(o, d), color(1) {}
-  lightray() : ray(vec(0), vec(0)), color(1) {}
-
-  bool isBlack() const {
-    return glm::length(color) < std::numeric_limits<float>::epsilon();
-  }
-
-  float energy() const {
-    return std::max(std::max(color.x, color.y), color.z);
-  }
-};
-
-struct intersection {
-  vec position;
-  vec normal;
-  float distance;
-
-  intersection() : position(0), normal(0), distance(0.0f) {}
-  intersection(vec p, vec n, float d)
-    : position(p), normal(glm::normalize(n)), distance(d) {}
-  bool hit() const { return distance > 0.0f; }
-};
-
 namespace math {
 
   inline float clamp(float x) {
@@ -87,4 +45,60 @@ namespace math {
     }
   }
 
+  inline bool isNearlyZero(float x) {
+    return fabsf(x) < std::numeric_limits<float>::epsilon();
+  }
+
+  inline bool isPositive(float x) {
+    return x > std::numeric_limits<float>::epsilon();
+  }
+
 }
+
+struct ray {
+  vec origin;
+  vec direction;
+
+  ray(vec o, vec d) : origin(o), direction(d) {}
+  ray() : origin(0.0), direction(0.0) {}
+
+  ray unit() const { return ray(origin, glm::normalize(direction)); }
+  vec at(float d) const { return origin + direction * d; }
+};
+
+struct lightray : public ray {
+  vec color;
+
+  lightray(vec o, vec d, vec c) : ray(o, d), color(c) {}
+  lightray(vec o, vec d) : ray(o, d), color(1) {}
+  lightray() : ray(vec(0), vec(0)), color(1) {}
+
+  bool isBlack() const {
+    return math::isNearlyZero(glm::length(color));
+  }
+
+  float energy() const {
+    return std::max(std::max(color.x, color.y), color.z);
+  }
+
+  bool isZeroLength() const {
+    return math::isNearlyZero(glm::length(direction));
+  }
+
+  void kill() {
+    origin = vec(0);
+    direction = vec(0);
+    color = vec(0);
+  }
+};
+
+struct intersection {
+  vec position;
+  vec normal;
+  float distance;
+
+  intersection() : position(0), normal(0), distance(0.0f) {}
+  intersection(vec p, vec n, float d)
+  : position(p), normal(glm::normalize(n)), distance(d) {}
+  bool hit() const { return distance > 0.0f; }
+};

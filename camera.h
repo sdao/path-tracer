@@ -25,7 +25,7 @@ class camera {
   Imf::Array2D<Imf::Rgba> exrData;
 
   geomptr intersect(const ray& r,
-    std::vector<geomptr> objs,
+    std::vector<geomptr>& objs,
     intersection* isect_out);
 
 public:

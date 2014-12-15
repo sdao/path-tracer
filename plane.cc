@@ -17,9 +17,8 @@ intersection plane::intersect(const ray& r) const {
   float denom = glm::dot(r.unit().direction, normal);
   if (denom != 0.0f) {
     float d = glm::dot(origin - r.origin, normal) / denom;
-    float epsilon = std::numeric_limits<float>::epsilon();
 
-    if (d > epsilon) {
+    if (math::isPositive(d)) {
       return intersection(r.unit().at(d), normal, d);
     }
   }

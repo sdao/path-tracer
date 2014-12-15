@@ -3,8 +3,10 @@
 #include <limits>
 #include <iostream>
 
-#define MAX_DEPTH 10
-#define RUSSIAN_ROULETTE_DEPTH 5
+#define MAX_DEPTH 20
+#define RUSSIAN_ROULETTE_DEPTH 10
+#define SAMPLES_PER_PIXEL 4
+#define PIXELS_PER_SAMPLE 0.25f
 
 camera::camera(ray e, int ww, int hh, float ff = M_PI / 4.0f)
   : eye(e.unit()), w(ww), h(hh), fovx2(0.5f * ff),
@@ -31,7 +33,7 @@ camera::camera(ray e, int ww, int hh, float ff = M_PI / 4.0f)
 }
 
 geomptr camera::intersect(const ray& r,
-  std::vector<geomptr> objs,
+  std::vector<geomptr>& objs,
   intersection* isect_out = nullptr) {
   intersection winner_isect;
   geomptr winner;
@@ -62,67 +64,63 @@ void camera::renderOnce(std::vector<geomptr>& objs, std::string name) {
   for (int y = 0; y < h; ++y) {
     std::mt19937 rowRng(intDist(rng));
 
-    //tbb::parallel_for(size_t(0), size_t(w), [&](size_t x) {
-    for (int x = 0; x < w; ++x) {
+    tbb::parallel_for(size_t(0), size_t(w), [&](size_t x) {
+    //for (int x = 0; x < w; ++x) {
       dvec pxColor;
-      for (int sy = -1; sy < 1; ++sy) {
-        for (int sx = -1; sx < 1; ++sx) {
-          float frac_y = (y + 0.5f * sy) / (h - 1.0f);
-          float frac_x = (x + 0.5f * sx) / (w - 1.0f);
+      for (int samps = 0; samps < SAMPLES_PER_PIXEL; ++samps) {
+        float frac_y = (y - 0.5f + realDist(rng)) / (h - 1.0f);
+        float frac_x = (x - 0.5f + realDist(rng)) / (w - 1.0f);
 
-          lightray r(eye.origin, corner_ray + (up * frac_y) + (right * frac_x));
-          vec sampColor(0);
+        lightray r(eye.origin, corner_ray + (up * frac_y) + (right * frac_x));
 
-          int depth = 0;
-          bool died = false;
-          while (!r.isZero() && !died) {
-            depth++;
-            died = false;
+        int depth = 0;
+        while (!r.isZeroLength()) {
+          depth++;
 
-            // Do Russian Roulette if this ray is "old".
-            if (depth > MAX_DEPTH) {
-              died = true;
-            } else if (depth > RUSSIAN_ROULETTE_DEPTH || r.isBlack()) {
-              float rv = realDist(rowRng);
-              float energy = r.energy();
-              if (rv < energy) {
-                // The ray lives.
-                // Increase its energy to balance out probabilities.
-                r.color = r.color * (1.0f / energy);
-              } else {
-                // The ray dies.
-                died = true;
-              }
-            }
-
-            // Bounce ray and kill if nothing hit.
-            intersection isect;
-            geomptr g = intersect(r, objs, &isect);
-
-            if (g) {
-              r = g->mat->propagate(r, isect, rowRng);
-              sampColor = r.color;
+          // Do Russian Roulette if this ray is "old".
+          if (depth > MAX_DEPTH) {
+            r.kill();
+            break;
+          } else if (depth > RUSSIAN_ROULETTE_DEPTH || r.isBlack()) {
+            float rv = realDist(rowRng);
+            float probLive = math::clamp(r.energy());
+            if (rv < probLive) {
+              // The ray lives (more energy = more likely to live).
+              // Increase its energy to balance out probabilities.
+              r.color = r.color / probLive;
             } else {
-              died = true;
+              // The ray dies.
+              r.kill();
+              break;
             }
           }
 
-          // Black if ray died; fill in color otherwise.
-          if (!died) {
-            pxColor += dvec(sampColor.x, sampColor.y, sampColor.z);
+          // Bounce ray and kill if nothing hit.
+          intersection isect;
+          geomptr g = intersect(r, objs, &isect);
+
+          if (g) {
+            r = g->mat->propagate(r, isect, rowRng);
+          } else {
+            r.kill();
+            break;
           }
         }
+
+        // Black if ray died; fill in color otherwise.
+        pxColor += dvec(r.color.x, r.color.y, r.color.z);
       }
 
-      pxColor *= 0.25;
+      pxColor *= PIXELS_PER_SAMPLE;
+
       dvec &p = data[y][x];
       if (iters == 1) {
         p = pxColor;
       } else {
         p = p * oldFrac + pxColor * newFrac;
       }
-    }
-    //});
+    //}
+    });
   }
 
   math::copyData(w, h, data, exrData);

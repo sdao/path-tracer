@@ -27,14 +27,13 @@ intersection sphere::intersect(const ray& r) const {
     // Quadratic has at most 2 results.
     float resPos = (-b + discriminant);
     float resNeg = (-b - discriminant);
-    float epsilon = std::numeric_limits<float>::epsilon();
 
     // Neg before pos because we want to return closest isect first.
-    if (resNeg > epsilon) {
+    if (math::isPositive(resNeg)) {
       vec pt = r.unit().at(resNeg);
       vec normal = glm::normalize(pt - origin);
       return intersection(pt, normal, resNeg);
-    } else if (resPos > epsilon) {
+    } else if (math::isPositive(resPos)) {
       vec pt = r.unit().at(resPos);
       vec normal = glm::normalize(pt - origin);
       return intersection(pt, normal, resPos);
