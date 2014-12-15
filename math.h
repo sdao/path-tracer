@@ -53,11 +53,11 @@ namespace math {
     return fabsf(x) < std::numeric_limits<float>::epsilon();
   }
 
-  inline bool isNearlyZero(vec v) {
+  inline bool isNearlyZero(const vec& v) {
     return isNearlyZero(glm::length2(v));
   }
 
-  inline bool isExactlyZero(vec v) {
+  inline bool isExactlyZero(const vec& v) {
     return v.x == 0.0f && v.y == 0.0f && v.z == 0.0f;
   }
 
@@ -74,8 +74,8 @@ struct ray {
   ray(vec o, vec d) : origin(o), direction(d) {}
   ray() : origin(0.0), direction(0.0) {}
 
-  ray unit() const { return ray(origin, glm::normalize(direction)); }
-  vec at(float d) const { return origin + direction * d; }
+  inline ray unit() const { return ray(origin, glm::normalize(direction)); }
+  inline vec at(float d) const { return origin + direction * d; }
 };
 
 struct lightray : public ray {
@@ -85,19 +85,19 @@ struct lightray : public ray {
   lightray(vec o, vec d) : ray(o, d), color(1) {}
   lightray() : ray(vec(0), vec(0)), color(1) {}
 
-  bool isBlack() const {
+  inline bool isBlack() const {
     return math::isNearlyZero(color);
   }
 
-  float energy() const {
+  inline float energy() const {
     return std::max(std::max(color.x, color.y), color.z);
   }
 
-  bool isZeroLength() const {
+  inline bool isZeroLength() const {
     return math::isNearlyZero(direction);
   }
 
-  void kill() {
+  inline void kill() {
     origin = vec(0);
     direction = vec(0);
     color = vec(0);
@@ -114,16 +114,15 @@ struct intersection {
   intersection()
     : position(0), normal(0), tangent(0), cotangent(0), distance(0.0f) {}
   intersection(vec p, vec n, float d)
-    : position(p), normal(glm::normalize(n)), tangent(0), cotangent(0),
-      distance(d) {}
+    : position(p), normal(n), tangent(0), cotangent(0), distance(d) {}
   intersection(vec p, vec n, vec tang, vec cotang, float d)
     : position(p),
-      normal(glm::normalize(n)),
-      tangent(glm::normalize(tang)),
-      cotangent(glm::normalize(cotang)),
+      normal(n),
+      tangent(tang),
+      cotangent(cotang),
       distance(d) {}
 
-  bool hit() const { return distance > 0.0f; }
+  inline bool hit() const { return distance > 0.0f; }
 
   /**
    * Generates a random ray in the hemisphere of normal by using a Gaussian
@@ -134,7 +133,7 @@ struct intersection {
    * computed and we will compute it and the cotangent.
    * Otherwise, we trust that the tangent and cotangent are correct.
    */
-  vec uniformSampleHemisphere(randomness& rng) {
+  inline vec uniformSampleHemisphere(randomness& rng) {
     if (math::isExactlyZero(tangent)) {
       math::coordSystem(normal, &tangent, &cotangent);
     }
