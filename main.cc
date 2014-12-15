@@ -15,7 +15,7 @@ void render(int w, int h) {
 
   std::vector<geomptr> objs;
   objs.push_back(std::make_shared<sphere>(vec(-8, -10, -36), 8.0f, spec));
-  objs.push_back(std::make_shared<sphere>(vec(8, -10, -24), 8.0f, fresnel));
+  objs.push_back(std::make_shared<sphere>(vec(10, -10, -24), 8.0f, fresnel));
   objs.push_back(std::make_shared<plane>(vec(0, -18, 0), vec(0, 1, 0), white)); // bottom
   objs.push_back(std::make_shared<plane>(vec(0, 18, 0), vec(0, -1, 0), white)); // top
   objs.push_back(std::make_shared<plane>(vec(0, 0, -50), vec(0, 0, 1), white)); // back
