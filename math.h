@@ -32,19 +32,19 @@ namespace math {
   }
 
   inline void copyData(
-    int w,
-    int h,
-    const std::vector<std::vector<dvec>>& data,
+    size_t w,
+    size_t h,
+    const std::vector< std::vector<dvec> >& data,
     Imf::Array2D<Imf::Rgba>& exrData
   ) {
-    for (int y = 0; y < h; ++y) {
-      for (int x = 0; x < w; ++x) {
-        Imf::Rgba& rgba = exrData[y][x];
+    for (size_t y = 0; y < h; ++y) {
+      for (size_t x = 0; x < w; ++x) {
+        Imf::Rgba& rgba = exrData[long(y)][long(x)];
         const dvec &p = data[y][x];
-        rgba.r = p.x;
-        rgba.g = p.y;
-        rgba.b = p.z;
-        rgba.a = 1.0;
+        rgba.r = float(p.x);
+        rgba.g = float(p.y);
+        rgba.b = float(p.z);
+        rgba.a = 1.0f;
       }
     }
   }
@@ -142,7 +142,7 @@ struct intersection {
     float x2 = rng.nextNormalFloat();
     float x3 = rng.nextNormalFloat();
 
-    float denom = 1.0f / sqrt(x1 * x1 + x2 * x2 + x3 * x3);
+    float denom = 1.0f / sqrtf(x1 * x1 + x2 * x2 + x3 * x3);
     float y1 = fabsf(x1 * denom);
     float y2 = x2 * denom;
     float y3 = x3 * denom;

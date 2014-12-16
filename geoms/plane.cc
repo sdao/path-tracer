@@ -2,18 +2,18 @@
 #include <memory>
 
 geoms::plane::plane(vec o, vec n, materialptr m)
-  : origin(o), normal(glm::normalize(n)), geom(m)
+  : geom(m), origin(o), normal(glm::normalize(n))
 {
   computeTangents();
 }
 
 geoms::plane::plane(vec o, vec n)
-  : origin(o), normal(glm::normalize(n)), geom()
+  : geom(), origin(o), normal(glm::normalize(n))
 {
   computeTangents();
 }
 
-geoms::plane::plane() : origin(0.0), normal(0.0, 1.0, 0.0) {
+geoms::plane::plane() : geom(), origin(0.0), normal(0.0, 1.0, 0.0) {
   computeTangents();
 }
 

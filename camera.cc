@@ -7,14 +7,14 @@
 #define SAMPLES_PER_PIXEL 4
 #define PIXELS_PER_SAMPLE 0.25f
 
-camera::camera(ray e, int ww, int hh, float ff = M_PI / 4.0f)
+camera::camera(ray e, size_t ww, size_t hh, float ff)
   : eye(e.unit()), w(ww), h(hh), fovx2(0.5f * ff),
-    iters(0), data(h), exrData(hh, ww), masterRng(time(0))
+    masterRng(unsigned(time(0))), data(h), exrData(long(hh), long(ww)), iters(0)
 {
   // Size of the image plane projected into world space
   // using the given fovx and cam focal length.
   float scale_right = 2.0f * glm::length(eye.direction) * tanf(fovx2);
-  float scale_up = scale_right * ((float)h / float(w));
+  float scale_up = scale_right * (float(h) / float(w));
 
   // Corresponding vectors.
   up = -vec(0, 1, 0) * scale_up; // Flip the y-axis for image output!
@@ -24,9 +24,9 @@ camera::camera(ray e, int ww, int hh, float ff = M_PI / 4.0f)
   corner_ray = eye.direction - (0.5f * up) - (0.5f * right);
 
   // Prepare raw output data array.
-  for (int y = 0; y < h; ++y) {
+  for (size_t y = 0; y < h; ++y) {
     data[y] = std::vector<dvec>(w);
-    for (int x = 0; x < w; ++x) {
+    for (size_t x = 0; x < w; ++x) {
       data[y][x] = dvec(0);
     }
   }
@@ -40,7 +40,7 @@ geomptr camera::intersect(
   intersection winner_isect;
   geomptr winner;
 
-  for (int i = 0; i < objs.size(); i++) {
+  for (size_t i = 0; i < objs.size(); i++) {
     intersection isect = objs[i]->intersect(r);
     if (isect.hit()
       && (!winner_isect.hit() || isect.distance < winner_isect.distance)) {
@@ -61,27 +61,28 @@ void camera::renderOnce(const std::vector<geomptr>& objs, std::string name) {
   std::cout << "Iteration " << iters << "\n";
 
   double newFrac = 1.0 / double(iters);
-  double oldFrac = (double)(iters - 1.0) * newFrac;
+  double oldFrac = double(iters - 1.0) * newFrac;
+
+  std::vector<unsigned> rowSeeds(h);
+  for (size_t y = 0; y < h; ++y) {
+    rowSeeds[y] = masterRng.nextUnsigned();
+  }
 
   tbb::parallel_for(size_t(0), size_t(h), [&](size_t y) {
   //for (int y = 0; y < h; ++y) {
-    int seed; // Grab a seed for our per-row RNG.
-    {
-      // Lock access to master RNG.
-      tbb::mutex::scoped_lock lock(masterRngMutex);
-      seed = masterRng.nextInt();
-    }
-    randomness rng(seed);
+    randomness rng(rowSeeds[y]);
 
-    for (int x = 0; x < w; ++x) {
+    for (size_t x = 0; x < w; ++x) {
       dvec pxColor;
-      for (int samps = 0; samps < SAMPLES_PER_PIXEL; ++samps) {
-        float frac_y = (y - 0.5f + rng.nextUnitFloat()) / (h - 1.0f);
-        float frac_x = (x - 0.5f + rng.nextUnitFloat()) / (w - 1.0f);
+      for (unsigned samps = 0; samps < SAMPLES_PER_PIXEL; ++samps) {
+        float frac_y =
+          (float(y) - 0.5f + rng.nextUnitFloat()) / (float(h) - 1.0f);
+        float frac_x =
+          (float(x) - 0.5f + rng.nextUnitFloat()) / (float(w) - 1.0f);
 
         lightray r(eye.origin, corner_ray + (up * frac_y) + (right * frac_x));
 
-        int depth = 0;
+        unsigned depth = 0;
         while (!r.isZeroLength()) {
           depth++;
 
@@ -132,9 +133,9 @@ void camera::renderOnce(const std::vector<geomptr>& objs, std::string name) {
   });
 
   math::copyData(w, h, data, exrData);
-  Imf::RgbaOutputFile file(name.c_str(), w, h, Imf::WRITE_RGBA);
+  Imf::RgbaOutputFile file(name.c_str(), int(w), int(h), Imf::WRITE_RGBA);
   file.setFrameBuffer(&exrData[0][0], 1, w);
-  file.writePixels(h);
+  file.writePixels(int(h));
 }
 
 void camera::renderInfinite(const std::vector<geomptr>& objs,
@@ -143,4 +144,6 @@ void camera::renderInfinite(const std::vector<geomptr>& objs,
   while (true) {
     renderOnce(objs, name);
   }
+
+  /* Will not return. */
 }

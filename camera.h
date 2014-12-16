@@ -8,20 +8,20 @@
 
 class camera {
   ray eye;
-  int w;
-  int h;
+  size_t w;
+  size_t h;
   float fovx2;
 
   vec up;
   vec right;
   vec corner_ray;
 
-  tbb::mutex masterRngMutex;
   randomness masterRng;
 
-  int iters;
-  std::vector<std::vector<dvec>> data;
+  std::vector< std::vector<dvec> > data;
   Imf::Array2D<Imf::Rgba> exrData;
+
+  int iters;
 
   geomptr intersect(
     const ray& r,
@@ -30,7 +30,10 @@ class camera {
   ) const;
 
 public:
-  camera(ray e, int ww, int hh, float ff);
+  camera(ray e, size_t ww, size_t hh, float ff = float(M_PI / 4.0));
   void renderOnce(const std::vector<geomptr>& objs, std::string name);
-  void renderInfinite(const std::vector<geomptr>& objs, std::string name);
+  [[noreturn]] void renderInfinite(
+    const std::vector<geomptr>& objs,
+    std::string name
+  );
 };

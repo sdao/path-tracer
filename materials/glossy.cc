@@ -1,7 +1,7 @@
 #include "glossy.h"
 #include <memory>
 
-materials::glossy::glossy(float g) : glossiness(g), material() {}
+materials::glossy::glossy(float g) : material(), glossiness(g) {}
 
 lightray materials::glossy::propagate(
   const lightray& incoming,

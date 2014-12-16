@@ -6,7 +6,7 @@ materials::specular::specular() : material() {}
 lightray materials::specular::propagate(
   const lightray& incoming,
   intersection& isect,
-  randomness& rng
+  randomness& /* rng */
 ) const {
   vec reflectVector = glm::reflect(incoming.unit().direction, isect.normal);
   return lightray(

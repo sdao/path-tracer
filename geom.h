@@ -5,13 +5,13 @@
 
 class geom {
 protected:
-  geom() : mat() {}
-  geom(materialptr m) : mat(m) {}
+  geom();
+  geom(materialptr m);
 
 public:
   materialptr mat;
 
-  virtual ~geom() {}
+  virtual ~geom();
   virtual intersection intersect(const ray& r) const = 0;
 };
 

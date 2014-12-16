@@ -1,7 +1,15 @@
 #include "fresnel.h"
 #include <memory>
 
-materials::fresnel::fresnel(float ior) : material(), idxRefract(ior) {}
+#define IOR_VACUUM 1.0f
+
+materials::fresnel::fresnel(float ior)
+  : material(), etaEntering(IOR_VACUUM / ior), etaExiting(ior / IOR_VACUUM) {
+  // Pre-compute values for Fresnel calculations.
+
+  float r0_temp = (IOR_VACUUM - ior) / (IOR_VACUUM + ior);
+  r0 = r0_temp * r0_temp;
+}
 
 lightray materials::fresnel::propagate(
   const lightray& incoming,
@@ -10,20 +18,19 @@ lightray materials::fresnel::propagate(
 ) const {
   // Entering = are normal and ray in opposite directions?
   bool entering = glm::dot(isect.normal, incoming.direction) < 0;
-  vec alignedNormal;
-  float nIncident, nTransmit; // Indices of refraction.
+
+  vec alignedNormal; // Normal flipped based on ray direction.
+  float eta; // Ratio of indices of refraction.
   if (entering) {
     // Note: geometry will return surface normal pointing outwards.
     // If we are entering, this is the right normal.
     // If we are exiting, since geometry is single-shelled, we will need
     // to flip the normal.
     alignedNormal = isect.normal;
-    nIncident = IOR_VACUUM;
-    nTransmit = idxRefract;
+    eta = etaEntering;
   } else {
     alignedNormal = -isect.normal;
-    nIncident = idxRefract;
-    nTransmit = IOR_VACUUM;
+    eta = etaExiting;
   }
 
   // Calculate reflection vector using GLM.
@@ -36,7 +43,7 @@ lightray materials::fresnel::propagate(
   vec refractVector = glm::refract(
     incoming.unit().direction,
     alignedNormal,
-    nIncident / nTransmit
+    eta
   );
   if (math::isNearlyZero(glm::length(refractVector))) {
     // Total internal reflection. Must reflect.
@@ -50,10 +57,9 @@ lightray materials::fresnel::propagate(
   // Calculates Fresnel reflectance factor using Schlick's approximation.
   // See <http://graphics.stanford.edu/
   // courses/cs148-10-summer/docs/2006--degreve--reflection_refraction.pdf>.
-  float r0_temp = (nIncident - nTransmit) / (nIncident + nTransmit);
-  float r0 = r0_temp * r0_temp;
   float cosTemp;
-  if (nIncident < nTransmit) {
+  if (eta < 1.0f) {
+    // Equivalent to nIncident < nTransmit.
     // Equivalent to condition: entering == true
     // (e.g. nI = 1 (air), nT = 1.5 (glass))
     // Theta = angle of incidence.

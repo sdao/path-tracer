@@ -2,12 +2,12 @@
 #include <memory>
 
 geoms::sphere::sphere(vec o, float r, materialptr m)
-  : origin(o), radius(r), geom(m) {}
+  : geom(m), origin(o), radius(r) {}
 
 geoms::sphere::sphere(vec o, float r)
-  : origin(o), radius(r), geom() {}
+  : geom(), origin(o), radius(r) {}
 
-geoms::sphere::sphere() : origin(0.0), radius(1.0f) {}
+geoms::sphere::sphere() : geom(), origin(0.0), radius(1.0f) {}
 
 intersection geoms::sphere::intersect(const ray& r) const {
   vec diff = r.origin - origin;
@@ -19,10 +19,10 @@ intersection geoms::sphere::intersect(const ray& r) const {
   float b = glm::dot(l, diff);
   float c = glm::dot(diff, diff) - (radius * radius);
 
-  double discriminant = (b * b) - (a * c);
+  float discriminant = (b * b) - (a * c);
 
   if (discriminant > 0.0f) {
-    discriminant = sqrt(discriminant);
+    discriminant = sqrtf(discriminant);
     // Quadratic has at most 2 results.
     float resPos = (-b + discriminant);
     float resNeg = (-b - discriminant);

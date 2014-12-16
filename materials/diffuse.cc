@@ -1,7 +1,7 @@
 #include "diffuse.h"
 #include <memory>
 
-materials::diffuse::diffuse(vec c) : color(c), material(c) {}
+materials::diffuse::diffuse(vec c) : material(), color(c) {}
 
 lightray materials::diffuse::propagate(
   const lightray& incoming,

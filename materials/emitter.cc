@@ -1,12 +1,12 @@
 #include "emitter.h"
 #include <memory>
 
-materials::emitter::emitter(vec c) : color(c), material(c) {}
+materials::emitter::emitter(vec c) : material(), color(c) {}
 
 lightray materials::emitter::propagate(
   const lightray& incoming,
-  intersection& isect,
-  randomness& rng
+  intersection& /* isect */,
+  randomness& /* rng */
 ) const {
   return lightray(vec(0), vec(0), incoming.color * color);
 }

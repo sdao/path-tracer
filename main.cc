@@ -4,7 +4,9 @@
 #include "geoms/all.h"
 #include "camera.h"
 
-void render(int w, int h) {
+[[noreturn]] void render(size_t w, size_t h);
+
+void render(size_t w, size_t h) {
   materialptr green = materials::diffuse::make(vec(0.5, 0.9, 0.4));
   materialptr white = materials::diffuse::make(vec(1, 1, 1));
   materialptr blue = materials::diffuse::make(vec(0.5, 0.6, 1));
@@ -22,15 +24,14 @@ void render(int w, int h) {
   objs.push_back(geoms::plane::make(vec(20, 0, 0), vec(-1, 0, 0), green)); // right
   objs.push_back(geoms::sphere::make(vec(0, 46, -25), 30.0f, emit)); // light
 
-  camera cam(ray(vec(0, 0, 50), vec(0, 0, -100)), w, h, M_PI / 4.0f);
+  camera cam(ray(vec(0, 0, 50), vec(0, 0, -100)), w, h, float(M_PI / 4.0));
   cam.renderInfinite(objs, "/Users/Steve/Desktop/sample.exr");
+
+  /* Will not return. */
 }
 
 int main() {
-  int w = 512;
-  int h = 384;
-
   render(512, 384);
 
-  return 0;
+  /* Will not return. */
 }

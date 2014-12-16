@@ -1,12 +1,14 @@
 SOURCES = *.cc materials/*.cc geoms/*.cc
+LIBS = -lIlmImf -lHalf -ltbb
+WARN = -Werror -Weverything -Wno-c++98-compat -Wno-padded
 
 path-tracer: $(SOURCES)
 	mkdir -p bin
-	g++ $(SOURCES) -lIlmImf -lHalf -ltbb -std=c++11 -O3 -o bin/path-tracer
+	g++ $(SOURCES) $(LIBS) -std=c++11 -O3 $(WARN) -o bin/path-tracer
 
 debug: $(SOURCES)
 	mkdir -p bin
-	g++ $(SOURCES) -lIlmImf -lHalf -ltbb -std=c++11 -g -o bin/path-tracer
+	g++ $(SOURCES) $(LIBS) -std=c++11 -g $(WARN) -o bin/path-tracer
 
 clean:
 	rm -r bin
