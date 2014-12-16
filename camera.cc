@@ -74,7 +74,7 @@ void camera::renderOnce(const std::vector<geomptr>& objs, std::string name) {
 
     for (size_t x = 0; x < w; ++x) {
       dvec pxColor;
-      for (unsigned samps = 0; samps < SAMPLES_PER_PIXEL; ++samps) {
+      for (int samps = 0; samps < SAMPLES_PER_PIXEL; ++samps) {
         float frac_y =
           (float(y) - 0.5f + rng.nextUnitFloat()) / (float(h) - 1.0f);
         float frac_x =
@@ -85,7 +85,7 @@ void camera::renderOnce(const std::vector<geomptr>& objs, std::string name) {
           glm::normalize(corner_ray + (up * frac_y) + (right * frac_x))
         );
 
-        unsigned depth = 0;
+        int depth = 0;
         while (!r.isZeroLength()) {
           depth++;
 
