@@ -24,7 +24,7 @@ void render(size_t w, size_t h) {
   objs.push_back(geoms::plane::make(vec(20, 0, 0), vec(-1, 0, 0), green)); // right
   objs.push_back(geoms::sphere::make(vec(0, 46, -25), 30.0f, emit)); // light
 
-  camera cam(ray(vec(0, 0, 50), vec(0, 0, -100)), w, h, float(M_PI / 4.0));
+  camera cam(ray(vec(0, 0, 50), vec(0, 0, -1)), w, h, float(M_PI_4));
   cam.renderInfinite(objs, "/Users/Steve/Desktop/sample.exr");
 
   /* Will not return. */

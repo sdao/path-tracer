@@ -17,6 +17,7 @@ class camera {
   vec corner_ray;
 
   randomness masterRng;
+  std::vector<unsigned> rowSeeds;
 
   std::vector< std::vector<dvec> > data;
   Imf::Array2D<Imf::Rgba> exrData;
@@ -30,7 +31,7 @@ class camera {
   ) const;
 
 public:
-  camera(ray e, size_t ww, size_t hh, float ff = float(M_PI / 4.0));
+  camera(ray e, size_t ww, size_t hh, float ff = float(M_PI_4));
   void renderOnce(const std::vector<geomptr>& objs, std::string name);
   [[noreturn]] void renderInfinite(
     const std::vector<geomptr>& objs,

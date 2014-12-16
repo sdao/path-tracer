@@ -72,9 +72,8 @@ struct ray {
   vec direction;
 
   ray(vec o, vec d) : origin(o), direction(d) {}
-  ray() : origin(0.0), direction(0.0) {}
+  ray() : origin(0), direction(0) {}
 
-  inline ray unit() const { return ray(origin, glm::normalize(direction)); }
   inline vec at(float d) const { return origin + direction * d; }
 };
 
@@ -83,7 +82,7 @@ struct lightray : public ray {
 
   lightray(vec o, vec d, vec c) : ray(o, d), color(c) {}
   lightray(vec o, vec d) : ray(o, d), color(1) {}
-  lightray() : ray(vec(0), vec(0)), color(1) {}
+  lightray() : ray(), color(1) {}
 
   inline bool isBlack() const {
     return math::isNearlyZero(color);
@@ -125,9 +124,9 @@ struct intersection {
   inline bool hit() const { return distance > 0.0f; }
 
   /**
-   * Generates a random ray in the hemisphere of normal by using a Gaussian
-   * distribution.
-   * See <http://mathworld.wolfram.com/SpherePointPicking.html>.
+   * Generates a random ray in the hemisphere of the normal.
+   * See <http://femto.cs.illinois.edu/faqs/cga-faq.html#S6.08>,
+   * specifically question 6.08 of the comp.graphics.algorithms FAQ.
    *
    * If the tangent is exactly zero-length, we assume that it has not been
    * computed and we will compute it and the cotangent.
@@ -138,15 +137,41 @@ struct intersection {
       math::coordSystem(normal, &tangent, &cotangent);
     }
 
-    float x1 = rng.nextNormalFloat();
-    float x2 = rng.nextNormalFloat();
-    float x3 = rng.nextNormalFloat();
+    float z = rng.nextFloat(1.0f);
+    float t = rng.nextFloat(float(M_PI * 2.0));
+    float r = sqrtf(1.0f - (z * z));
+    float x = r * cosf(t);
+    float y = r * sinf(t);
 
-    float denom = 1.0f / sqrtf(x1 * x1 + x2 * x2 + x3 * x3);
-    float y1 = fabsf(x1 * denom);
-    float y2 = x2 * denom;
-    float y3 = x3 * denom;
+    return (z * normal) + (x * tangent) + (y * cotangent);
+  }
 
-    return (y1 * normal) + (y2 * tangent) + (y3 * cotangent);
+  /**
+   * Half-angle must be between 0 and Pi/2.
+   *
+   * Handy Mathematica code for checking that this works:
+   * R[a_] := (h = Cos[Pi/2];
+   *   z = RandomReal[{h, 1}];
+   *   t = RandomReal[{0, 2*Pi}];
+   *   r = Sqrt[1 - z^2];
+   *   x = r*Cos[t];
+   *   y = r*Sin[t];
+   *   {x, y, z})
+   *
+   * ListPointPlot3D[Map[R, Range[1000]], BoxRatios -> Automatic]
+   */
+  inline vec uniformSampleCone(randomness& rng, float halfAngle) {
+    if (math::isExactlyZero(tangent)) {
+      math::coordSystem(normal, &tangent, &cotangent);
+    }
+
+    float h = cosf(halfAngle);
+    float z = rng.nextFloat(h, 1.0f);
+    float t = rng.nextFloat(float(M_PI * 2.0));
+    float r = sqrtf(1.0f - (z * z));
+    float x = r * cosf(t);
+    float y = r * sinf(t);
+
+    return (z * normal) + (x * tangent) + (y * cotangent);
   }
 };

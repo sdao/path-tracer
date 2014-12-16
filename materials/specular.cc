@@ -8,7 +8,8 @@ lightray materials::specular::propagate(
   intersection& isect,
   randomness& /* rng */
 ) const {
-  vec reflectVector = glm::reflect(incoming.unit().direction, isect.normal);
+  vec reflectVector = glm::reflect(incoming.direction, isect.normal);
+  
   return lightray(
     isect.position + reflectVector * 0.01f,
     reflectVector,

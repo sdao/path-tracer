@@ -25,12 +25,12 @@ intersection geoms::plane::intersect(const ray& r) const {
   // See Wikipedia:
   // <http://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection>
 
-  float denom = glm::dot(r.unit().direction, normal);
+  float denom = glm::dot(r.direction, normal);
   if (denom != 0.0f) {
     float d = glm::dot(origin - r.origin, normal) / denom;
 
     if (math::isPositive(d)) {
-      return intersection(r.unit().at(d), normal, tangent, cotangent, d);
+      return intersection(r.at(d), normal, tangent, cotangent, d);
     }
   }
 

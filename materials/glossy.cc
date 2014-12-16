@@ -8,11 +8,11 @@ lightray materials::glossy::propagate(
   intersection& isect,
   randomness& rng
 ) const {
-  vec reflectVector = isect.uniformSampleHemisphere(rng);
+  vec reflectVector = isect.uniformSampleCone(rng, glossiness * float(M_PI_2));
 
   return lightray(
     isect.position + reflectVector * 0.01f,
-    glossiness * reflectVector + (1.0f - glossiness) * isect.normal,
+    reflectVector,
     incoming.color
   );
 }

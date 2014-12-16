@@ -8,8 +8,9 @@
 #define PIXELS_PER_SAMPLE 0.25f
 
 camera::camera(ray e, size_t ww, size_t hh, float ff)
-  : eye(e.unit()), w(ww), h(hh), fovx2(0.5f * ff),
-    masterRng(unsigned(time(0))), data(h), exrData(long(hh), long(ww)), iters(0)
+  : eye(e), w(ww), h(hh), fovx2(0.5f * ff),
+    masterRng(unsigned(time(0))), rowSeeds(hh),
+    data(hh), exrData(long(hh), long(ww)), iters(0)
 {
   // Size of the image plane projected into world space
   // using the given fovx and cam focal length.
@@ -40,12 +41,12 @@ geomptr camera::intersect(
   intersection winner_isect;
   geomptr winner;
 
-  for (size_t i = 0; i < objs.size(); i++) {
-    intersection isect = objs[i]->intersect(r);
+  for (auto& obj : objs) {
+    intersection isect = obj->intersect(r);
     if (isect.hit()
       && (!winner_isect.hit() || isect.distance < winner_isect.distance)) {
       winner_isect = isect;
-      winner = objs[i];
+      winner = obj;
     }
   }
 
@@ -63,13 +64,12 @@ void camera::renderOnce(const std::vector<geomptr>& objs, std::string name) {
   double newFrac = 1.0 / double(iters);
   double oldFrac = double(iters - 1.0) * newFrac;
 
-  std::vector<unsigned> rowSeeds(h);
   for (size_t y = 0; y < h; ++y) {
     rowSeeds[y] = masterRng.nextUnsigned();
   }
 
-  tbb::parallel_for(size_t(0), size_t(h), [&](size_t y) {
-  //for (int y = 0; y < h; ++y) {
+  //tbb::parallel_for(size_t(0), size_t(h), [&](size_t y) {
+  for (size_t y = 0; y < h; ++y) {
     randomness rng(rowSeeds[y]);
 
     for (size_t x = 0; x < w; ++x) {
@@ -80,7 +80,10 @@ void camera::renderOnce(const std::vector<geomptr>& objs, std::string name) {
         float frac_x =
           (float(x) - 0.5f + rng.nextUnitFloat()) / (float(w) - 1.0f);
 
-        lightray r(eye.origin, corner_ray + (up * frac_y) + (right * frac_x));
+        lightray r(
+          eye.origin,
+          glm::normalize(corner_ray + (up * frac_y) + (right * frac_x))
+        );
 
         unsigned depth = 0;
         while (!r.isZeroLength()) {
@@ -129,8 +132,8 @@ void camera::renderOnce(const std::vector<geomptr>& objs, std::string name) {
         p = p * oldFrac + pxColor * newFrac;
       }
     } // end of x-for loop
-  //} // end of y-for loop
-  });
+  } // end of y-for loop
+  //});
 
   math::copyData(w, h, data, exrData);
   Imf::RgbaOutputFile file(name.c_str(), int(w), int(h), Imf::WRITE_RGBA);

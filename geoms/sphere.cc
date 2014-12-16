@@ -11,7 +11,7 @@ geoms::sphere::sphere() : geom(), origin(0.0), radius(1.0f) {}
 
 intersection geoms::sphere::intersect(const ray& r) const {
   vec diff = r.origin - origin;
-  vec l = r.unit().direction;
+  vec l = r.direction;
 
   // See Wikipedia:
   // <http://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection>
@@ -29,11 +29,11 @@ intersection geoms::sphere::intersect(const ray& r) const {
 
     // Neg before pos because we want to return closest isect first.
     if (math::isPositive(resNeg)) {
-      vec pt = r.unit().at(resNeg);
+      vec pt = r.at(resNeg);
       vec normal = glm::normalize(pt - origin);
       return intersection(pt, normal, resNeg);
     } else if (math::isPositive(resPos)) {
-      vec pt = r.unit().at(resPos);
+      vec pt = r.at(resPos);
       vec normal = glm::normalize(pt - origin);
       return intersection(pt, normal, resPos);
     }

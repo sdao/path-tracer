@@ -8,7 +8,7 @@ path-tracer: $(SOURCES)
 
 debug: $(SOURCES)
 	mkdir -p bin
-	g++ $(SOURCES) $(LIBS) -std=c++11 -g $(WARN) -o bin/path-tracer
+	g++ $(SOURCES) $(LIBS) -std=c++11 -O0 -g $(WARN) -o bin/path-tracer
 
 clean:
 	rm -r bin

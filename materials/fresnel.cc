@@ -35,16 +35,17 @@ lightray materials::fresnel::propagate(
 
   // Calculate reflection vector using GLM.
   vec reflectVector = glm::reflect(
-    incoming.unit().direction,
+    incoming.direction,
     alignedNormal
   );
 
   // Calculate refraction vector using GLM.
   vec refractVector = glm::refract(
-    incoming.unit().direction,
+    incoming.direction,
     alignedNormal,
     eta
   );
+
   if (math::isNearlyZero(glm::length(refractVector))) {
     // Total internal reflection. Must reflect.
     return lightray(
@@ -63,7 +64,7 @@ lightray materials::fresnel::propagate(
     // Equivalent to condition: entering == true
     // (e.g. nI = 1 (air), nT = 1.5 (glass))
     // Theta = angle of incidence.
-    cosTemp = 1.0f - glm::dot(-incoming.unit().direction, alignedNormal);
+    cosTemp = 1.0f - glm::dot(-incoming.direction, alignedNormal);
   } else {
     // Equivalent to condition: entering == false
     // Theta = angle of refraction.
