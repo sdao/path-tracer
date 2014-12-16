@@ -103,6 +103,23 @@ struct lightray : public ray {
   }
 };
 
+struct bbox {
+  vec min;
+  vec max;
+
+  bbox() : min(0), max(0) {}
+
+  bbox(vec a, vec b) {
+    min = vec(std::min(a.x, b.x), std::min(a.y, b.y), std::min(a.z, b.z));
+    max = vec(std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z));
+  }
+
+  void expand(vec v) {
+    min = vec(std::min(min.x, v.x), std::min(min.y, v.y), std::min(min.z, v.z));
+    max = vec(std::max(max.x, v.x), std::max(max.y, v.y), std::max(max.z, v.z));
+  }
+};
+
 struct intersection {
   vec position;
   vec normal;

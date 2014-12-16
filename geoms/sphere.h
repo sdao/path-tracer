@@ -4,19 +4,17 @@
 namespace geoms {
 
   class sphere : public geom {
+    void finishConstructing();
+
   public:
     const vec origin;
     const float radius;
 
-    sphere(vec o, float r, materialptr m);
-    sphere(vec o, float r);
-    sphere();
+    sphere(materialptr m, vec o = vec(0), float r = 1.0f);
 
     virtual intersection intersect(const ray& r) const;
 
-    static geomptr make(vec o, float r, materialptr m);
-    static geomptr make(vec o, float r);
-    static geomptr make();
+    static geomptr make(materialptr m, vec o = vec(0), float r = 1.0f);
   };
 
 }

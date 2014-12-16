@@ -5,11 +5,11 @@
 
 class geom {
 protected:
-  geom();
-  geom(materialptr m);
+  geom(materialptr m, bbox b = bbox());
 
 public:
   materialptr mat;
+  bbox bounds;
 
   virtual ~geom();
   virtual intersection intersect(const ray& r) const = 0;

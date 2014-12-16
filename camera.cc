@@ -8,7 +8,8 @@
 #define PIXELS_PER_SAMPLE 0.25f
 
 camera::camera(ray e, size_t ww, size_t hh, float ff)
-  : eye(e), w(ww), h(hh), fovx2(0.5f * ff),
+  : eye(ray(e.origin, glm::normalize(e.direction))),
+    w(ww), h(hh), fovx2(0.5f * ff),
     masterRng(unsigned(time(0))), rowSeeds(hh),
     data(hh), exrData(long(hh), long(ww)), iters(0)
 {

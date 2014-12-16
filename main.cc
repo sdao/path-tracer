@@ -15,14 +15,37 @@ void render(size_t w, size_t h) {
   materialptr spec = materials::glossy::make(0.25f);
 
   std::vector<geomptr> objs;
-  objs.push_back(geoms::sphere::make(vec(-8, -10, -36), 8.0f, spec));
-  objs.push_back(geoms::sphere::make(vec(10, -10, -24), 8.0f, fresnel));
-  objs.push_back(geoms::plane::make(vec(0, -18, 0), vec(0, 1, 0), white)); // bottom
-  objs.push_back(geoms::plane::make(vec(0, 18, 0), vec(0, -1, 0), white)); // top
-  objs.push_back(geoms::plane::make(vec(0, 0, -50), vec(0, 0, 1), white)); // back
-  objs.push_back(geoms::plane::make(vec(-20, 0, 0), vec(1, 0, 0), blue)); // left
-  objs.push_back(geoms::plane::make(vec(20, 0, 0), vec(-1, 0, 0), green)); // right
-  objs.push_back(geoms::sphere::make(vec(0, 46, -25), 30.0f, emit)); // light
+  // spheres
+  objs.push_back(
+    geoms::sphere::make(spec, vec(-8, -10, -36), 8.0f)
+  );
+  objs.push_back(
+    geoms::sphere::make(fresnel, vec(10, -10, -24), 8.0f)
+  );
+  // bottom
+  objs.push_back(
+    geoms::disc::make(white, vec(0, -18, -25), vec(0, 1, 0), 100.0f)
+  );
+  // top
+  objs.push_back(
+    geoms::disc::make(white, vec(0, 18, -25), vec(0, -1, 0), 100.0f)
+  );
+  // back
+  objs.push_back(
+    geoms::disc::make(white, vec(0, 0, -50), vec(0, 0, 1), 100.0f)
+  );
+  // left
+  objs.push_back(
+    geoms::disc::make(blue, vec(-20, 0, -25), vec(1, 0, 0), 100.0f)
+  );
+  // right
+  objs.push_back(
+    geoms::disc::make(green, vec(20, 0, -25), vec(-1, 0, 0), 100.0f)
+  );
+  // light
+  objs.push_back(
+    geoms::sphere::make(emit, vec(0, 46, -25), 30.0f)
+  );
 
   camera cam(ray(vec(0, 0, 50), vec(0, 0, -1)), w, h, float(M_PI_4));
   cam.renderInfinite(objs, "/Users/Steve/Desktop/sample.exr");

@@ -1,13 +1,16 @@
 #include "sphere.h"
 #include <memory>
 
-geoms::sphere::sphere(vec o, float r, materialptr m)
-  : geom(m), origin(o), radius(r) {}
+geoms::sphere::sphere(materialptr m, vec o, float r)
+  : geom(m), origin(o), radius(r)
+{
+  finishConstructing();
+}
 
-geoms::sphere::sphere(vec o, float r)
-  : geom(), origin(o), radius(r) {}
-
-geoms::sphere::sphere() : geom(), origin(0.0), radius(1.0f) {}
+void geoms::sphere::finishConstructing() {
+  vec boundsDiag(radius, radius, radius);
+  bounds = bbox(origin - boundsDiag, origin + boundsDiag);
+}
 
 intersection geoms::sphere::intersect(const ray& r) const {
   vec diff = r.origin - origin;
@@ -43,14 +46,6 @@ intersection geoms::sphere::intersect(const ray& r) const {
   return intersection();
 }
 
-geomptr geoms::sphere::make(vec o, float r, materialptr m) {
-  return std::make_shared<sphere>(o, r, m);
-}
-
-geomptr geoms::sphere::make(vec o, float r) {
-  return std::make_shared<sphere>(o, r);
-}
-
-geomptr geoms::sphere::make() {
-  return std::make_shared<sphere>();
+geomptr geoms::sphere::make(materialptr m, vec o, float r) {
+  return std::make_shared<sphere>(m, o, r);
 }
