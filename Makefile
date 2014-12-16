@@ -4,7 +4,7 @@ WARN = -Werror -Weverything -Wno-c++98-compat -Wno-padded
 
 path-tracer: $(SOURCES)
 	mkdir -p bin
-	g++ $(SOURCES) $(LIBS) -std=c++11 -O3 $(WARN) -o bin/path-tracer
+	g++ $(SOURCES) $(LIBS) -std=c++11 -O3 -flto $(WARN) -o bin/path-tracer
 
 debug: $(SOURCES)
 	mkdir -p bin

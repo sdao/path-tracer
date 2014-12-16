@@ -2,8 +2,8 @@
 #include <limits>
 #include <iostream>
 
-#define MAX_DEPTH 20
-#define RUSSIAN_ROULETTE_DEPTH 10
+#define MAX_DEPTH 20 // Slightly biased, but should be high enough.
+#define RUSSIAN_ROULETTE_DEPTH 5
 #define SAMPLES_PER_PIXEL 4
 #define PIXELS_PER_SAMPLE 0.25f
 
