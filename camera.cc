@@ -68,8 +68,8 @@ void camera::renderOnce(const std::vector<geomptr>& objs, std::string name) {
     rowSeeds[y] = masterRng.nextUnsigned();
   }
 
-  //tbb::parallel_for(size_t(0), size_t(h), [&](size_t y) {
-  for (size_t y = 0; y < h; ++y) {
+  tbb::parallel_for(size_t(0), size_t(h), [&](size_t y) {
+  //for (size_t y = 0; y < h; ++y) {
     randomness rng(rowSeeds[y]);
 
     for (size_t x = 0; x < w; ++x) {
@@ -132,8 +132,8 @@ void camera::renderOnce(const std::vector<geomptr>& objs, std::string name) {
         p = p * oldFrac + pxColor * newFrac;
       }
     } // end of x-for loop
-  } // end of y-for loop
-  //});
+  //} // end of y-for loop
+  });
 
   math::copyData(w, h, data, exrData);
   Imf::RgbaOutputFile file(name.c_str(), int(w), int(h), Imf::WRITE_RGBA);
