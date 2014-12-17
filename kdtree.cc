@@ -25,10 +25,10 @@ void kdtree::build() {
 
   // Allocate working memory for kd-tree construction (p. 236).
   std::vector<bboxedge> workEdgesRaw[3];
-  std::vector<bboxedge>::iterator workEdges[3];
+  std::vector<bboxedge>::iterator workEdgesIters[3];
   for (size_t i = 0; i < 3; ++i) {
     workEdgesRaw[i] = std::vector<bboxedge>(2 * objs->size());
-    workEdges[i] = workEdgesRaw[i].begin();
+    workEdgesIters[i] = workEdgesRaw[i].begin();
   }
   std::vector<id> workObjs0(objs->size());
   std::vector<id> workObjs1(size_t(maxDepth + 1) * objs->size());
@@ -47,7 +47,7 @@ void kdtree::build() {
     objIds.begin(),
     long(objs->size()),
     maxDepth,
-    workEdges,
+    workEdgesIters,
     workObjs0.begin(),
     workObjs1.begin(),
     0
