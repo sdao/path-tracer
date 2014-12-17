@@ -1,5 +1,4 @@
 #include "camera.h"
-#include <limits>
 #include <iostream>
 
 #define MAX_DEPTH 50 // Should be high enough to prevent bias.
@@ -34,31 +33,7 @@ camera::camera(ray e, size_t ww, size_t hh, float ff)
   }
 }
 
-geomptr camera::intersect(
-  const ray& r,
-  const std::vector<geomptr>& objs,
-  intersection* isect_out
-) const {
-  intersection winner_isect;
-  geomptr winner;
-
-  for (auto& obj : objs) {
-    intersection isect = obj->intersect(r);
-    if (isect.hit()
-      && (!winner_isect.hit() || isect.distance < winner_isect.distance)) {
-      winner_isect = isect;
-      winner = obj;
-    }
-  }
-
-  if (isect_out) {
-    *isect_out = winner_isect;
-  }
-
-  return winner;
-}
-
-void camera::renderOnce(const std::vector<geomptr>& objs, std::string name) {
+void camera::renderOnce(const kdtree& kdt, std::string name) {
   iters++;
   std::cout << "Iteration " << iters << "\n";
 
@@ -110,7 +85,7 @@ void camera::renderOnce(const std::vector<geomptr>& objs, std::string name) {
 
           // Bounce ray and kill if nothing hit.
           intersection isect;
-          geomptr g = intersect(r, objs, &isect);
+          geomptr g = kdt.intersect(r, &isect);
 
           if (g) {
             r = g->mat->propagate(r, isect, rng);
@@ -142,11 +117,13 @@ void camera::renderOnce(const std::vector<geomptr>& objs, std::string name) {
   file.writePixels(int(h));
 }
 
-void camera::renderInfinite(const std::vector<geomptr>& objs,
-    std::string name) {
+void camera::renderInfinite(
+  const kdtree& kdt,
+  std::string name
+) {
   std:: cout << "Press Ctrl-c to quit\n";
   while (true) {
-    renderOnce(objs, name);
+    renderOnce(kdt, name);
   }
 
   /* Will not return. */

@@ -1,6 +1,5 @@
 #pragma once
 #include <memory>
-#include <limits>
 #include "math.h"
 
 class material {

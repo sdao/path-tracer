@@ -4,8 +4,6 @@
 namespace geoms {
 
   class sphere : public geom {
-    void finishConstructing();
-
   public:
     const vec origin;
     const float radius;
@@ -13,6 +11,7 @@ namespace geoms {
     sphere(materialptr m, vec o = vec(0), float r = 1.0f);
 
     virtual intersection intersect(const ray& r) const;
+    virtual bbox bounds() const;
 
     static geomptr make(materialptr m, vec o = vec(0), float r = 1.0f);
   };

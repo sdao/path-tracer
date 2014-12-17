@@ -6,13 +6,12 @@ namespace geoms {
   class disc : public geom {
     vec tangent;
     vec cotangent;
-
-    void finishConstructing();
+    const float radiusSquared;
 
   public:
     const vec origin;
     const vec normal;
-    const float radiusSquared;
+    const float radius;
 
     disc(
       materialptr m,
@@ -22,6 +21,7 @@ namespace geoms {
     );
 
     virtual intersection intersect(const ray& r) const;
+    virtual bbox bounds() const;
 
     static geomptr make(
       materialptr m,

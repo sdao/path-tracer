@@ -1,12 +1,14 @@
 #include <vector>
 #include <memory>
+#include <iostream>
 #include "materials/all.h"
 #include "geoms/all.h"
 #include "camera.h"
+#include "kdtree.h"
 
-[[noreturn]] void render(size_t w, size_t h);
+[[noreturn]] void render(size_t w, size_t h, std::string name);
 
-void render(size_t w, size_t h) {
+void render(size_t w, size_t h, std::string name) {
   materialptr green = materials::diffuse::make(vec(0.5, 0.9, 0.4));
   materialptr white = materials::diffuse::make(vec(1, 1, 1));
   materialptr blue = materials::diffuse::make(vec(0.5, 0.6, 1));
@@ -14,7 +16,10 @@ void render(size_t w, size_t h) {
   materialptr fresnel = materials::fresnel::make();
   materialptr spec = materials::glossy::make(0.25f);
 
-  std::vector<geomptr> objs;
+  // Construct k-d tree acceleration structure.
+  kdtree tree;
+
+  std::vector<geomptr>& objs = tree.objs;
   // spheres
   objs.push_back(
     geoms::sphere::make(spec, vec(-8, -10, -36), 8.0f)
@@ -47,14 +52,17 @@ void render(size_t w, size_t h) {
     geoms::sphere::make(emit, vec(0, 46, -25), 30.0f)
   );
 
+  tree.build();
+  std::cout << tree << "\n";
+
   camera cam(ray(vec(0, 0, 50), vec(0, 0, -1)), w, h, float(M_PI_4));
-  cam.renderInfinite(objs, "/Users/Steve/Desktop/sample.exr");
+  cam.renderInfinite(tree, name);
 
   /* Will not return. */
 }
 
 int main() {
-  render(512, 384);
+  render(512, 384, "/Users/Steve/Desktop/sample.exr");
 
   /* Will not return. */
 }

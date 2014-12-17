@@ -5,6 +5,7 @@
 #include <vector>
 #include "math.h"
 #include "geom.h"
+#include "kdtree.h"
 
 class camera {
   ray eye;
@@ -24,17 +25,11 @@ class camera {
 
   int iters;
 
-  geomptr intersect(
-    const ray& r,
-    const std::vector<geomptr>& objs,
-    intersection* isect_out = nullptr
-  ) const;
-
 public:
   camera(ray e, size_t ww, size_t hh, float ff = float(M_PI_4));
-  void renderOnce(const std::vector<geomptr>& objs, std::string name);
+  void renderOnce(const kdtree& kdt, std::string name);
   [[noreturn]] void renderInfinite(
-    const std::vector<geomptr>& objs,
+    const kdtree& kdt,
     std::string name
   );
 };

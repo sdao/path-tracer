@@ -2,15 +2,7 @@
 #include <memory>
 
 geoms::sphere::sphere(materialptr m, vec o, float r)
-  : geom(m), origin(o), radius(r)
-{
-  finishConstructing();
-}
-
-void geoms::sphere::finishConstructing() {
-  vec boundsDiag(radius, radius, radius);
-  bounds = bbox(origin - boundsDiag, origin + boundsDiag);
-}
+  : geom(m), origin(o), radius(r) {}
 
 intersection geoms::sphere::intersect(const ray& r) const {
   vec diff = r.origin - origin;
@@ -44,6 +36,11 @@ intersection geoms::sphere::intersect(const ray& r) const {
 
   // Either no isect was found or it was behind us.
   return intersection();
+}
+
+bbox geoms::sphere::bounds() const {
+  vec boundsDiag(radius, radius, radius);
+  return bbox(origin - boundsDiag, origin + boundsDiag);
 }
 
 geomptr geoms::sphere::make(materialptr m, vec o, float r) {

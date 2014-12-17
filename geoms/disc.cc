@@ -2,16 +2,10 @@
 #include <memory>
 
 geoms::disc::disc(materialptr m, vec o, vec n, float r)
-  : geom(m), origin(o), normal(glm::normalize(n)), radiusSquared(r * r)
+  : geom(m), radiusSquared(r * r), origin(o), normal(glm::normalize(n)),
+    radius(r)
 {
-  finishConstructing();
-}
-
-void geoms::disc::finishConstructing() {
   math::coordSystem(normal, &tangent, &cotangent);
-  bounds = bbox(origin + tangent + cotangent, origin - tangent - cotangent);
-  bounds.expand(origin + tangent - cotangent);
-  bounds.expand(origin - tangent + cotangent);
 }
 
 intersection geoms::disc::intersect(const ray& r) const {
@@ -34,6 +28,17 @@ intersection geoms::disc::intersect(const ray& r) const {
 
   // Either no isect was found or it was behind us.
   return intersection();
+}
+
+bbox geoms::disc::bounds() const {
+  vec tr = tangent * radius;
+  vec cr = cotangent * radius;
+
+  bbox b(origin + tr + cr, origin - tr - cr);
+  b.expand(origin + tr - cr);
+  b.expand(origin - tr + cr);
+
+  return b;
 }
 
 geomptr geoms::disc::make(materialptr m, vec o, vec n, float r) {
