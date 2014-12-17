@@ -1,9 +1,15 @@
 #include "kdtree.h"
 
-kdtree::kdtree() : root(), objs() {}
+kdtree::kdtree() : root(nullptr), objs() {}
+
+kdtree::~kdtree() {
+  if (root) {
+    delete root;
+  }
+}
 
 void kdtree::build() {
-  root = std::make_shared<kdnode>();
+  root = new kdnode();
 
   // Build kd-tree for accelerator (p. 232).
   int maxDepth = int(roundf(8.0f + 1.3f * floorf(math::log2(objs.size()))));
@@ -49,7 +55,7 @@ void kdtree::build() {
 }
 
 void kdtree::buildTree(
-  std::shared_ptr<kdnode> node,
+  kdnode* node,
   const bbox& nodeBounds,
   const std::vector<bbox>& allObjBounds,
   iditer nodeObjIds,
@@ -225,7 +231,7 @@ geomptr kdtree::intersect(
   int todoPos = 0;
 
   // Traverse kd-tree nodes in order for ray (p. 242).
-  std::shared_ptr<kdnode> node = root;
+  const kdnode* node = root;
   intersection winnerIsect;
   geomptr winnerObj = nullptr;
   while (node) {
@@ -241,8 +247,8 @@ geomptr kdtree::intersect(
       float tplane = (node->splitPos - r.origin[ax]) * invDir[ax];
 
       // Get node children pointers for ray.
-      std::shared_ptr<kdnode> firstChild;
-      std::shared_ptr<kdnode> secondChild;
+      const kdnode* firstChild;
+      const kdnode* secondChild;
       bool belowFirst = (r.origin[ax] < node->splitPos) ||
                         (math::unsafeEquals(r.origin[ax], node->splitPos)
                          && r.direction[ax] <= 0);

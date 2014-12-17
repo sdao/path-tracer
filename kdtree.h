@@ -1,5 +1,4 @@
 #pragma once
-#include <memory>
 #include <iostream>
 #include "math.h"
 #include "geom.h"
@@ -14,14 +13,23 @@ class kdtree {
   typedef std::vector<id>::iterator iditer;
 
   struct kdnode {
-    std::shared_ptr<kdnode> above;
-    std::shared_ptr<kdnode> below;
+    kdnode* above;
+    kdnode* below;
     axis splitAxis;
     float splitPos;
 
     std::vector<id> objIds;
 
-    kdnode() : above(), below(), objIds() {}
+    kdnode() : above(nullptr), below(nullptr), objIds() {}
+
+    ~kdnode() {
+      if (above) {
+        delete above;
+      }
+      if (below) {
+        delete below;
+      }
+    }
 
     inline void makeLeaf(iditer ids, long count) {
       for (long i = 0; i < count; ++i) {
@@ -32,8 +40,8 @@ class kdtree {
     inline void makeInterior(axis ax, float pos) {
       splitAxis = ax;
       splitPos = pos;
-      below = std::make_shared<kdnode>();
-      above = std::make_shared<kdnode>();
+      below = new kdnode();
+      above = new kdnode();
     }
 
     inline bool isLeaf() const {
@@ -89,7 +97,7 @@ class kdtree {
   };
 
   struct kdtodo {
-    std::shared_ptr<kdnode> node;
+    const kdnode* node;
     float tmin;
     float tmax;
   };
@@ -114,11 +122,11 @@ class kdtree {
     }
   };
 
-  std::shared_ptr<kdnode> root;
+  kdnode* root;
   bbox bounds;
 
   void buildTree(
-    std::shared_ptr<kdnode> node,
+    kdnode* node,
     const bbox& nodeBounds,
     const std::vector<bbox>& allObjBounds,
     iditer nodeObjIds,
@@ -134,6 +142,7 @@ public:
   std::vector<geomptr> objs;
 
   kdtree();
+  ~kdtree();
   void build();
   geomptr intersect(const ray& r, intersection* isect_out = nullptr) const;
 
