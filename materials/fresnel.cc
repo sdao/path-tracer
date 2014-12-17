@@ -95,7 +95,3 @@ lightray materials::fresnel::propagate(
     );
   }
 }
-
-material* materials::fresnel::make(float ior) {
-  return new fresnel(ior);
-}

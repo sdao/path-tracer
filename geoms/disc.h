@@ -22,13 +22,6 @@ namespace geoms {
 
     virtual intersection intersect(const ray& r) const;
     virtual bbox bounds() const;
-
-    static geom* make(
-      material* m,
-      vec o = vec(0),
-      vec n = vec(0, 1, 0),
-      float r = 10.0f
-    );
   };
 
 }

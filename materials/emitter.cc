@@ -9,7 +9,3 @@ lightray materials::emitter::propagate(
 ) const {
   return lightray(vec(0), vec(0), incoming.color * color);
 }
-
-material* materials::emitter::make(vec c) {
-  return new emitter(c);
-}

@@ -39,7 +39,3 @@ bbox geoms::disc::bounds() const {
 
   return b;
 }
-
-geom* geoms::disc::make(material* m, vec o, vec n, float r) {
-  return new disc(m, o, n, r);
-}

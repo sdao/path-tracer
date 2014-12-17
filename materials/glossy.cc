@@ -15,7 +15,3 @@ lightray materials::glossy::propagate(
     incoming.color
   );
 }
-
-material* materials::glossy::make(float g) {
-  return new glossy(g);
-}

@@ -15,7 +15,3 @@ lightray materials::specular::propagate(
     incoming.color
   );
 }
-
-material* materials::specular::make() {
-  return new specular();
-}

@@ -16,8 +16,6 @@ namespace materials {
       intersection& isect,
       randomness& rng
     ) const;
-
-    static material* make(float ior = 1.5f);
   };
 
 }

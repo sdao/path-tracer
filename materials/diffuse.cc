@@ -15,7 +15,3 @@ lightray materials::diffuse::propagate(
     incoming.color * color
   );
 }
-
-material* materials::diffuse::make(vec c) {
-  return new diffuse(c);
-}

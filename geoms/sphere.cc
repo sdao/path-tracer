@@ -41,7 +41,3 @@ bbox geoms::sphere::bounds() const {
   vec boundsDiag(radius, radius, radius);
   return bbox(origin - boundsDiag, origin + boundsDiag);
 }
-
-geom* geoms::sphere::make(material* m, vec o, float r) {
-  return new sphere(m, o, r);
-}

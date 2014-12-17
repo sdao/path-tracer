@@ -14,8 +14,6 @@ namespace materials {
       intersection& isect,
       randomness& rng
     ) const;
-
-    static material* make(vec c);
   };
 
 }
