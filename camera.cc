@@ -85,7 +85,7 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
 
           // Bounce ray and kill if nothing hit.
           intersection isect;
-          geomptr g = kdt.intersect(r, &isect);
+          geom* g = kdt.intersect(r, &isect);
 
           if (g) {
             r = g->mat->propagate(r, isect, rng);

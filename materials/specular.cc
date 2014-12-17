@@ -1,5 +1,4 @@
 #include "specular.h"
-#include <memory>
 
 materials::specular::specular() : material() {}
 
@@ -9,7 +8,7 @@ lightray materials::specular::propagate(
   randomness& /* rng */
 ) const {
   vec reflectVector = glm::reflect(incoming.direction, isect.normal);
-  
+
   return lightray(
     isect.position + reflectVector * 0.01f,
     reflectVector,
@@ -17,6 +16,6 @@ lightray materials::specular::propagate(
   );
 }
 
-materialptr materials::specular::make() {
-  return std::shared_ptr<specular>();
+material* materials::specular::make() {
+  return new specular();
 }

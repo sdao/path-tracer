@@ -1,7 +1,6 @@
 #include "disc.h"
-#include <memory>
 
-geoms::disc::disc(materialptr m, vec o, vec n, float r)
+geoms::disc::disc(material* m, vec o, vec n, float r)
   : geom(m), radiusSquared(r * r), origin(o), normal(glm::normalize(n)),
     radius(r)
 {
@@ -41,6 +40,6 @@ bbox geoms::disc::bounds() const {
   return b;
 }
 
-geomptr geoms::disc::make(materialptr m, vec o, vec n, float r) {
-  return std::make_shared<disc>(m, o, n, r);
+geom* geoms::disc::make(material* m, vec o, vec n, float r) {
+  return new disc(m, o, n, r);
 }

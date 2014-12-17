@@ -15,7 +15,7 @@ namespace materials {
       randomness& rng
     ) const;
 
-    static materialptr make(vec c);
+    static material* make(vec c);
   };
 
 }

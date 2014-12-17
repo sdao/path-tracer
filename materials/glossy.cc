@@ -1,5 +1,4 @@
 #include "glossy.h"
-#include <memory>
 
 materials::glossy::glossy(float g) : material(), glossiness(g) {}
 
@@ -17,6 +16,6 @@ lightray materials::glossy::propagate(
   );
 }
 
-materialptr materials::glossy::make(float g) {
-  return std::make_shared<glossy>(g);
+material* materials::glossy::make(float g) {
+  return new glossy(g);
 }

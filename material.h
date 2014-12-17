@@ -1,5 +1,4 @@
 #pragma once
-#include <memory>
 #include "math.h"
 
 class material {
@@ -15,5 +14,3 @@ public:
     randomness& rng
   ) const = 0;
 };
-
-typedef std::shared_ptr<material> materialptr;

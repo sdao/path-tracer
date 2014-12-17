@@ -13,7 +13,7 @@ namespace materials {
       randomness& rng
     ) const;
 
-    static materialptr make();
+    static material* make();
   };
 
 }

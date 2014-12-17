@@ -1,5 +1,4 @@
 #include "fresnel.h"
-#include <memory>
 
 #define IOR_VACUUM 1.0f
 
@@ -97,6 +96,6 @@ lightray materials::fresnel::propagate(
   }
 }
 
-materialptr materials::fresnel::make(float ior) {
-  return std::make_shared<fresnel>(ior);
+material* materials::fresnel::make(float ior) {
+  return new fresnel(ior);
 }

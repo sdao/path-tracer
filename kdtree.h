@@ -139,12 +139,12 @@ class kdtree {
   );
 
 public:
-  std::vector<geomptr> objs;
+  std::vector<geom*>* objs;
 
-  kdtree();
+  kdtree(std::vector<geom*>* o);
   ~kdtree();
   void build();
-  geomptr intersect(const ray& r, intersection* isect_out = nullptr) const;
+  geom* intersect(const ray& r, intersection* isect_out = nullptr) const;
 
   friend std::ostream& operator<<(std::ostream& os, const kdtree& tree) {
     os << *(tree.root);

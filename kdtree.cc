@@ -1,6 +1,6 @@
 #include "kdtree.h"
 
-kdtree::kdtree() : root(nullptr), objs() {}
+kdtree::kdtree(std::vector<geom*>* o) : root(nullptr), objs(o) {}
 
 kdtree::~kdtree() {
   if (root) {
@@ -12,13 +12,13 @@ void kdtree::build() {
   root = new kdnode();
 
   // Build kd-tree for accelerator (p. 232).
-  int maxDepth = int(roundf(8.0f + 1.3f * floorf(math::log2(objs.size()))));
+  int maxDepth = int(roundf(8.0f + 1.3f * floorf(math::log2(objs->size()))));
 
   // Compute bounds for kd-tree construction (Pharr & Humphreys p. 232).
   bounds = bbox();
-  std::vector<bbox> allObjBounds(objs.size());
-  for (size_t i = 0; i < objs.size(); ++i) {
-    allObjBounds[i] = objs[i]->bounds();
+  std::vector<bbox> allObjBounds(objs->size());
+  for (size_t i = 0; i < objs->size(); ++i) {
+    allObjBounds[i] = (*objs)[i]->bounds();
     allObjBounds[i].expand(0.1f); // Avoid pathological "flat" bboxes.
     bounds.expand(allObjBounds[i]);
   }
@@ -27,15 +27,15 @@ void kdtree::build() {
   std::vector<bboxedge> workEdgesRaw[3];
   std::vector<bboxedge>::iterator workEdges[3];
   for (size_t i = 0; i < 3; ++i) {
-    workEdgesRaw[i] = std::vector<bboxedge>(2 * objs.size());
+    workEdgesRaw[i] = std::vector<bboxedge>(2 * objs->size());
     workEdges[i] = workEdgesRaw[i].begin();
   }
-  std::vector<id> workObjs0(objs.size());
-  std::vector<id> workObjs1(size_t(maxDepth + 1) * objs.size());
+  std::vector<id> workObjs0(objs->size());
+  std::vector<id> workObjs1(size_t(maxDepth + 1) * objs->size());
 
   // Initialize `objIds` for kd-tree construction (p. 232).
-  std::vector<id> objIds(objs.size());
-  for (size_t i = 0; i < objs.size(); ++i) {
+  std::vector<id> objIds(objs->size());
+  for (size_t i = 0; i < objs->size(); ++i) {
     objIds[i] = i;
   }
 
@@ -45,7 +45,7 @@ void kdtree::build() {
     bounds,
     allObjBounds,
     objIds.begin(),
-    long(objs.size()),
+    long(objs->size()),
     maxDepth,
     workEdges,
     workObjs0.begin(),
@@ -210,7 +210,7 @@ retrySplit:
   );
 }
 
-geomptr kdtree::intersect(
+geom* kdtree::intersect(
   const ray& r,
   intersection* isect_out
 ) const {
@@ -233,7 +233,7 @@ geomptr kdtree::intersect(
   // Traverse kd-tree nodes in order for ray (p. 242).
   const kdnode* node = root;
   intersection winnerIsect;
-  geomptr winnerObj = nullptr;
+  geom* winnerObj = nullptr;
   while (node) {
     // Bail out if we found a hit closer than the curent node (p. 242).
     if (winnerIsect.distance < tmin) break;
@@ -278,7 +278,7 @@ geomptr kdtree::intersect(
     } else  {
       // Check for intersections inside leaf node (p. 244).
       for (id objId : node->objIds) {
-        const geomptr obj = objs[objId];
+        geom* obj = (*objs)[objId];
 
         // Check one primitive inside leaf node (p. 244).
         const intersection isect = obj->intersect(r);

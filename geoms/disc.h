@@ -14,7 +14,7 @@ namespace geoms {
     const float radius;
 
     disc(
-      materialptr m,
+      material* m,
       vec o = vec(0),
       vec n = vec(0, 1, 0),
       float r = 10.0f
@@ -23,8 +23,8 @@ namespace geoms {
     virtual intersection intersect(const ray& r) const;
     virtual bbox bounds() const;
 
-    static geomptr make(
-      materialptr m,
+    static geom* make(
+      material* m,
       vec o = vec(0),
       vec n = vec(0, 1, 0),
       float r = 10.0f

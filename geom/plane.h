@@ -6,7 +6,7 @@ public:
   vec origin;
   vec normal;
 
-  plane(vec o, vec n, materialptr m);
+  plane(vec o, vec n, material* m);
   plane(vec o, vec n);
   plane();
   ~plane();

@@ -17,7 +17,7 @@ namespace materials {
       randomness& rng
     ) const;
 
-    static materialptr make(float ior = 1.5f);
+    static material* make(float ior = 1.5f);
   };
 
 }

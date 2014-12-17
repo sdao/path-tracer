@@ -1,5 +1,4 @@
 #include "diffuse.h"
-#include <memory>
 
 materials::diffuse::diffuse(vec c) : material(), color(c) {}
 
@@ -17,6 +16,6 @@ lightray materials::diffuse::propagate(
   );
 }
 
-materialptr materials::diffuse::make(vec c) {
-  return std::make_shared<diffuse>(c);
+material* materials::diffuse::make(vec c) {
+  return new diffuse(c);
 }

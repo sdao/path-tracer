@@ -8,12 +8,12 @@ namespace geoms {
     const vec origin;
     const float radius;
 
-    sphere(materialptr m, vec o = vec(0), float r = 1.0f);
+    sphere(material* m, vec o = vec(0), float r = 1.0f);
 
     virtual intersection intersect(const ray& r) const;
     virtual bbox bounds() const;
 
-    static geomptr make(materialptr m, vec o = vec(0), float r = 1.0f);
+    static geom* make(material* m, vec o = vec(0), float r = 1.0f);
   };
 
 }
