@@ -1,15 +1,11 @@
 #include "kdtree.h"
 
-kdtree::kdtree(std::vector<geom*>* o) : root(nullptr), objs(o) {}
-
-kdtree::~kdtree() {
-  if (root) {
-    delete root;
-  }
-}
+kdtree::kdtree(std::vector<geom*>* o) :
+  allNodes(), rootId(ID_INVALID), objs(o) {}
 
 void kdtree::build() {
-  root = new kdnode();
+  rootId = 0;
+  allNodes.push_back(kdnode());
 
   // Build kd-tree for accelerator (p. 232).
   int maxDepth = int(roundf(8.0f + 1.3f * floorf(math::log2(objs->size()))));
@@ -41,7 +37,7 @@ void kdtree::build() {
 
   // Start recursive construction of kd-tree (p. 233).
   buildTree(
-    root,
+    rootId,
     bounds,
     allObjBounds,
     objIds.begin(),
@@ -55,7 +51,7 @@ void kdtree::build() {
 }
 
 void kdtree::buildTree(
-  kdnode* node,
+  id nodeId,
   const bbox& nodeBounds,
   const std::vector<bbox>& allObjBounds,
   iditer nodeObjIds,
@@ -69,7 +65,7 @@ void kdtree::buildTree(
   // Initialize leaf node at `node` if termination criteria met (p. 233).
   // ====================================================================
   if (nodeObjCount <= MAX_LEAF_OBJS || depth == 0) {
-    node->makeLeaf(nodeObjIds, nodeObjCount);
+    allNodes[nodeId].makeLeaf(nodeObjIds, nodeObjCount);
     return;
   }
 
@@ -155,7 +151,7 @@ retrySplit:
   }
   if ((bestCost > 4.0f * oldCost && nodeObjCount < 16)
       || bestAxis == INVALID_AXIS || badRefinesSoFar == 3) {
-    node->makeLeaf(nodeObjIds, nodeObjCount);
+    allNodes[nodeId].makeLeaf(nodeObjIds, nodeObjCount);
     return;
   }
 
@@ -181,10 +177,10 @@ retrySplit:
   bbox bounds1 = nodeBounds;
   bounds0.max[bestAxis] = bounds1.min[bestAxis] = splitPos;
 
-  node->makeInterior(bestAxis, splitPos);
+  allNodes[nodeId].makeInterior(bestAxis, splitPos, allNodes);
 
   buildTree(
-    node->below,
+    allNodes[nodeId].below,
     bounds0,
     allObjBounds,
     workObjs0,
@@ -197,7 +193,7 @@ retrySplit:
   );
 
   buildTree(
-    node->above,
+    allNodes[nodeId].above,
     bounds1,
     allObjBounds,
     workObjs1,
@@ -212,7 +208,7 @@ retrySplit:
 
 geom* kdtree::intersect(
   const ray& r,
-  intersection* isect_out
+  intersection* isectOut
 ) const {
   // Compute initial parametric range of ray inside kd-tree extent (p. 240).
   float tmin, tmax;
@@ -226,58 +222,58 @@ geom* kdtree::intersect(
     1.0f / r.direction.y,
     1.0f / r.direction.z
   );
-  #define MAX_TODO 64 // Pharr & Humphreys says this is enough in practice.
   kdtodo todo[MAX_TODO];
   int todoPos = 0;
 
   // Traverse kd-tree nodes in order for ray (p. 242).
-  const kdnode* node = root;
+  id nodeId = rootId;
   intersection winnerIsect;
   geom* winnerObj = nullptr;
-  while (node) {
+  while (nodeId < ID_INVALID) {
     // Bail out if we found a hit closer than the curent node (p. 242).
     if (winnerIsect.distance < tmin) break;
 
-    if (!node->isLeaf()) {
+    if (!allNodes[nodeId].isLeaf()) {
       // Process kd-tree interior node (p. 242).
       // ---------------------------------------
 
       // Compute parametric distance along ray to split plane.
-      axis ax = node->splitAxis;
-      float tplane = (node->splitPos - r.origin[ax]) * invDir[ax];
+      axis ax = allNodes[nodeId].splitAxis;
+      float tplane = (allNodes[nodeId].splitPos - r.origin[ax]) * invDir[ax];
 
       // Get node children pointers for ray.
-      const kdnode* firstChild;
-      const kdnode* secondChild;
-      bool belowFirst = (r.origin[ax] < node->splitPos) ||
-                        (math::unsafeEquals(r.origin[ax], node->splitPos)
+      id firstChild;
+      id secondChild;
+      bool belowFirst = (r.origin[ax] < allNodes[nodeId].splitPos) ||
+                        (math::unsafeEquals(r.origin[ax],
+                           allNodes[nodeId].splitPos)
                          && r.direction[ax] <= 0);
       if (belowFirst) {
-        firstChild = node->below;
-        secondChild = node->above;
+        firstChild = allNodes[nodeId].below;
+        secondChild = allNodes[nodeId].above;
       } else {
-        firstChild = node->above;
-        secondChild = node->below;
+        firstChild = allNodes[nodeId].above;
+        secondChild = allNodes[nodeId].below;
       }
 
       // Advance to next child node, possibly enqueue other child (p. 244).
       if (tplane > tmax || tplane <= 0) {
-        node = firstChild;
+        nodeId = firstChild;
       } else if (tplane < tmin) {
-        node = secondChild;
+        nodeId = secondChild;
       } else {
         // Enqueue secondChild in todo list (p. 244).
-        todo[todoPos].node = secondChild;
+        todo[todoPos].nodeId = secondChild;
         todo[todoPos].tmin = tplane;
         todo[todoPos].tmax = tmax;
         ++todoPos;
 
-        node = firstChild;
+        nodeId = firstChild;
         tmax = tplane;
       }
     } else  {
       // Check for intersections inside leaf node (p. 244).
-      for (id objId : node->objIds) {
+      for (id objId : allNodes[nodeId].objIds) {
         geom* obj = (*objs)[objId];
 
         // Check one primitive inside leaf node (p. 244).
@@ -293,7 +289,7 @@ geom* kdtree::intersect(
       // Grab next node to process from todo list (p. 245).
       if (todoPos > 0) {
         --todoPos;
-        node = todo[todoPos].node;
+        nodeId = todo[todoPos].nodeId;
         tmin = todo[todoPos].tmin;
         tmax = todo[todoPos].tmax;
       } else {
@@ -302,9 +298,54 @@ geom* kdtree::intersect(
     }
   }
 
-  if (isect_out) {
-    *isect_out = winnerIsect;
+  if (isectOut) {
+    *isectOut = winnerIsect;
   }
 
   return winnerObj;
+}
+
+void kdtree::print(id nodeId, std::ostream& os, std::string header) const {
+  const kdnode& node = allNodes[nodeId];
+
+  if (!node.isLeaf()) {
+    os << header << "interior ";
+  } else {
+    os << header <<
+    "leaf: ";
+    if (node.objIds.size() > 0) {
+      for (auto& i : node.objIds) {
+        os << i << " ";
+      }
+    } else {
+      os << "[empty] ";
+    }
+  }
+
+  os << "(" << node.splitPos;
+  if (node.splitAxis == X_AXIS) {
+    os << "x";
+  } else if (node.splitAxis == Y_AXIS) {
+    os << "y";
+  } else if (node.splitAxis == Z_AXIS) {
+    os << "z";
+  } else {
+    os << "?";
+  }
+
+  os << ") {\n";
+  if (node.below < ID_INVALID) {
+    print(node.below, os, header + "  ");
+  } else {
+    os << header << "  [none below]";
+  }
+
+  os << "\n";
+  if (node.above < ID_INVALID) {
+    print(node.above, os, header + "  ");
+  } else {
+    os << header << "  [none above]";
+  }
+
+  os << "\n" << header << "}";
 }

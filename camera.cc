@@ -1,11 +1,6 @@
 #include "camera.h"
 #include <iostream>
 
-#define MAX_DEPTH 50 // Should be high enough to prevent bias.
-#define RUSSIAN_ROULETTE_DEPTH 5
-#define SAMPLES_PER_PIXEL 4
-#define PIXELS_PER_SAMPLE 0.25f
-
 camera::camera(ray e, size_t ww, size_t hh, float ff)
   : eye(ray(e.origin, glm::normalize(e.direction))),
     w(ww), h(hh), fovx2(0.5f * ff),
@@ -14,15 +9,15 @@ camera::camera(ray e, size_t ww, size_t hh, float ff)
 {
   // Size of the image plane projected into world space
   // using the given fovx and cam focal length.
-  float scale_right = 2.0f * glm::length(eye.direction) * tanf(fovx2);
-  float scale_up = scale_right * (float(h) / float(w));
+  float scaleRight = 2.0f * glm::length(eye.direction) * tanf(fovx2);
+  float scaleUp = scaleRight * (float(h) / float(w));
 
   // Corresponding vectors.
-  up = -vec(0, 1, 0) * scale_up; // Flip the y-axis for image output!
-  right = -glm::normalize(glm::cross(eye.direction, up)) * scale_right;
+  up = -vec(0, 1, 0) * scaleUp; // Flip the y-axis for image output!
+  right = -glm::normalize(glm::cross(eye.direction, up)) * scaleRight;
 
   // Image corner ray in world space.
-  corner_ray = eye.direction - (0.5f * up) - (0.5f * right);
+  cornerRay = eye.direction - (0.5f * up) - (0.5f * right);
 
   // Prepare raw output data array.
   for (size_t y = 0; y < h; ++y) {
@@ -58,7 +53,7 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
 
         lightray r(
           eye.origin,
-          glm::normalize(corner_ray + (up * frac_y) + (right * frac_x))
+          glm::normalize(cornerRay + (up * frac_y) + (right * frac_x))
         );
 
         int depth = 0;

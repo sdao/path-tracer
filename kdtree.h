@@ -3,33 +3,29 @@
 #include "math.h"
 #include "geom.h"
 
-#define MAX_LEAF_OBJS 1
-#define ISECT_COST 80.0f
-#define TRAVERSAL_COST 1.0f
-#define EMPTY_BONUS 0.2f
-
 class kdtree {
   typedef size_t id;
   typedef std::vector<id>::iterator iditer;
+  static constexpr id ID_INVALID = std::numeric_limits<id>::max();
+
+  static constexpr int MAX_LEAF_OBJS = 1;
+  static constexpr float ISECT_COST = 80.0f;
+  static constexpr float TRAVERSAL_COST = 1.0f;
+  static constexpr float EMPTY_BONUS = 0.2f;
+  static constexpr int MAX_TODO = 64; // PBR says this is enough in practice.
 
   struct kdnode {
-    kdnode* above;
-    kdnode* below;
+    id above;
+    id below;
     axis splitAxis;
     float splitPos;
-
     std::vector<id> objIds;
 
-    kdnode() : above(nullptr), below(nullptr), objIds() {}
-
-    ~kdnode() {
-      if (above) {
-        delete above;
-      }
-      if (below) {
-        delete below;
-      }
-    }
+    kdnode() : above(ID_INVALID),
+               below(ID_INVALID),
+               splitAxis(INVALID_AXIS),
+               splitPos(0.0f),
+               objIds() {}
 
     inline void makeLeaf(iditer ids, long count) {
       for (long i = 0; i < count; ++i) {
@@ -37,67 +33,27 @@ class kdtree {
       }
     }
 
-    inline void makeInterior(axis ax, float pos) {
+    inline void makeInterior(axis ax, float pos, std::vector<kdnode>& nodes) {
       splitAxis = ax;
       splitPos = pos;
-      below = new kdnode();
-      above = new kdnode();
+
+      below = nodes.size();
+      above = nodes.size() + 1;
+
+      // Since we change the vector that contains us in this step,
+      // we no longer have safe access to our own memory. So all changes
+      // must happen before modifying the vector.
+      nodes.push_back(kdnode());
+      nodes.push_back(kdnode());
     }
 
     inline bool isLeaf() const {
-      return (!above && !below);
-    }
-
-    void print(std::ostream& os, std::string header = "") const {
-      if (!isLeaf()) {
-        os << header << "interior ";
-      } else {
-        os << header <<
-        "leaf: ";
-        if (objIds.size() > 0) {
-          for (auto& i : objIds) {
-            os << i << " ";
-          }
-        } else {
-          os << "[empty] ";
-        }
-      }
-
-      os << "(" << splitPos;
-      if (splitAxis == X_AXIS)
-        os << "x";
-        else if (splitAxis == Y_AXIS)
-        os << "y";
-        else if (splitAxis == Z_AXIS)
-        os << "z";
-        else
-          os << "?";
-
-      os << ") {\n";
-      if (below) {
-        below->print(os, header + "  ");
-      } else {
-        os << header << "  [none below]";
-      }
-
-      os << "\n";
-      if (above) {
-        above->print(os, header + "  ");
-      } else {
-        os << header << "  [none above]";
-      }
-
-      os << "\n" << header << "}";
-    }
-
-    friend std::ostream& operator<<(std::ostream& os, const kdnode& n) {
-      n.print(os);
-      return os;
+      return (above == ID_INVALID && below == ID_INVALID);
     }
   };
 
   struct kdtodo {
-    const kdnode* node;
+    id nodeId;
     float tmin;
     float tmax;
   };
@@ -122,11 +78,12 @@ class kdtree {
     }
   };
 
-  kdnode* root;
+  std::vector<kdnode> allNodes;
+  id rootId;
   bbox bounds;
 
   void buildTree(
-    kdnode* node,
+    id nodeId,
     const bbox& nodeBounds,
     const std::vector<bbox>& allObjBounds,
     iditer nodeObjIds,
@@ -138,16 +95,18 @@ class kdtree {
     int badRefinesSoFar
   );
 
+protected:
+  void print(id nodeId, std::ostream& os, std::string header = "") const;
+
 public:
   std::vector<geom*>* objs;
 
   kdtree(std::vector<geom*>* o);
-  ~kdtree();
   void build();
-  geom* intersect(const ray& r, intersection* isect_out = nullptr) const;
+  geom* intersect(const ray& r, intersection* isectOut = nullptr) const;
 
   friend std::ostream& operator<<(std::ostream& os, const kdtree& tree) {
-    os << *(tree.root);
+    tree.print(tree.rootId, os);
     return os;
   }
 };

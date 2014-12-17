@@ -1,7 +1,5 @@
 #include "fresnel.h"
 
-#define IOR_VACUUM 1.0f
-
 materials::fresnel::fresnel(float ior)
   : material(), etaEntering(IOR_VACUUM / ior), etaExiting(ior / IOR_VACUUM) {
   // Pre-compute values for Fresnel calculations.
@@ -70,8 +68,8 @@ lightray materials::fresnel::propagate(
     cosTemp = 1.0f - glm::dot(refractVector, -alignedNormal);
   }
 
-  float cosTemp_5 = cosTemp * cosTemp * cosTemp * cosTemp * cosTemp;
-  float refl = r0 + (1.0f - r0) * cosTemp_5;
+  float cosTemp5 = cosTemp * cosTemp * cosTemp * cosTemp * cosTemp;
+  float refl = r0 + (1.0f - r0) * cosTemp5;
   float refr = 1.0f - refl;
 
   // Importance sampling probabilities.

@@ -4,6 +4,8 @@
 namespace materials {
 
   class fresnel : public material {
+    static constexpr float IOR_VACUUM = 1.0f;
+
     float r0;
     const float etaEntering; // nAir / nThisMaterial
     const float etaExiting; // nThisMaterial / nAir;
