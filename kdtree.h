@@ -45,7 +45,7 @@ class kdtree {
     }
 
     inline bool isLeaf() const {
-      return (!mem::isValidId(above) && !mem::isValidId(below));
+      return !mem::isValidId(above);
     }
   };
 

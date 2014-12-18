@@ -17,11 +17,11 @@ void render(size_t w, size_t h, std::string name) {
 
   std::vector<geom*> objs;
   // spheres
+//  objs.push_back(
+//    new geoms::sphere(spec, vec(-8, -10, -36), 8.0f)
+//  );
   objs.push_back(
-    new geoms::sphere(spec, vec(-8, -10, -36), 8.0f)
-  );
-  objs.push_back(
-    new geoms::sphere(fresnel, vec(10, -10, -24), 8.0f)
+    new geoms::sphere(fresnel, vec(10, -10, -20), 8.0f)
   );
   // bottom
   objs.push_back(
@@ -47,6 +47,21 @@ void render(size_t w, size_t h, std::string name) {
   objs.push_back(
     new geoms::sphere(emit, vec(0, 46, -25), 30.0f)
   );
+  
+  // external model
+  std::vector<geoms::poly> polys;
+  std::vector<geoms::poly::point> pointLookup;
+  geoms::poly::readPolyModel(
+    spec,
+    "assets/dragon.obj",
+    pointLookup,
+    polys,
+    vec(-8, -18, -32)
+  );
+  
+  for (auto& x : polys) {
+    objs.push_back(&x); // Add pointers to all polys.
+  }
 
   // Construct k-d tree acceleration structure.
   kdtree tree(&objs);
@@ -59,7 +74,7 @@ void render(size_t w, size_t h, std::string name) {
 }
 
 int main() {
-  render(512, 384, "/Users/Steve/Desktop/sample.exr");
+  render(512, 384, "output.exr");
 
   /* Will not return. */
 }

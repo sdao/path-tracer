@@ -5,22 +5,18 @@
 namespace geoms {
   
   class poly : public geom {
+  public:
     struct point {
       vec position;
       vec normal;
       vec tangent;
       vec binormal;
       
-      void computeTangents() {
+      inline void computeTangents() {
         math::coordSystem(normal, &tangent, &binormal);
       }
     };
     
-    inline point get(mem::id i) const {
-      return (*pointLookup)[i];
-    }
-  
-  public:
     const mem::id pt0;
     const mem::id pt1;
     const mem::id pt2;
@@ -45,6 +41,11 @@ namespace geoms {
       std::vector<geoms::poly>& polys,
       vec offset
     );
+    
+  private:
+    inline const point get(mem::id i) const {
+      return (*pointLookup)[i];
+    }
   };
   
 }
