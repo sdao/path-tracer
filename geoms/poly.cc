@@ -117,7 +117,7 @@ bool geoms::poly::readPolyModel(
     }
     
     // Add points.
-    mem::id pointOffset = pointLookup.size();
+    mem::id idRangeBegin = pointLookup.size();
     for (size_t i = 0; i < mesh->mNumVertices; ++i) {
       aiVector3D thisPos = mesh->mVertices[i];
       aiVector3D thisNorm = mesh->mNormals[i];
@@ -140,9 +140,9 @@ bool geoms::poly::readPolyModel(
       if (face.mNumIndices == 3) {
         poly thisPoly(
           m,
-          face.mIndices[0] + pointOffset,
-          face.mIndices[1] + pointOffset,
-          face.mIndices[2] + pointOffset,
+          idRangeBegin.offset(face.mIndices[0]),
+          idRangeBegin.offset(face.mIndices[1]),
+          idRangeBegin.offset(face.mIndices[2]),
           &pointLookup
         );
         

@@ -12,17 +12,18 @@ void render(size_t w, size_t h, std::string name) {
   material* white = new materials::diffuse(vec(1, 1, 1));
   material* blue = new materials::diffuse(vec(0.5, 0.6, 1));
   material* emit = new materials::emitter(vec(4, 4, 4));
-  material* fresnel = new materials::fresnel();
+  //material* fresnel = new materials::fresnel();
   material* spec = new materials::glossy(0.25f);
+  //material* normaltest = new materials::normaltest();
 
   std::vector<geom*> objs;
   // spheres
-//  objs.push_back(
-//    new geoms::sphere(spec, vec(-8, -10, -36), 8.0f)
-//  );
-  objs.push_back(
-    new geoms::sphere(fresnel, vec(10, -10, -20), 8.0f)
-  );
+  //objs.push_back(
+  //  new geoms::sphere(spec, vec(-8, -10, -36), 8.0f)
+  //);
+  //objs.push_back(
+  //  new geoms::sphere(fresnel, vec(10, -10, -20), 8.0f)
+  //);
   // bottom
   objs.push_back(
     new geoms::disc(white, vec(0, -18, -25), vec(0, 1, 0), 100.0f)
@@ -53,10 +54,10 @@ void render(size_t w, size_t h, std::string name) {
   std::vector<geoms::poly::point> pointLookup;
   geoms::poly::readPolyModel(
     spec,
-    "assets/dragon.obj",
+    "assets/cone6.obj",
     pointLookup,
     polys,
-    vec(-8, -18, -32)
+    vec(0, -18, -32)
   );
   
   for (auto& x : polys) {

@@ -1,7 +1,7 @@
 #include "kdtree.h"
 
 kdtree::kdtree(std::vector<geom*>* o) :
-allNodes(), rootId(mem::ID_INVALID), objs(o) {}
+allNodes(), rootId(), objs(o) {}
 
 void kdtree::build() {
   rootId = 0;
@@ -65,7 +65,7 @@ void kdtree::buildTree(
   // Initialize leaf node at `node` if termination criteria met (p. 233).
   // ====================================================================
   if (nodeObjCount <= MAX_LEAF_OBJS || depth == 0) {
-    allNodes[nodeId].makeLeaf(nodeObjIds, nodeObjCount);
+    mem::ref(allNodes, nodeId).makeLeaf(nodeObjIds, nodeObjCount);
     return;
   }
 
@@ -91,7 +91,7 @@ retrySplit:
   // Initialize edges for axis (p. 236).
   for (long i = 0; i < nodeObjCount; ++i) {
     mem::id j = nodeObjIds[i];
-    const bbox& jBounds = allObjBounds[j];
+    const bbox& jBounds = mem::refConst(allObjBounds, j);
     workEdges[ax][2 * i]     = bboxedge(j, jBounds.min[ax], true);
     workEdges[ax][2 * i + 1] = bboxedge(j, jBounds.max[ax], false);
   }
@@ -151,7 +151,7 @@ retrySplit:
   }
   if ((bestCost > 4.0f * oldCost && nodeObjCount < 16)
       || bestAxis == INVALID_AXIS || badRefinesSoFar == 3) {
-    allNodes[nodeId].makeLeaf(nodeObjIds, nodeObjCount);
+    mem::ref(allNodes, nodeId).makeLeaf(nodeObjIds, nodeObjCount);
     return;
   }
 
@@ -177,10 +177,10 @@ retrySplit:
   bbox bounds1 = nodeBounds;
   bounds0.max[bestAxis] = bounds1.min[bestAxis] = splitPos;
 
-  allNodes[nodeId].makeInterior(bestAxis, splitPos, allNodes);
+  mem::ref(allNodes, nodeId).makeInterior(bestAxis, splitPos, allNodes);
 
   buildTree(
-    allNodes[nodeId].below,
+    mem::ref(allNodes, nodeId).belowId(),
     bounds0,
     allObjBounds,
     workObjs0,
@@ -193,7 +193,7 @@ retrySplit:
   );
 
   buildTree(
-    allNodes[nodeId].above,
+    mem::ref(allNodes, nodeId).aboveId(),
     bounds1,
     allObjBounds,
     workObjs1,
@@ -227,33 +227,35 @@ geom* kdtree::intersect(
 
   // Traverse kd-tree nodes in order for ray (p. 242).
   mem::id nodeId = rootId;
+  
   intersection winnerIsect;
   geom* winnerObj = nullptr;
-  while (mem::isValidId(nodeId)) {
+  while (nodeId.isValid()) {
+    const kdnode& node = mem::refConst(allNodes, nodeId);
+  
     // Bail out if we found a hit closer than the curent node (p. 242).
     if (winnerIsect.distance < tmin) break;
 
-    if (!allNodes[nodeId].isLeaf()) {
+    if (!node.isLeaf()) {
       // Process kd-tree interior node (p. 242).
       // ---------------------------------------
 
       // Compute parametric distance along ray to split plane.
-      axis ax = allNodes[nodeId].splitAxis;
-      float tplane = (allNodes[nodeId].splitPos - r.origin[ax]) * invDir[ax];
+      axis ax = node.splitAxis;
+      float tplane = (node.splitPos - r.origin[ax]) * invDir[ax];
 
       // Get node children pointers for ray.
       mem::id firstChild;
       mem::id secondChild;
-      bool belowFirst = (r.origin[ax] < allNodes[nodeId].splitPos) ||
-                        (math::unsafeEquals(r.origin[ax],
-                           allNodes[nodeId].splitPos)
+      bool belowFirst = (r.origin[ax] < node.splitPos) ||
+                        (math::unsafeEquals(r.origin[ax], node.splitPos)
                          && r.direction[ax] <= 0);
       if (belowFirst) {
-        firstChild = allNodes[nodeId].below;
-        secondChild = allNodes[nodeId].above;
+        firstChild = node.belowId();
+        secondChild = node.aboveId();
       } else {
-        firstChild = allNodes[nodeId].above;
-        secondChild = allNodes[nodeId].below;
+        firstChild = node.aboveId();
+        secondChild = node.belowId();
       }
 
       // Advance to next child node, possibly enqueue other child (p. 244).
@@ -273,8 +275,8 @@ geom* kdtree::intersect(
       }
     } else  {
       // Check for intersections inside leaf node (p. 244).
-      for (mem::id objId : allNodes[nodeId].objIds) {
-        geom* obj = (*objs)[objId];
+      for (mem::id objId : node.objIds) {
+        geom* obj = mem::ref(*objs, objId);
 
         // Check one primitive inside leaf node (p. 244).
         const intersection isect = obj->intersect(r);
@@ -306,7 +308,7 @@ geom* kdtree::intersect(
 }
 
 void kdtree::print(mem::id nodeId, std::ostream& os, std::string header) const {
-  const kdnode& node = allNodes[nodeId];
+  const kdnode& node = mem::refConst<kdnode>(allNodes, nodeId);
 
   if (!node.isLeaf()) {
     os << header << "interior ";
@@ -315,7 +317,7 @@ void kdtree::print(mem::id nodeId, std::ostream& os, std::string header) const {
     "leaf: ";
     if (node.objIds.size() > 0) {
       for (auto& i : node.objIds) {
-        os << i << " ";
+        os << i.val << " ";
       }
     } else {
       os << "[empty] ";
@@ -334,15 +336,15 @@ void kdtree::print(mem::id nodeId, std::ostream& os, std::string header) const {
   }
 
   os << ") {\n";
-  if (mem::isValidId(node.below)) {
-    print(node.below, os, header + "  ");
+  if (node.belowId().isValid()) {
+    print(node.belowId(), os, header + "  ");
   } else {
     os << header << "  [none below]";
   }
 
   os << "\n";
-  if (mem::isValidId(node.above)) {
-    print(node.above, os, header + "  ");
+  if (node.aboveId().isValid()) {
+    print(node.aboveId(), os, header + "  ");
   } else {
     os << header << "  [none above]";
   }

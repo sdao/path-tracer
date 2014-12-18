@@ -4,3 +4,4 @@
 #include "fresnel.h"
 #include "glossy.h"
 #include "specular.h"
+#include "normaltest.h"

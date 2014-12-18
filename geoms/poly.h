@@ -44,7 +44,7 @@ namespace geoms {
     
   private:
     inline const point get(mem::id i) const {
-      return (*pointLookup)[i];
+      return mem::ref(*pointLookup, i);
     }
   };
   

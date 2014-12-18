@@ -12,14 +12,12 @@ class kdtree {
   static constexpr int MAX_TODO = 64; // PBR says this is enough in practice.
 
   struct kdnode {
-    mem::id above;
     mem::id below;
     axis splitAxis;
     float splitPos;
     std::vector<mem::id> objIds;
 
-    kdnode() : above(mem::ID_INVALID),
-               below(mem::ID_INVALID),
+    kdnode() : below(),
                splitAxis(INVALID_AXIS),
                splitPos(0.0f),
                objIds() {}
@@ -35,7 +33,7 @@ class kdtree {
       splitPos = pos;
 
       below = nodes.size();
-      above = nodes.size() + 1;
+      // above is always (below + 1).
 
       // Since we change the vector that contains us in this step,
       // we no longer have safe access to our own memory. So all changes
@@ -45,7 +43,15 @@ class kdtree {
     }
 
     inline bool isLeaf() const {
-      return !mem::isValidId(above);
+      return !below.isValid();
+    }
+    
+    inline mem::id aboveId() const {
+      return below.offset(1);
+    }
+    
+    inline mem::id belowId() const {
+      return below;
     }
   };
 
