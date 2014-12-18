@@ -34,14 +34,6 @@ namespace geoms {
     virtual intersection intersect(const ray& r) const;
     virtual bbox bounds() const;
     
-    static bool readPolyModel(
-      material* m,
-      std::string name,
-      std::vector<geoms::poly::point>& pointLookup,
-      std::vector<geoms::poly>& polys,
-      vec offset
-    );
-    
   private:
     inline const point get(mem::id i) const {
       return mem::ref(*pointLookup, i);

@@ -4,6 +4,7 @@
 #include "geoms/all.h"
 #include "camera.h"
 #include "kdtree.h"
+#include "mesh.h"
 
 [[noreturn]] void render(size_t w, size_t h, std::string name);
 
@@ -50,19 +51,13 @@ void render(size_t w, size_t h, std::string name) {
   );
   
   // external model
-  std::vector<geoms::poly> polys;
-  std::vector<geoms::poly::point> pointLookup;
-  geoms::poly::readPolyModel(
+  mesh externalModel;
+  externalModel.readPolyModel(
     spec,
     "assets/cone6.obj",
-    pointLookup,
-    polys,
-    vec(0, -18, -32)
+    vec(0, -18, -32),
+    &objs
   );
-  
-  for (auto& x : polys) {
-    objs.push_back(&x); // Add pointers to all polys.
-  }
 
   // Construct k-d tree acceleration structure.
   kdtree tree(&objs);
