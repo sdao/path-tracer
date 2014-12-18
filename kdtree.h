@@ -2,12 +2,9 @@
 #include <iostream>
 #include "math.h"
 #include "geom.h"
+#include "mem.h"
 
 class kdtree {
-  typedef size_t id;
-  typedef std::vector<id>::iterator iditer;
-  static constexpr id ID_INVALID = std::numeric_limits<id>::max();
-
   static constexpr int MAX_LEAF_OBJS = 1;
   static constexpr float ISECT_COST = 80.0f;
   static constexpr float TRAVERSAL_COST = 1.0f;
@@ -15,19 +12,19 @@ class kdtree {
   static constexpr int MAX_TODO = 64; // PBR says this is enough in practice.
 
   struct kdnode {
-    id above;
-    id below;
+    mem::id above;
+    mem::id below;
     axis splitAxis;
     float splitPos;
-    std::vector<id> objIds;
+    std::vector<mem::id> objIds;
 
-    kdnode() : above(ID_INVALID),
-               below(ID_INVALID),
+    kdnode() : above(mem::ID_INVALID),
+               below(mem::ID_INVALID),
                splitAxis(INVALID_AXIS),
                splitPos(0.0f),
                objIds() {}
 
-    inline void makeLeaf(iditer ids, long count) {
+    inline void makeLeaf(std::vector<mem::id>::iterator ids, long count) {
       for (long i = 0; i < count; ++i) {
         objIds.push_back(ids[i]);
       }
@@ -48,25 +45,25 @@ class kdtree {
     }
 
     inline bool isLeaf() const {
-      return (above == ID_INVALID && below == ID_INVALID);
+      return (!mem::isValidId(above) && !mem::isValidId(below));
     }
   };
 
   struct kdtodo {
-    id nodeId;
+    mem::id nodeId;
     float tmin;
     float tmax;
   };
 
   struct bboxedge {
-    id objId;
+    mem::id objId;
     float pos;
     bool starting;
 
     bboxedge()
-      : objId(std::numeric_limits<id>::max()), pos(0.0f), starting(false) {}
+      : objId(mem::ID_INVALID), pos(0.0f), starting(false) {}
 
-    bboxedge(id o, float p,  bool start)
+    bboxedge(mem::id o, float p,  bool start)
       : objId(o), pos(p), starting(start) {}
 
     bool operator<(const bboxedge &e) const {
@@ -79,24 +76,24 @@ class kdtree {
   };
 
   std::vector<kdnode> allNodes;
-  id rootId;
+  mem::id rootId;
   bbox bounds;
 
   void buildTree(
-    id nodeId,
+    mem::id nodeId,
     const bbox& nodeBounds,
     const std::vector<bbox>& allObjBounds,
-    iditer nodeObjIds,
+    std::vector<mem::id>::iterator nodeObjIds,
     long nodeObjCount,
     int depth,
     std::vector<bboxedge>::iterator workEdges[],
-    iditer workObjs0,
-    iditer workObjs1,
+    std::vector<mem::id>::iterator workObjs0,
+    std::vector<mem::id>::iterator workObjs1,
     int badRefinesSoFar
   );
 
 protected:
-  void print(id nodeId, std::ostream& os, std::string header = "") const;
+  void print(mem::id nodeId, std::ostream& os, std::string header = "") const;
 
 public:
   std::vector<geom*>* objs;

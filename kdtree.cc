@@ -1,7 +1,7 @@
 #include "kdtree.h"
 
 kdtree::kdtree(std::vector<geom*>* o) :
-  allNodes(), rootId(ID_INVALID), objs(o) {}
+allNodes(), rootId(mem::ID_INVALID), objs(o) {}
 
 void kdtree::build() {
   rootId = 0;
@@ -26,11 +26,11 @@ void kdtree::build() {
     workEdgesRaw[i] = std::vector<bboxedge>(2 * objs->size());
     workEdgesIters[i] = workEdgesRaw[i].begin();
   }
-  std::vector<id> workObjs0(objs->size());
-  std::vector<id> workObjs1(size_t(maxDepth + 1) * objs->size());
+  std::vector<mem::id> workObjs0(objs->size());
+  std::vector<mem::id> workObjs1(size_t(maxDepth + 1) * objs->size());
 
   // Initialize `objIds` for kd-tree construction (p. 232).
-  std::vector<id> objIds(objs->size());
+  std::vector<mem::id> objIds(objs->size());
   for (size_t i = 0; i < objs->size(); ++i) {
     objIds[i] = i;
   }
@@ -51,15 +51,15 @@ void kdtree::build() {
 }
 
 void kdtree::buildTree(
-  id nodeId,
+  mem::id nodeId,
   const bbox& nodeBounds,
   const std::vector<bbox>& allObjBounds,
-  iditer nodeObjIds,
+  std::vector<mem::id>::iterator nodeObjIds,
   long nodeObjCount,
   int depth,
   std::vector<bboxedge>::iterator workEdges[],
-  iditer workObjs0,
-  iditer workObjs1,
+  std::vector<mem::id>::iterator workObjs0,
+  std::vector<mem::id>::iterator workObjs1,
   int badRefinesSoFar
 ) {
   // Initialize leaf node at `node` if termination criteria met (p. 233).
@@ -90,7 +90,7 @@ void kdtree::buildTree(
 retrySplit:
   // Initialize edges for axis (p. 236).
   for (long i = 0; i < nodeObjCount; ++i) {
-    id j = nodeObjIds[i];
+    mem::id j = nodeObjIds[i];
     const bbox& jBounds = allObjBounds[j];
     workEdges[ax][2 * i]     = bboxedge(j, jBounds.min[ax], true);
     workEdges[ax][2 * i + 1] = bboxedge(j, jBounds.max[ax], false);
@@ -161,12 +161,12 @@ retrySplit:
   long n1 = 0;
   for (long i = 0; i < bestOffset; ++i) {
     if (workEdges[bestAxis][i].starting) {
-      workObjs0[n0++] = id(workEdges[bestAxis][i].objId);
+      workObjs0[n0++] = mem::id(workEdges[bestAxis][i].objId);
     }
   }
   for (long i = bestOffset + 1; i < 2 * nodeObjCount; ++i) {
     if (!workEdges[bestAxis][i].starting) {
-      workObjs1[n1++] = id(workEdges[bestAxis][i].objId);
+      workObjs1[n1++] = mem::id(workEdges[bestAxis][i].objId);
     }
   }
 
@@ -226,10 +226,10 @@ geom* kdtree::intersect(
   int todoPos = 0;
 
   // Traverse kd-tree nodes in order for ray (p. 242).
-  id nodeId = rootId;
+  mem::id nodeId = rootId;
   intersection winnerIsect;
   geom* winnerObj = nullptr;
-  while (nodeId < ID_INVALID) {
+  while (mem::isValidId(nodeId)) {
     // Bail out if we found a hit closer than the curent node (p. 242).
     if (winnerIsect.distance < tmin) break;
 
@@ -242,8 +242,8 @@ geom* kdtree::intersect(
       float tplane = (allNodes[nodeId].splitPos - r.origin[ax]) * invDir[ax];
 
       // Get node children pointers for ray.
-      id firstChild;
-      id secondChild;
+      mem::id firstChild;
+      mem::id secondChild;
       bool belowFirst = (r.origin[ax] < allNodes[nodeId].splitPos) ||
                         (math::unsafeEquals(r.origin[ax],
                            allNodes[nodeId].splitPos)
@@ -273,7 +273,7 @@ geom* kdtree::intersect(
       }
     } else  {
       // Check for intersections inside leaf node (p. 244).
-      for (id objId : allNodes[nodeId].objIds) {
+      for (mem::id objId : allNodes[nodeId].objIds) {
         geom* obj = (*objs)[objId];
 
         // Check one primitive inside leaf node (p. 244).
@@ -305,7 +305,7 @@ geom* kdtree::intersect(
   return winnerObj;
 }
 
-void kdtree::print(id nodeId, std::ostream& os, std::string header) const {
+void kdtree::print(mem::id nodeId, std::ostream& os, std::string header) const {
   const kdnode& node = allNodes[nodeId];
 
   if (!node.isLeaf()) {
@@ -334,14 +334,14 @@ void kdtree::print(id nodeId, std::ostream& os, std::string header) const {
   }
 
   os << ") {\n";
-  if (node.below < ID_INVALID) {
+  if (mem::isValidId(node.below)) {
     print(node.below, os, header + "  ");
   } else {
     os << header << "  [none below]";
   }
 
   os << "\n";
-  if (node.above < ID_INVALID) {
+  if (mem::isValidId(node.above)) {
     print(node.above, os, header + "  ");
   } else {
     os << header << "  [none above]";
