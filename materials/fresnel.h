@@ -11,7 +11,10 @@ namespace materials {
     const float etaExiting; // nThisMaterial / nAir;
 
   public:
-    fresnel(float ior = 1.5f);
+    static constexpr float IOR_GLASS = 1.5f;
+    static constexpr float IOR_DIAMOND = 2.4f;
+  
+    fresnel(float ior = IOR_GLASS);
 
     virtual lightray propagate(
       const lightray& incoming,
