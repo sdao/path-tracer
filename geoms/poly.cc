@@ -53,13 +53,28 @@ intersection geoms::poly::intersect(const ray& r) const {
   
   const float w = 1.0f - u - v;
   
-  return intersection(
-    r.at(dist),
-    w * pt0_data.normal + u * pt1_data.normal + v * pt2_data.normal,
-    w * pt0_data.tangent + u * pt1_data.tangent + v * pt2_data.tangent,
-    w * pt0_data.binormal + u * pt1_data.binormal + v * pt2_data.binormal,
-    dist
-  );
+  intersection isect;
+  isect.position = r.at(dist);
+  isect.distance = dist;
+  
+  // See Pharr & Humphreys pp. 147-148.
+  // The gist is that interpolation w/ barycentric coordinates will not
+  // preserve the orthonormality of the basis vectors.
+  isect.normal =
+    w * pt0_data.normal + u * pt1_data.normal + v * pt2_data.normal;
+  isect.tangent =
+    w * pt0_data.tangent + u * pt1_data.tangent + v * pt2_data.tangent;
+  isect.binormal = glm::cross(isect.tangent, isect.normal);
+  
+  if (glm::length2(isect.binormal) > 0.0f) {
+    isect.binormal = glm::normalize(isect.binormal);
+    isect.tangent = glm::cross(isect.binormal, isect.normal);
+  } else {
+    // Force recompute tangent and binormal.
+    math::coordSystem(isect.normal, &isect.tangent, &isect.binormal);
+  }
+  
+  return isect;
 }
 
 bbox geoms::poly::bounds() const {

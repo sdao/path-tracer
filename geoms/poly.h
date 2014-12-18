@@ -10,10 +10,10 @@ namespace geoms {
       vec position;
       vec normal;
       vec tangent;
-      vec binormal;
-      
+            
       inline void computeTangents() {
-        math::coordSystem(normal, &tangent, &binormal);
+        vec dummy;
+        math::coordSystem(normal, &tangent, &dummy);
       }
     };
     

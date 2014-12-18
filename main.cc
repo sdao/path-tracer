@@ -54,8 +54,8 @@ void render(size_t w, size_t h, std::string name) {
   mesh externalModel;
   externalModel.readPolyModel(
     spec,
-    "assets/cone6.obj",
-    vec(0, -18, -32),
+    "assets/cone20.obj",
+    vec(-8, -18, -32),
     &objs
   );
 
