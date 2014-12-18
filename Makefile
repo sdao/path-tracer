@@ -1,5 +1,5 @@
 SOURCES = *.cc materials/*.cc geoms/*.cc
-LIBS = -lIlmImf -lHalf -ltbb
+LIBS = -lIlmImf -lHalf -ltbb -lassimp
 WARN = -Werror -Weverything -Wno-c++98-compat -Wno-padded
 
 path-tracer: $(SOURCES)

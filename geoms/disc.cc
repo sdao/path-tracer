@@ -4,8 +4,12 @@ geoms::disc::disc(material* m, vec o, vec n, float r)
   : geom(m), radiusSquared(r * r), origin(o), normal(glm::normalize(n)),
     radius(r)
 {
-  math::coordSystem(normal, &tangent, &cotangent);
+  math::coordSystem(normal, &tangent, &binormal);
 }
+
+geoms::disc::disc(const geoms::disc& other)
+  : geom(other.mat), radiusSquared(other.radiusSquared),
+    origin(other.origin), normal(other.normal), radius(other.radius) {}
 
 intersection geoms::disc::intersect(const ray& r) const {
   // See Wikipedia:
@@ -20,7 +24,7 @@ intersection geoms::disc::intersect(const ray& r) const {
       vec isectPoint = r.at(d);
       if (glm::length2(isectPoint - origin) < radiusSquared) {
         // In the disc.
-        return intersection(isectPoint, normal, tangent, cotangent, d);
+        return intersection(isectPoint, normal, tangent, binormal, d);
       }
     }
   }
@@ -31,11 +35,11 @@ intersection geoms::disc::intersect(const ray& r) const {
 
 bbox geoms::disc::bounds() const {
   vec tr = tangent * radius;
-  vec cr = cotangent * radius;
+  vec br = binormal * radius;
 
-  bbox b(origin + tr + cr, origin - tr - cr);
-  b.expand(origin + tr - cr);
-  b.expand(origin - tr + cr);
+  bbox b(origin + tr + br, origin - tr - br);
+  b.expand(origin + tr - br);
+  b.expand(origin - tr + br);
 
   return b;
 }

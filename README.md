@@ -8,6 +8,7 @@ Dependencies
 * Intel Threading Building Blocks (tbb)
 * OpenEXR libraries (IlmImf)
 * OpenGL Mathematics (GLM)
+* Open Asset Import Library (Assimp) 
 
 Reference
 ---------

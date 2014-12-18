@@ -3,7 +3,6 @@
 
 class material {
 protected:
-  material(vec d);
   material();
 
 public:

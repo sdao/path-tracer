@@ -5,7 +5,7 @@ namespace geoms {
 
   class disc : public geom {
     vec tangent;
-    vec cotangent;
+    vec binormal;
     const float radiusSquared;
 
   public:
@@ -19,6 +19,7 @@ namespace geoms {
       vec n = vec(0, 1, 0),
       float r = 10.0f
     );
+    disc(const geoms::disc& other);
 
     virtual intersection intersect(const ray& r) const;
     virtual bbox bounds() const;

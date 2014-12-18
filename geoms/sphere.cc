@@ -3,6 +3,9 @@
 geoms::sphere::sphere(material* m, vec o, float r)
   : geom(m), origin(o), radius(r) {}
 
+geoms::sphere::sphere(const geoms::sphere& other)
+  : geom(other.mat), origin(other.origin), radius(other.radius) {}
+
 intersection geoms::sphere::intersect(const ray& r) const {
   vec diff = r.origin - origin;
   vec l = r.direction;

@@ -222,19 +222,19 @@ struct intersection {
   vec position;
   vec normal;
   vec tangent;
-  vec cotangent;
+  vec binormal;
   float distance;
 
   intersection()
-    : position(0), normal(0), tangent(0), cotangent(0),
+    : position(0), normal(0), tangent(0), binormal(0),
       distance(std::numeric_limits<float>::max()) {}
   intersection(vec p, vec n, float d)
-    : position(p), normal(n), tangent(0), cotangent(0), distance(d) {}
-  intersection(vec p, vec n, vec tang, vec cotang, float d)
+    : position(p), normal(n), tangent(0), binormal(0), distance(d) {}
+  intersection(vec p, vec n, vec tang, vec binorm, float d)
     : position(p),
       normal(n),
       tangent(tang),
-      cotangent(cotang),
+      binormal(binorm),
       distance(d) {}
 
   inline bool hit() const {
@@ -247,12 +247,12 @@ struct intersection {
    * specifically question 6.08 of the comp.graphics.algorithms FAQ.
    *
    * If the tangent is exactly zero-length, we assume that it has not been
-   * computed and we will compute it and the cotangent.
-   * Otherwise, we trust that the tangent and cotangent are correct.
+   * computed and we will compute it and the binormal.
+   * Otherwise, we trust that the tangent and binormal are correct.
    */
   inline vec uniformSampleHemisphere(randomness& rng) {
     if (math::isExactlyZero(tangent)) {
-      math::coordSystem(normal, &tangent, &cotangent);
+      math::coordSystem(normal, &tangent, &binormal);
     }
 
     float z = rng.nextFloat(1.0f);
@@ -261,7 +261,7 @@ struct intersection {
     float x = r * cosf(t);
     float y = r * sinf(t);
 
-    return (z * normal) + (x * tangent) + (y * cotangent);
+    return (z * normal) + (x * tangent) + (y * binormal);
   }
 
   /**
@@ -280,7 +280,7 @@ struct intersection {
    */
   inline vec uniformSampleCone(randomness& rng, float halfAngle) {
     if (math::isExactlyZero(tangent)) {
-      math::coordSystem(normal, &tangent, &cotangent);
+      math::coordSystem(normal, &tangent, &binormal);
     }
 
     float h = cosf(halfAngle);
@@ -290,6 +290,6 @@ struct intersection {
     float x = r * cosf(t);
     float y = r * sinf(t);
 
-    return (z * normal) + (x * tangent) + (y * cotangent);
+    return (z * normal) + (x * tangent) + (y * binormal);
   }
 };
