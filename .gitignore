@@ -1,11 +1,13 @@
 # Xcode project
 *.xcodeproj/
 
+# Test image output
+output.exr
+
 # Compiled Object files
 *.slo
 *.lo
 *.o
-*.obj
 
 # Precompiled Headers
 *.gch
