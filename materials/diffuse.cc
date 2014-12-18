@@ -10,7 +10,7 @@ lightray materials::diffuse::propagate(
   vec reflectVector = isect.uniformSampleHemisphere(rng);
 
   return lightray(
-    isect.position + reflectVector * 0.01f,
+    isect.position + reflectVector * math::VERY_SMALL,
     reflectVector,
     incoming.color * color
   );

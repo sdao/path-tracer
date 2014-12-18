@@ -16,6 +16,8 @@ enum axis { X_AXIS = 0, Y_AXIS = 1, Z_AXIS = 2, INVALID_AXIS = -1 };
 
 namespace math {
 
+  static constexpr float VERY_SMALL = 0.0001f;
+
   inline float clamp(float x) {
     return x < 0 ? 0 : (x > 1 ? 1 : x);
   }
@@ -153,7 +155,7 @@ struct bbox {
     max = vec(std::max(max.x, v.x), std::max(max.y, v.y), std::max(max.z, v.z));
   }
 
-  inline void expand(float f = 0.1f) {
+  inline void expand(float f = math::VERY_SMALL) {
     min.x -= f;
     min.y -= f;
     min.z -= f;

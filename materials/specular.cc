@@ -10,7 +10,7 @@ lightray materials::specular::propagate(
   vec reflectVector = glm::reflect(incoming.direction, isect.normal);
 
   return lightray(
-    isect.position + reflectVector * 0.01f,
+    isect.position + reflectVector * math::VERY_SMALL,
     reflectVector,
     incoming.color
   );

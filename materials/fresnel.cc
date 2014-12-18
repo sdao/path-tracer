@@ -46,7 +46,7 @@ lightray materials::fresnel::propagate(
   if (math::isNearlyZero(glm::length(refractVector))) {
     // Total internal reflection. Must reflect.
     return lightray(
-      isect.position + reflectVector * 0.01f,
+      isect.position + reflectVector * math::VERY_SMALL,
       reflectVector,
       incoming.color
     );
@@ -81,13 +81,13 @@ lightray materials::fresnel::propagate(
   if (rng.nextUnitFloat() < probRefl) {
     // Higher reflectance = higher probability of reflecting.
     return lightray(
-      isect.position + reflectVector * 0.01f,
+      isect.position + reflectVector * math::VERY_SMALL,
       reflectVector,
       incoming.color * refl / probRefl // Adjust color for probabilities.
     );
   } else {
     return lightray(
-      isect.position + refractVector * 0.01f,
+      isect.position + refractVector * math::VERY_SMALL,
       refractVector,
       incoming.color * refr / probRefr // Adjust color for probabilities.
     );

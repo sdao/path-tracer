@@ -10,7 +10,7 @@ lightray materials::glossy::propagate(
   vec reflectVector = isect.uniformSampleCone(rng, glossiness * float(M_PI_2));
 
   return lightray(
-    isect.position + reflectVector * 0.01f,
+    isect.position + reflectVector * math::VERY_SMALL,
     reflectVector,
     incoming.color
   );

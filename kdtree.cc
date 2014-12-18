@@ -15,7 +15,7 @@ void kdtree::build() {
   std::vector<bbox> allObjBounds(objs->size());
   for (size_t i = 0; i < objs->size(); ++i) {
     allObjBounds[i] = (*objs)[i]->bounds();
-    allObjBounds[i].expand(0.1f); // Avoid pathological "flat" bboxes.
+    allObjBounds[i].expand(math::VERY_SMALL); // Avoid pathological "flat" bboxes.
     bounds.expand(allObjBounds[i]);
   }
 
