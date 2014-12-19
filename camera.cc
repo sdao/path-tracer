@@ -44,7 +44,7 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
     randomness rng(rowSeeds[y]);
 
     for (size_t x = 0; x < w; ++x) {
-      dvec pxColor;
+      dvec pxColor(0, 0, 0);
       for (int samps = 0; samps < SAMPLES_PER_PIXEL; ++samps) {
         float frac_y =
           (float(y) - 0.5f + rng.nextUnitFloat()) / (float(h) - 1.0f);
