@@ -13,13 +13,13 @@ void render(size_t w, size_t h, std::string name) {
   material* white = new materials::diffuse(vec(1, 1, 1));
   material* blue = new materials::diffuse(vec(0.5, 0.6, 1));
   material* emit = new materials::emitter(vec(4, 4, 4));
-  material* fresnel = new materials::fresnel(materials::fresnel::IOR_DIAMOND);
-  material* glossy = new materials::glossy(0.25f);
+  material* fresnel = new materials::fresnel(materials::fresnel::IOR_GLASS);
+  material* glossy = new materials::glossy(0.10f);
 
   std::vector<geom*> objs;
   // spheres
   objs.push_back(
-    new geoms::sphere(fresnel, vec(-4, -14, -20), 4.0f)
+    new geoms::sphere(fresnel, vec(-6, -14, -16), 4.0f)
   );
   objs.push_back(
     new geoms::sphere(fresnel, vec(10, -12, -24), 6.0f)
@@ -53,7 +53,7 @@ void render(size_t w, size_t h, std::string name) {
   externalModel.readPolyModel(
     glossy,
     "assets/dragon.obj",
-    vec(-8, -18, -32),
+    vec(-6, -18, -32),
     &objs
   );
 
