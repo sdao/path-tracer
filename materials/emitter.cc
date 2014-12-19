@@ -7,5 +7,9 @@ lightray materials::emitter::propagate(
   intersection& /* isect */,
   randomness& /* rng */
 ) const {
-  return lightray(vec(0), vec(0), incoming.color * color);
+  return lightray(
+    vec(0, 0, 0),
+    vec(0, 0, 0),
+    incoming.color.cwiseProduct(color)
+  );
 }

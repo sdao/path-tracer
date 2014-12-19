@@ -12,6 +12,6 @@ lightray materials::diffuse::propagate(
   return lightray(
     isect.position + reflectVector * math::VERY_SMALL,
     reflectVector,
-    incoming.color * color
+    incoming.color.cwiseProduct(color)
   );
 }

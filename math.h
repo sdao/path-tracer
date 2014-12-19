@@ -1,16 +1,19 @@
 #pragma once
+
+#define EIGEN_NO_DEBUG 1
+
 #include <OpenEXR/ImfRgbaFile.h>
 #include <OpenEXR/ImfArray.h>
 #include <cmath>
 #include <limits>
 #include <vector>
 #include <iostream>
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
+#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/Geometry>
 #include "randomness.h"
 
-typedef glm::vec3 vec;
-typedef glm::dvec3 dvec;
+typedef Eigen::Vector3f vec;
+typedef Eigen::Vector3d dvec;
 
 enum axis { X_AXIS = 0, Y_AXIS = 1, Z_AXIS = 2, INVALID_AXIS = -1 };
 
@@ -26,14 +29,14 @@ namespace math {
    * Taken from page 63 of Pharr & Humphreys' Physically-Based Rendering.
    */
   inline void coordSystem(const vec& v1, vec* v2, vec* v3) {
-    if (fabsf(v1.x) > fabsf(v1.y)) {
-      float invLen = 1.0f / sqrtf(v1.x * v1.x + v1.z * v1.z);
-      *v2 = vec(-v1.z * invLen, 0.0f, v1.x * invLen);
+    if (fabsf(v1.x()) > fabsf(v1.y())) {
+      float invLen = 1.0f / sqrtf(v1.x() * v1.x() + v1.z() * v1.z());
+      *v2 = vec(-v1.z() * invLen, 0.0f, v1.x() * invLen);
     } else {
-      float invLen = 1.0f / sqrtf(v1.y * v1.y + v1.z * v1.z);
-      *v2 = vec(0.0f, v1.z * invLen, -v1.y * invLen);
+      float invLen = 1.0f / sqrtf(v1.y() * v1.y() + v1.z() * v1.z());
+      *v2 = vec(0.0f, v1.z() * invLen, -v1.y() * invLen);
     }
-    *v3 = glm::cross(v1, *v2);
+    *v3 = v1.cross(*v2);
   }
 
   inline void copyData(
@@ -46,9 +49,9 @@ namespace math {
       for (size_t x = 0; x < w; ++x) {
         Imf::Rgba& rgba = exrData[long(y)][long(x)];
         const dvec &p = data[y][x];
-        rgba.r = float(p.x);
-        rgba.g = float(p.y);
-        rgba.b = float(p.z);
+        rgba.r = float(p.x());
+        rgba.g = float(p.y());
+        rgba.b = float(p.z());
         rgba.a = 1.0f;
       }
     }
@@ -59,11 +62,11 @@ namespace math {
   }
 
   inline bool isNearlyZero(const vec& v) {
-    return isNearlyZero(glm::length2(v));
+    return isNearlyZero(v.squaredNorm());
   }
 
   inline bool isExactlyZero(const vec& v) {
-    return v.x == 0.0f && v.y == 0.0f && v.z == 0.0f;
+    return v.x() == 0.0f && v.y() == 0.0f && v.z() == 0.0f;
   }
 
   inline bool isPositive(float x) {
@@ -94,6 +97,28 @@ namespace math {
         return INVALID_AXIS;
     }
   }
+  
+  /**
+   * Same as GLSL reflect.
+   * See <https://www.opengl.org/sdk/docs/man4/html/reflect.xhtml>.
+   */
+  inline vec reflect(const vec& I, const vec& N) {
+    return I - 2.0f * N.dot(I) * N;
+  }
+  
+  /**
+   * Same as GLSL refract.
+   * See <https://www.opengl.org/sdk/docs/man4/html/refract.xhtml>.
+   */
+  inline vec refract(const vec& I, const vec& N, float eta) {
+    float d = N.dot(I);
+    float k = 1.0f - eta * eta * (1.0f - d * d);
+    if (k < 0.0f) {
+      return vec(0, 0, 0);
+    } else {
+      return (eta * I) - ((eta * d + sqrtf(k)) * N);
+    }
+  }
 
 }
 
@@ -102,13 +127,13 @@ struct ray {
   vec direction;
 
   ray(vec o, vec d) : origin(o), direction(d) {}
-  ray() : origin(0), direction(0) {}
+  ray() : origin(0, 0, 0), direction(0, 0, 0) {}
 
   inline vec at(float d) const { return origin + direction * d; }
 
   friend std::ostream& operator<<(std::ostream& os, const ray& r) {
-    os << "<origin: " << glm::to_string(r.origin)
-       << ", direction: " << glm::to_string(r.direction) << ">";
+    os << "<origin: " << r.origin
+       << ", direction: " << r.direction << ">";
     return os;
   }
 };
@@ -117,15 +142,15 @@ struct lightray : public ray {
   vec color;
 
   lightray(vec o, vec d, vec c) : ray(o, d), color(c) {}
-  lightray(vec o, vec d) : ray(o, d), color(1) {}
-  lightray() : ray(), color(1) {}
+  lightray(vec o, vec d) : ray(o, d), color(1, 1, 1) {}
+  lightray() : ray(), color(1, 1, 1) {}
 
   inline bool isBlack() const {
     return math::isNearlyZero(color);
   }
 
   inline float energy() const {
-    return std::max(std::max(color.x, color.y), color.z);
+    return std::max(std::max(color.x(), color.y()), color.z());
   }
 
   inline bool isZeroLength() const {
@@ -133,9 +158,9 @@ struct lightray : public ray {
   }
 
   inline void kill() {
-    origin = vec(0);
-    direction = vec(0);
-    color = vec(0);
+    origin = vec(0, 0, 0);
+    direction = vec(0, 0, 0);
+    color = vec(0, 0, 0);
   }
 };
 
@@ -143,51 +168,51 @@ struct bbox {
   vec min;
   vec max;
 
-  bbox() : min(0), max(0) {}
+  bbox() : min(0, 0, 0), max(0, 0, 0) {}
 
   bbox(vec a, vec b) {
-    min = vec(std::min(a.x, b.x), std::min(a.y, b.y), std::min(a.z, b.z));
-    max = vec(std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z));
+    min = vec(std::min(a.x(), b.x()), std::min(a.y(), b.y()), std::min(a.z(), b.z()));
+    max = vec(std::max(a.x(), b.x()), std::max(a.y(), b.y()), std::max(a.z(), b.z()));
   }
 
   inline void expand(const vec& v) {
-    min = vec(std::min(min.x, v.x), std::min(min.y, v.y), std::min(min.z, v.z));
-    max = vec(std::max(max.x, v.x), std::max(max.y, v.y), std::max(max.z, v.z));
+    min = vec(std::min(min.x(), v.x()), std::min(min.y(), v.y()), std::min(min.z(), v.z()));
+    max = vec(std::max(max.x(), v.x()), std::max(max.y(), v.y()), std::max(max.z(), v.z()));
   }
 
   inline void expand(float f = math::VERY_SMALL) {
-    min.x -= f;
-    min.y -= f;
-    min.z -= f;
+    min.x() -= f;
+    min.y() -= f;
+    min.z() -= f;
 
-    max.x += f;
-    max.y += f;
-    max.z += f;
+    max.x() += f;
+    max.y() += f;
+    max.z() += f;
   }
 
   inline void expand(const bbox& b) {
     min = vec(
-      std::min(min.x, b.min.x),
-      std::min(min.y, b.min.y),
-      std::min(min.z, b.min.z)
+      std::min(min.x(), b.min.x()),
+      std::min(min.y(), b.min.y()),
+      std::min(min.z(), b.min.z())
     );
     max = vec(
-      std::max(max.x, b.max.x),
-      std::max(max.y, b.max.y),
-      std::max(max.z, b.max.z)
+      std::max(max.x(), b.max.x()),
+      std::max(max.y(), b.max.y()),
+      std::max(max.z(), b.max.z())
     );
   }
 
   inline float surfaceArea() const {
     vec d = max - min;
-    return 2.0f * (d.x * d.y + d.x * d.z + d.y * d.z);
+    return 2.0f * (d.x() * d.y() + d.x() * d.z() + d.y() * d.z());
   }
 
   inline axis maximumExtent() const {
     vec d = max - min;
-    if (d.x > d.y && d.x > d.z) {
+    if (d.x() > d.y() && d.x() > d.z()) {
       return X_AXIS;
-    } else if (d.y > d.z) {
+    } else if (d.y() > d.z()) {
       return Y_AXIS;
     } else {
       return Z_AXIS;
@@ -214,8 +239,8 @@ struct bbox {
   }
 
   friend std::ostream& operator<<(std::ostream& os, const bbox& b) {
-    os << "<min: " << glm::to_string(b.min)
-       << ", max: " << glm::to_string(b.max) << ">";
+    os << "<min: " << b.min
+       << ", max: " << b.max << ">";
     return os;
   }
 };
@@ -228,10 +253,11 @@ struct intersection {
   float distance;
 
   intersection()
-    : position(0), normal(0), tangent(0), binormal(0),
+    : position(0, 0, 0), normal(0, 0, 0), tangent(0, 0, 0), binormal(0, 0, 0),
       distance(std::numeric_limits<float>::max()) {}
   intersection(vec p, vec n, float d)
-    : position(p), normal(n), tangent(0), binormal(0), distance(d) {}
+    : position(p), normal(n), tangent(0, 0, 0), binormal(0, 0, 0),
+      distance(d) {}
   intersection(vec p, vec n, vec tang, vec binorm, float d)
     : position(p),
       normal(n),

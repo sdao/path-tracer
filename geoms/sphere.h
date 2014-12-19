@@ -8,7 +8,7 @@ namespace geoms {
     const vec origin;
     const float radius;
 
-    sphere(material* m, vec o = vec(0), float r = 1.0f);
+    sphere(material* m, vec o = vec(0, 0, 0), float r = 1.0f);
     sphere(const geoms::sphere& other);
 
     virtual intersection intersect(const ray& r) const;

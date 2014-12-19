@@ -25,8 +25,8 @@ intersection geoms::poly::intersect(const ray& r) const {
   const vec edge1 = pt1_data.position - pt0_data.position;
   const vec edge2 = pt2_data.position - pt0_data.position;
   
-  const vec p = glm::cross(r.direction, edge2);
-  const float det = glm::dot(edge1, p);
+  const vec p = r.direction.cross(edge2);
+  const float det = edge1.dot(p);
   
   if (math::isNearlyZero(det)) {
     return intersection(); // No hit on plane.
@@ -35,18 +35,18 @@ intersection geoms::poly::intersect(const ray& r) const {
   const float invDet = 1.0f / det;
   const vec t = r.origin - pt0_data.position;
   
-  const float u = glm::dot(t, p) * invDet;
+  const float u = t.dot(p) * invDet;
   if (u < 0.0f || u > 1.0f) {
     return intersection(); // In plane but not triangle.
   }
   
-  const vec q = glm::cross(t, edge1);
-  const float v = glm::dot(r.direction, q) * invDet;
+  const vec q = t.cross(edge1);
+  const float v = r.direction.dot(q) * invDet;
   if (v < 0.0f || (u + v) > 1.0f) {
     return intersection(); // In plane but not triangle.
   }
   
-  const float dist = glm::dot(edge2, q) * invDet;
+  const float dist = edge2.dot(q) * invDet;
   if (dist < 0.0f) {
     return intersection(); // In triangle but behind us.
   }
@@ -64,11 +64,11 @@ intersection geoms::poly::intersect(const ray& r) const {
     w * pt0_data.normal + u * pt1_data.normal + v * pt2_data.normal;
   isect.tangent =
     w * pt0_data.tangent + u * pt1_data.tangent + v * pt2_data.tangent;
-  isect.binormal = glm::cross(isect.tangent, isect.normal);
+  isect.binormal = isect.tangent.cross(isect.normal);
   
-  if (glm::length2(isect.binormal) > 0.0f) {
-    isect.binormal = glm::normalize(isect.binormal);
-    isect.tangent = glm::cross(isect.binormal, isect.normal);
+  if (isect.binormal.squaredNorm() > 0.0f) {
+    isect.binormal = isect.binormal.normalized();
+    isect.tangent = isect.binormal.cross(isect.normal);
   } else {
     // Force recompute tangent and binormal.
     math::coordSystem(isect.normal, &isect.tangent, &isect.binormal);

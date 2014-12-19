@@ -58,9 +58,8 @@ bool mesh::readPolyModel(
       
       geoms::poly::point thisPoint;
       thisPoint.position = vec(thisPos.x, thisPos.y, thisPos.z) + offset;
-      thisPoint.normal = glm::normalize(
-        vec(thisNorm.x, thisNorm.y, thisNorm.z)
-      );
+      thisPoint.normal =
+        vec(thisNorm.x, thisNorm.y, thisNorm.z).normalized();
       thisPoint.computeTangents();
       
       points.push_back(thisPoint);

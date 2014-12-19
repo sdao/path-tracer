@@ -9,9 +9,9 @@
 [[noreturn]] void render(size_t w, size_t h, std::string name);
 
 void render(size_t w, size_t h, std::string name) {
-  material* green = new materials::diffuse(vec(0.5, 0.9, 0.4));
+  material* green = new materials::diffuse(vec(0.5f, 0.9f, 0.4f));
   material* white = new materials::diffuse(vec(1, 1, 1));
-  material* blue = new materials::diffuse(vec(0.5, 0.6, 1));
+  material* blue = new materials::diffuse(vec(0.5f, 0.6f, 1));
   material* emit = new materials::emitter(vec(4, 4, 4));
   material* fresnel = new materials::fresnel(materials::fresnel::IOR_GLASS);
   material* glossy = new materials::glossy(0.10f);

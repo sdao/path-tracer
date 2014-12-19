@@ -15,7 +15,7 @@ namespace geoms {
 
     disc(
       material* m,
-      vec o = vec(0),
+      vec o = vec(0, 0, 0),
       vec n = vec(0, 1, 0),
       float r = 10.0f
     );

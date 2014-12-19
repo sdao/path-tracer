@@ -7,5 +7,5 @@ lightray materials::normaltest::propagate(
   intersection& isect,
   randomness& /* rng */
 ) const {
-  return lightray(vec(0), vec(0), isect.normal);
+  return lightray(vec(0, 0, 0), vec(0, 0, 0), isect.normal);
 }

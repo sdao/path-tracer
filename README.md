@@ -5,9 +5,9 @@ Little global illumination Monte Carlo path tracer
 
 Dependencies
 ------------
+* Eigen
 * Intel Threading Building Blocks (tbb)
 * OpenEXR libraries (IlmImf)
-* OpenGL Mathematics (GLM)
 * Open Asset Import Library (Assimp) 
 
 Reference

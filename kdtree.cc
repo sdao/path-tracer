@@ -218,9 +218,9 @@ geom* kdtree::intersect(
 
   // Prepare to traverse kd-tree for ray (p. 241).
   vec invDir(
-    1.0f / r.direction.x,
-    1.0f / r.direction.y,
-    1.0f / r.direction.z
+    1.0f / r.direction.x(),
+    1.0f / r.direction.y(),
+    1.0f / r.direction.z()
   );
   kdtodo todo[MAX_TODO];
   int todoPos = 0;

@@ -14,7 +14,7 @@ lightray materials::fresnel::propagate(
   randomness& rng
 ) const {
   // Entering = are normal and ray in opposite directions?
-  bool entering = glm::dot(isect.normal, incoming.direction) < 0;
+  bool entering = isect.normal.dot(incoming.direction) < 0;
 
   vec alignedNormal; // Normal flipped based on ray direction.
   float eta; // Ratio of indices of refraction.
@@ -30,20 +30,20 @@ lightray materials::fresnel::propagate(
     eta = etaExiting;
   }
 
-  // Calculate reflection vector using GLM.
-  vec reflectVector = glm::reflect(
+  // Calculate reflection vector.
+  vec reflectVector = math::reflect(
     incoming.direction,
     alignedNormal
   );
 
-  // Calculate refraction vector using GLM.
-  vec refractVector = glm::refract(
+  // Calculate refraction vector.
+  vec refractVector = math::refract(
     incoming.direction,
     alignedNormal,
     eta
   );
 
-  if (math::isNearlyZero(glm::length(refractVector))) {
+  if (math::isNearlyZero(refractVector.squaredNorm())) {
     // Total internal reflection. Must reflect.
     return lightray(
       isect.position + reflectVector * math::VERY_SMALL,
@@ -61,11 +61,11 @@ lightray materials::fresnel::propagate(
     // Equivalent to condition: entering == true
     // (e.g. nI = 1 (air), nT = 1.5 (glass))
     // Theta = angle of incidence.
-    cosTemp = 1.0f - glm::dot(-incoming.direction, alignedNormal);
+    cosTemp = 1.0f - (-incoming.direction).dot(alignedNormal);
   } else {
     // Equivalent to condition: entering == false
     // Theta = angle of refraction.
-    cosTemp = 1.0f - glm::dot(refractVector, -alignedNormal);
+    cosTemp = 1.0f - refractVector.dot(-alignedNormal);
   }
 
   float cosTemp5 = cosTemp * cosTemp * cosTemp * cosTemp * cosTemp;

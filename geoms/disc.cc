@@ -1,7 +1,7 @@
 #include "disc.h"
 
 geoms::disc::disc(material* m, vec o, vec n, float r)
-  : geom(m), radiusSquared(r * r), origin(o), normal(glm::normalize(n)),
+  : geom(m), radiusSquared(r * r), origin(o), normal(n.normalized()),
     radius(r)
 {
   math::coordSystem(normal, &tangent, &binormal);
@@ -15,14 +15,14 @@ intersection geoms::disc::intersect(const ray& r) const {
   // See Wikipedia:
   // <http://en.wikipedia.org/wiki/Line%E2%80%93disc_intersection>
 
-  float denom = glm::dot(r.direction, normal);
+  float denom = r.direction.dot(normal);
   if (denom != 0.0f) {
-    float d = glm::dot(origin - r.origin, normal) / denom;
+    float d = (origin - r.origin).dot(normal) / denom;
 
     if (math::isPositive(d)) {
       // In the plane, but are we in the disc?
       vec isectPoint = r.at(d);
-      if (glm::length2(isectPoint - origin) < radiusSquared) {
+      if ((isectPoint - origin).squaredNorm() < radiusSquared) {
         // In the disc.
         return intersection(isectPoint, normal, tangent, binormal, d);
       }

@@ -2,19 +2,19 @@
 #include <iostream>
 
 camera::camera(ray e, size_t ww, size_t hh, float ff)
-  : eye(ray(e.origin, glm::normalize(e.direction))),
+  : eye(ray(e.origin, e.direction.normalized())),
     w(ww), h(hh), fovx2(0.5f * ff),
     masterRng(unsigned(time(0))), rowSeeds(hh),
     data(hh), exrData(long(hh), long(ww)), iters(0)
 {
   // Size of the image plane projected into world space
   // using the given fovx and cam focal length.
-  float scaleRight = 2.0f * glm::length(eye.direction) * tanf(fovx2);
+  float scaleRight = 2.0f * eye.direction.norm() * tanf(fovx2);
   float scaleUp = scaleRight * (float(h) / float(w));
 
   // Corresponding vectors.
   up = -vec(0, 1, 0) * scaleUp; // Flip the y-axis for image output!
-  right = -glm::normalize(glm::cross(eye.direction, up)) * scaleRight;
+  right = -eye.direction.cross(up).normalized() * scaleRight;
 
   // Image corner ray in world space.
   cornerRay = eye.direction - (0.5f * up) - (0.5f * right);
@@ -23,7 +23,7 @@ camera::camera(ray e, size_t ww, size_t hh, float ff)
   for (size_t y = 0; y < h; ++y) {
     data[y] = std::vector<dvec>(w);
     for (size_t x = 0; x < w; ++x) {
-      data[y][x] = dvec(0);
+      data[y][x] = dvec(0, 0, 0);
     }
   }
 }
@@ -53,7 +53,7 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
 
         lightray r(
           eye.origin,
-          glm::normalize(cornerRay + (up * frac_y) + (right * frac_x))
+          (cornerRay + (up * frac_y) + (right * frac_x)).normalized()
         );
 
         int depth = 0;
@@ -91,7 +91,7 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
         }
 
         // Black if ray died; fill in color otherwise.
-        pxColor += dvec(r.color.x, r.color.y, r.color.z);
+        pxColor += dvec(r.color.x(), r.color.y(), r.color.z());
       }
 
       pxColor *= PIXELS_PER_SAMPLE;

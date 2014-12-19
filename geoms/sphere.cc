@@ -12,9 +12,9 @@ intersection geoms::sphere::intersect(const ray& r) const {
 
   // See Wikipedia:
   // <http://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection>
-  float a = glm::dot(l, l);
-  float b = glm::dot(l, diff);
-  float c = glm::dot(diff, diff) - (radius * radius);
+  float a = l.dot(l);
+  float b = l.dot(diff);
+  float c = diff.dot(diff) - (radius * radius);
 
   float discriminant = (b * b) - (a * c);
 
@@ -27,11 +27,11 @@ intersection geoms::sphere::intersect(const ray& r) const {
     // Neg before pos because we want to return closest isect first.
     if (math::isPositive(resNeg)) {
       vec pt = r.at(resNeg);
-      vec normal = glm::normalize(pt - origin);
+      vec normal = (pt - origin).normalized();
       return intersection(pt, normal, resNeg);
     } else if (math::isPositive(resPos)) {
       vec pt = r.at(resPos);
-      vec normal = glm::normalize(pt - origin);
+      vec normal = (pt - origin).normalized();
       return intersection(pt, normal, resPos);
     }
   }
