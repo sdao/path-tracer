@@ -14,8 +14,6 @@ class camera {
   static constexpr float PIXELS_PER_SAMPLE = 1.0f / float(SAMPLES_PER_PIXEL);
 
   ray eye;
-  size_t w;
-  size_t h;
   float fovx2;
 
   vec up;
@@ -28,6 +26,8 @@ class camera {
   std::vector< std::vector<dvec> > data;
   Imf::Array2D<Imf::Rgba> exrData;
 
+  size_t w;
+  size_t h;
   int iters;
 
 public:

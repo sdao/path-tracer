@@ -73,7 +73,7 @@ class kdtree {
       : objId(o), pos(p), starting(start) {}
 
     bool operator<(const bboxedge &e) const {
-      if (math::unsafeEquals(pos, e.pos)) {
+      if (pos == e.pos) {
         return int(starting) < int(e.starting);
       } else {
         return pos < e.pos;

@@ -248,7 +248,7 @@ geom* kdtree::intersect(
       mem::id firstChild;
       mem::id secondChild;
       bool belowFirst = (r.origin[ax] < node.splitPos) ||
-                        (math::unsafeEquals(r.origin[ax], node.splitPos)
+                        ((r.origin[ax] == node.splitPos)
                          && r.direction[ax] <= 0);
       if (belowFirst) {
         firstChild = node.belowId();

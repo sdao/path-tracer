@@ -78,13 +78,6 @@ namespace math {
     return logf(x) * invLog2;
   }
 
-  inline bool unsafeEquals(float x, float y) {
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wfloat-equal"
-    return x == y;
-    #pragma clang diagnostic pop
-  }
-
   inline axis axisFromInt(int x) {
     switch (x) {
       case 0:

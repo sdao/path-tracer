@@ -2,10 +2,9 @@
 #include <iostream>
 
 camera::camera(ray e, size_t ww, size_t hh, float ff)
-  : eye(ray(e.origin, e.direction.normalized())),
-    w(ww), h(hh), fovx2(0.5f * ff),
+  : eye(ray(e.origin, e.direction.normalized())), fovx2(0.5f * ff),
     masterRng(unsigned(time(0))), rowSeeds(hh),
-    data(hh), exrData(long(hh), long(ww)), iters(0)
+    data(hh), exrData(long(hh), long(ww)), w(ww), h(hh), iters(0)
 {
   // Size of the image plane projected into world space
   // using the given fovx and cam focal length.
