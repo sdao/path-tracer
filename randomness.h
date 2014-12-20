@@ -23,11 +23,27 @@ class randomness {
    */
   std::mt19937 rng;
 
+  /**
+   * Returns a seed based on true device randomness.
+   */
+  static inline unsigned createSeed() {
+    std::uniform_int_distribution<unsigned> seedDist;
+    std::random_device randDevice;
+
+    return seedDist(randDevice);
+  }
+
 public:
   /**
-   * Constructs a randomness object from the given speed.
+   * Constructs a randomness object from a truly random seed.
    */
-  randomness(unsigned seed) : unitDist(), intDist(), rng(seed) {}
+  randomness() : unitDist(), intDist(), unsignedDist(), rng(createSeed()) {}
+
+  /**
+   * Constructs a randomness object from the given seed.
+   */
+  randomness(unsigned seed)
+    : unitDist(), intDist(), unsignedDist(), rng(seed) {}
 
   /**
    * Samples a random int.

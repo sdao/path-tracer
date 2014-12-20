@@ -5,8 +5,7 @@
 namespace chrono = std::chrono;
 
 camera::camera(ray e, size_t ww, size_t hh, float ff)
-  : eye(ray(e.origin, e.direction.normalized())), fovx2(0.5f * ff),
-    masterRng(unsigned(chrono::system_clock::now().time_since_epoch().count())),
+  : eye(ray(e.origin, e.direction.normalized())), fovx2(0.5f * ff), masterRng(),
     rowSeeds(hh), data(hh), exrData(long(hh), long(ww)), w(ww), h(hh), iters(0)
 {
   // Size of the image plane projected into world space
