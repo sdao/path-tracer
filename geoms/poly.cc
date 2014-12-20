@@ -1,5 +1,4 @@
 #include "poly.h"
-#include <iostream>
 
 geoms::poly::poly(
   material* m,
