@@ -124,7 +124,7 @@ void camera::renderInfinite(
   const kdtree& kdt,
   std::string name
 ) {
-  std:: cout << "Press Ctrl-c to quit\n";
+  std::cout << "Press Ctrl-c to quit\n";
   while (true) {
     renderOnce(kdt, name);
   }
