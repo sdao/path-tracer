@@ -1,6 +1,6 @@
 #include "specular.h"
 
-materials::specular::specular() : material() {}
+materials::specular::specular() {}
 
 lightray materials::specular::propagate(
   const lightray& incoming,

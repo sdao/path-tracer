@@ -3,8 +3,14 @@
 
 namespace materials {
 
+  /**
+   * A perfectly-specular reflector.
+   */
   class specular : public material {
   public:
+    /**
+     * Constructs a specular material.
+     */
     specular();
 
     virtual lightray propagate(

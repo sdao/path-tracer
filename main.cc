@@ -53,7 +53,7 @@ void render(size_t w, size_t h, std::string name) {
   externalModel.readPolyModel(
     glossy,
     "assets/dragon.obj",
-    vec(-6, -18, -32),
+    vec(-6, -18, -28),
     &objs
   );
 

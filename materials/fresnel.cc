@@ -1,7 +1,7 @@
 #include "fresnel.h"
 
 materials::fresnel::fresnel(float ior)
-  : material(), etaEntering(IOR_VACUUM / ior), etaExiting(ior / IOR_VACUUM) {
+  : etaEntering(IOR_VACUUM / ior), etaExiting(ior / IOR_VACUUM) {
   // Pre-compute values for Fresnel calculations.
 
   float r0_temp = (IOR_VACUUM - ior) / (IOR_VACUUM + ior);

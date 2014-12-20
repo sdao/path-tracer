@@ -1,7 +1,6 @@
 #include "kdtree.h"
 
-kdtree::kdtree(std::vector<geom*>* o) :
-allNodes(), rootId(), objs(o) {}
+kdtree::kdtree(std::vector<geom*>* o) : allNodes(), rootId(), objs(o) {}
 
 void kdtree::build() {
   rootId = 0;
@@ -15,7 +14,7 @@ void kdtree::build() {
   std::vector<bbox> allObjBounds(objs->size());
   for (size_t i = 0; i < objs->size(); ++i) {
     allObjBounds[i] = (*objs)[i]->bounds();
-    allObjBounds[i].expand(math::VERY_SMALL); // Avoid pathological "flat" bboxes.
+    allObjBounds[i].expand(math::VERY_SMALL); // Avoid pathological flat bboxes.
     bounds.expand(allObjBounds[i]);
   }
 
@@ -54,7 +53,7 @@ void kdtree::buildTree(
   mem::id nodeId,
   const bbox& nodeBounds,
   const std::vector<bbox>& allObjBounds,
-  std::vector<mem::id>::iterator nodeObjIds,
+  const std::vector<mem::id>::iterator nodeObjIds,
   long nodeObjCount,
   int depth,
   std::vector<bboxedge>::iterator workEdges[],

@@ -1,6 +1,6 @@
 #include "emitter.h"
 
-materials::emitter::emitter(vec c) : material(), color(c) {}
+materials::emitter::emitter(vec c) : color(c) {}
 
 lightray materials::emitter::propagate(
   const lightray& incoming,
