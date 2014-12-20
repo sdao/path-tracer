@@ -30,7 +30,7 @@ namespace geoms {
       vec n = vec(0, 1, 0),
       float r = 10.0f
     );
-    
+
     /**
      * Constructs a disc from another disc.
      */

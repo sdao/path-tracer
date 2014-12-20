@@ -7,7 +7,7 @@
 class material {
 public:
   virtual ~material();
-  
+
   /**
    * Determines whether another ray should be cast as a consequence of a
    * lightray hitting a surface.
@@ -22,7 +22,7 @@ public:
    */
   virtual lightray propagate(
     const lightray& incoming,
-    intersection& isect,
+    const intersection& isect,
     randomness& rng
   ) const = 0;
 };

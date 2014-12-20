@@ -27,7 +27,7 @@ bool geoms::disc::intersect(const ray& r, intersection* isectOut) const {
         if (isectOut) {
           *isectOut = intersection(isectPoint, normal, tangent, binormal, d);
         }
-        
+
         return true;
       }
     }

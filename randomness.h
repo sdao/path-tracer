@@ -22,7 +22,7 @@ class randomness {
    * The engine used internally for the RNG.
    */
   std::mt19937 rng;
-  
+
 public:
   /**
    * Constructs a randomness object from the given speed.
@@ -33,24 +33,24 @@ public:
    * Samples a random int.
    */
   inline int nextInt() { return intDist(rng); }
-  
+
   /**
    * Samples a random unsigned.
    */
   inline unsigned nextUnsigned() { return unsignedDist(rng); }
-  
+
   /**
    * Samples a random float between 0 (inclusive) and 1 (exclusive).
    */
   inline float nextUnitFloat() { return unitDist(rng); }
-  
+
   /**
    * Samples a random float between 0 (inclusive) and max (exclusive).
    */
   inline float nextFloat(float max) {
     return max * unitDist(rng);
   }
-  
+
   /**
    * Samples a random float between min (inclusive) and max (exclusive).
    */

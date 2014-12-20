@@ -26,7 +26,7 @@ namespace materials {
 
     virtual lightray propagate(
       const lightray& incoming,
-      intersection& isect,
+      const intersection& isect,
       randomness& rng
     ) const;
   };

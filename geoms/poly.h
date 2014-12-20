@@ -3,7 +3,7 @@
 #include "../mem.h"
 
 namespace geoms {
-  
+
   /**
    * A geometric polygon with three points, i.e. a triangle.
    */
@@ -16,7 +16,7 @@ namespace geoms {
       vec position; /**< The position of the point in 3D space. */
       vec normal; /**< The normal of the surface at the point. */
       vec tangent; /**< A vector tangent to the surface at the point. */
-      
+
       /**
        * Computes the tangent vector for the point from its normal.
        */
@@ -25,13 +25,13 @@ namespace geoms {
         math::coordSystem(normal, &tangent, &dummy);
       }
     };
-    
+
     const mem::id pt0; /** < The index of the first point (in CCW order). */
     const mem::id pt1; /** < The index of the second point (in CCW order). */
     const mem::id pt2; /** < The index of the third point (in CCW order). */
     /** A point lookup table. We DO NOT own the pointer. */
     std::vector<geoms::poly::point>* pointLookup;
-    
+
     /**
      * Constructs a poly.
      *
@@ -52,10 +52,10 @@ namespace geoms {
      * Constructs a poly from another poly.
      */
     poly(const geoms::poly& other);
-    
+
     virtual bool intersect(const ray& r, intersection* isectOut) const;
     virtual bbox bounds() const;
-    
+
   private:
     /**
      * Gets the actual point data for the given point index by consulting
@@ -68,5 +68,5 @@ namespace geoms {
       return mem::ref(*pointLookup, i);
     }
   };
-  
+
 }

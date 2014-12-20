@@ -81,17 +81,17 @@ class kdtree {
       nodes.push_back(kdnode());
       nodes.push_back(kdnode());
     }
-  
+
     /** Returns true if the node is a leaf, false if the node is interior. */
     inline bool isLeaf() const {
       return !below.isValid();
     }
-    
+
     /** Returns the index of the child "above" the split. */
     inline mem::id aboveId() const {
       return below.offset(1);
     }
-    
+
     /** Returns the index of the child "below" the split. */
     inline mem::id belowId() const {
       return below;
@@ -176,12 +176,12 @@ public:
    * Use the kdtree::build() method to complete building.
    */
   kdtree(std::vector<geom*>* o);
-  
+
   /**
    * Actually builds out the k-d tree structure.
    */
   void build();
-  
+
   /**
    * Determines what object (if any) in the k-d tree a given ray intersects.
    *

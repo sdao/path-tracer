@@ -51,24 +51,24 @@ class camera {
 public:
   /**
    * Constructs a camera.
-   * 
+   *
    * @param e  a ray specifying the eye's position and orientation
    * @param ww the width of the output image, in pixels
    * @param hh the height of the output image, in pixels
    * @param ff the total horizontal field of view, in radians
    */
   camera(ray e, size_t ww, size_t hh, float ff = float(M_PI_4));
-  
+
   /**
    * Renders an additional iteration of the image by path-tracing.
    * If there are existing iterations, the additional iteration will be
    * combined in a weighted manner.
-   * 
+   *
    * @param kdt  a k-d tree containing the scene's geometry
    * @param name the name of the output EXR file
    */
   void renderOnce(const kdtree& kdt, std::string name);
-  
+
   /**
    * Infinitely renders additional path-tracing iterations.
    * There is no way to stop execution, short of terminating the thread,

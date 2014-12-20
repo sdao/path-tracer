@@ -10,7 +10,7 @@ materials::fresnel::fresnel(float ior)
 
 lightray materials::fresnel::propagate(
   const lightray& incoming,
-  intersection& isect,
+  const intersection& isect,
   randomness& rng
 ) const {
   // Entering = are normal and ray in opposite directions?

@@ -17,7 +17,7 @@ struct ray {
    * @param d the ray's direction (and magnitude, if desired)
    */
   ray(vec o, vec d) : origin(o), direction(d) {}
-  
+
   /**
    * Constructs a ray with origin at (0, 0, 0) and neither direction nor
    * magnitude.
@@ -55,7 +55,7 @@ struct lightray : public ray {
    * @param c the ray's light color
    */
   lightray(vec o, vec d, vec c) : ray(o, d), color(c) {}
-  
+
   /**
    * Constructs a white lightray with the given origin and direction.
    *
@@ -63,7 +63,7 @@ struct lightray : public ray {
    * @param d the ray's direction (and magnitude, if desired)
    */
   lightray(vec o, vec d) : ray(o, d), color(1, 1, 1) {}
-  
+
   /**
    * Constructs a white lightray with origin at (0, 0, 0) and neither direction
    * nor magnitude.
@@ -230,7 +230,7 @@ struct intersection {
   intersection()
     : position(0, 0, 0), normal(0, 0, 0), tangent(0, 0, 0), binormal(0, 0, 0),
       distance(std::numeric_limits<float>::max()) {}
-  
+
   /**
    * Constructs an intersection with the given position, normal, and distance,
    * but with no tangent or binormal. The tangent and binormal will be
@@ -243,7 +243,7 @@ struct intersection {
   intersection(vec p, vec n, float d)
     : position(p), normal(n), tangent(0, 0, 0), binormal(0, 0, 0),
       distance(d) {}
-  
+
   /**
    * Constructs an intersection with the given position, normal, distance,
    * tangen, and binormal.
@@ -282,9 +282,15 @@ struct intersection {
    * @param rng the per-thread RNG in use
    * @returns a uniformally-random vector in the hemisphere of the normal
    */
-  inline vec uniformSampleHemisphere(randomness& rng) {
+  inline vec uniformSampleHemisphere(randomness& rng) const {
+    vec actualTangent;
+    vec actualBinormal;
+
     if (math::isExactlyZero(tangent)) {
-      math::coordSystem(normal, &tangent, &binormal);
+      math::coordSystem(normal, &actualTangent, &actualBinormal);
+    } else {
+      actualTangent = tangent;
+      actualBinormal = binormal;
     }
 
     float z = rng.nextFloat(1.0f);
@@ -293,7 +299,7 @@ struct intersection {
     float x = r * cosf(t);
     float y = r * sinf(t);
 
-    return (z * normal) + (x * tangent) + (y * binormal);
+    return (z * normal) + (x * actualTangent) + (y * actualBinormal);
   }
 
   /**
@@ -318,9 +324,15 @@ struct intersection {
    * @returns         a uniformally-random vector within halfAngle radians of
    *                  the normal
    */
-  inline vec uniformSampleCone(randomness& rng, float halfAngle) {
+  inline vec uniformSampleCone(randomness& rng, float halfAngle) const {
+    vec actualTangent;
+    vec actualBinormal;
+
     if (math::isExactlyZero(tangent)) {
-      math::coordSystem(normal, &tangent, &binormal);
+      math::coordSystem(normal, &actualTangent, &actualBinormal);
+    } else {
+      actualTangent = tangent;
+      actualBinormal = binormal;
     }
 
     float h = cosf(halfAngle);
@@ -330,6 +342,6 @@ struct intersection {
     float x = r * cosf(t);
     float y = r * sinf(t);
 
-    return (z * normal) + (x * tangent) + (y * binormal);
+    return (z * normal) + (x * actualTangent) + (y * actualBinormal);
   }
 };

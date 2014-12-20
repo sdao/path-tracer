@@ -12,12 +12,12 @@ namespace materials {
      * Constructs a normaltest material.
      */
     normaltest();
-    
+
     virtual lightray propagate(
       const lightray& incoming,
-      intersection& isect,
+      const intersection& isect,
       randomness& rng
     ) const;
   };
-  
+
 }

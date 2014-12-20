@@ -28,20 +28,20 @@ bool geoms::sphere::intersect(const ray& r, intersection* isectOut) const {
     if (math::isPositive(resNeg)) {
       vec pt = r.at(resNeg);
       vec normal = (pt - origin).normalized();
-      
+
       if (isectOut) {
         *isectOut = intersection(pt, normal, resNeg);
       }
-      
+
       return true;
     } else if (math::isPositive(resPos)) {
       vec pt = r.at(resPos);
       vec normal = (pt - origin).normalized();
-      
+
       if (isectOut) {
         *isectOut = intersection(pt, normal, resPos);
       }
-      
+
       return true;
     }
   }

@@ -19,7 +19,7 @@ namespace geoms {
      * @param r the radius of the sphere
      */
     sphere(material* m, vec o = vec(0, 0, 0), float r = 1.0f);
-    
+
     /**
      * Constructs a sphere from another sphere.
      */

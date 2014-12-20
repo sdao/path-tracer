@@ -4,7 +4,7 @@ materials::emitter::emitter(vec c) : color(c) {}
 
 lightray materials::emitter::propagate(
   const lightray& incoming,
-  intersection& /* isect */,
+  const intersection& /* isect */,
   randomness& /* rng */
 ) const {
   return lightray(

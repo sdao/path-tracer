@@ -4,7 +4,7 @@ materials::specular::specular() {}
 
 lightray materials::specular::propagate(
   const lightray& incoming,
-  intersection& isect,
+  const intersection& isect,
   randomness& /* rng */
 ) const {
   vec reflectVector = math::reflect(incoming.direction, isect.normal);

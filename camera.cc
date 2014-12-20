@@ -113,7 +113,7 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
   Imf::RgbaOutputFile file(name.c_str(), int(w), int(h), Imf::WRITE_RGBA);
   file.setFrameBuffer(&exrData[0][0], 1, w);
   file.writePixels(int(h));
-  
+
   chrono::steady_clock::time_point endTime = chrono::steady_clock::now();
   chrono::duration<double> runTime =
     chrono::duration_cast<chrono::duration<double>>(endTime - startTime);

@@ -4,7 +4,7 @@ materials::glossy::glossy(float g) : glossiness(g) {}
 
 lightray materials::glossy::propagate(
   const lightray& incoming,
-  intersection& isect,
+  const intersection& isect,
   randomness& rng
 ) const {
   vec reflectVector = isect.uniformSampleCone(rng, glossiness * float(M_PI_2));

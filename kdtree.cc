@@ -226,12 +226,12 @@ geom* kdtree::intersect(
 
   // Traverse kd-tree nodes in order for ray (p. 242).
   mem::id nodeId = rootId;
-  
+
   intersection winnerIsect; // By default, distance is set to max float value.
   geom* winnerObj = nullptr;
   while (nodeId.isValid()) {
     const kdnode& node = mem::refConst(allNodes, nodeId);
-  
+
     // Bail out if we found a hit closer than the curent node (p. 242).
     if (winnerIsect.distance < tmin) break;
 
@@ -303,10 +303,10 @@ geom* kdtree::intersect(
     if (isectOut) {
       *isectOut = winnerIsect;
     }
-    
+
     return winnerObj;
   }
-  
+
   return nullptr;
 }
 

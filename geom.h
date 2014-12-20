@@ -19,7 +19,7 @@ public:
   material* mat; /**< The material used to render the geometry. */
 
   virtual ~geom();
-  
+
   /**
    * Finds an intersection between the geometry and the given ray.
    *
@@ -29,7 +29,7 @@ public:
    * @returns              true if the ray hit the geometry, false otherwise
    */
   virtual bool intersect(const ray& r, intersection* isectOut) const = 0;
-  
+
   /**
    * A bounding box encapsulating the entire geometry.
    */

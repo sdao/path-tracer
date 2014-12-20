@@ -79,7 +79,7 @@ namespace math {
   inline bool isNearlyZero(float x) {
     return fabsf(x) < std::numeric_limits<float>::epsilon();
   }
-  
+
   /**
    * Determines whether a vec's magnitude is zero, within a small epsilon.
    */
@@ -125,7 +125,7 @@ namespace math {
         return INVALID_AXIS;
     }
   }
-  
+
   /**
    * Same as GLSL reflect.
    * See <https://www.opengl.org/sdk/docs/man4/html/reflect.xhtml>.
@@ -137,7 +137,7 @@ namespace math {
   inline vec reflect(const vec& I, const vec& N) {
     return I - 2.0f * N.dot(I) * N;
   }
-  
+
   /**
    * Same as GLSL refract.
    * See <https://www.opengl.org/sdk/docs/man4/html/refract.xhtml>.

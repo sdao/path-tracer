@@ -4,7 +4,7 @@ materials::diffuse::diffuse(vec c) : color(c) {}
 
 lightray materials::diffuse::propagate(
   const lightray& incoming,
-  intersection& isect,
+  const intersection& isect,
   randomness& rng
 ) const {
   vec reflectVector = isect.uniformSampleHemisphere(rng);

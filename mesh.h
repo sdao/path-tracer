@@ -8,7 +8,7 @@
 class mesh {
     std::vector<geoms::poly::point> points; /**< The point lookup table. */
     std::vector<geoms::poly> faces; /**< The faces of the mesh. */
-  
+
 public:
     /** Constructs an empty mesh. Use mesh::readPolyModel() to populate. */
     mesh();
@@ -35,13 +35,13 @@ public:
       vec offset,
       std::vector<geom*>* geomList = nullptr
     );
-  
+
     /**
      * Appends a pointer to each poly face of the mesh to the specified
      * geometry vector. (The given geometry vector must already exist.)
      */
     void appendFacesTo(std::vector<geom*>* geomList);
-  
+
     /**
      * Destroys the existing poly faces and points in the mesh.
      * All existing pointers to this data will be invalidated.

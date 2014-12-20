@@ -18,13 +18,13 @@ namespace materials {
   public:
     static constexpr float IOR_GLASS = 1.5f; /**< The IOR for glass. */
     static constexpr float IOR_DIAMOND = 2.4f; /**< The IOR for diamond. */
-  
+
     /** Creates a Fresnel material. */
     fresnel(float ior = IOR_GLASS);
 
     virtual lightray propagate(
       const lightray& incoming,
-      intersection& isect,
+      const intersection& isect,
       randomness& rng
     ) const;
   };
