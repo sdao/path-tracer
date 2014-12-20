@@ -227,7 +227,7 @@ geom* kdtree::intersect(
   // Traverse kd-tree nodes in order for ray (p. 242).
   mem::id nodeId = rootId;
   
-  intersection winnerIsect;
+  intersection winnerIsect; // By default, distance is set to max float value.
   geom* winnerObj = nullptr;
   while (nodeId.isValid()) {
     const kdnode& node = mem::refConst(allNodes, nodeId);
@@ -278,10 +278,10 @@ geom* kdtree::intersect(
         geom* obj = mem::ref(*objs, objId);
 
         // Check one primitive inside leaf node (p. 244).
-        const intersection isect = obj->intersect(r);
+        intersection isect;
+        bool didHit = obj->intersect(r, &isect);
 
-        if (isect.hit()
-          && (!winnerIsect.hit() || isect.distance < winnerIsect.distance)) {
+        if (didHit && isect.distance < winnerIsect.distance) {
           winnerIsect = isect;
           winnerObj = obj;
         }
@@ -299,11 +299,15 @@ geom* kdtree::intersect(
     }
   }
 
-  if (isectOut) {
-    *isectOut = winnerIsect;
+  if (winnerObj) {
+    if (isectOut) {
+      *isectOut = winnerIsect;
+    }
+    
+    return winnerObj;
   }
-
-  return winnerObj;
+  
+  return nullptr;
 }
 
 void kdtree::print(mem::id nodeId, std::ostream& os, std::string header) const {

@@ -6,7 +6,7 @@ geoms::sphere::sphere(material* m, vec o, float r)
 geoms::sphere::sphere(const geoms::sphere& other)
   : geom(other.mat), origin(other.origin), radius(other.radius) {}
 
-intersection geoms::sphere::intersect(const ray& r) const {
+bool geoms::sphere::intersect(const ray& r, intersection* isectOut) const {
   vec diff = r.origin - origin;
   vec l = r.direction;
 
@@ -28,16 +28,26 @@ intersection geoms::sphere::intersect(const ray& r) const {
     if (math::isPositive(resNeg)) {
       vec pt = r.at(resNeg);
       vec normal = (pt - origin).normalized();
-      return intersection(pt, normal, resNeg);
+      
+      if (isectOut) {
+        *isectOut = intersection(pt, normal, resNeg);
+      }
+      
+      return true;
     } else if (math::isPositive(resPos)) {
       vec pt = r.at(resPos);
       vec normal = (pt - origin).normalized();
-      return intersection(pt, normal, resPos);
+      
+      if (isectOut) {
+        *isectOut = intersection(pt, normal, resPos);
+      }
+      
+      return true;
     }
   }
 
   // Either no isect was found or it was behind us.
-  return intersection();
+  return false;
 }
 
 bbox geoms::sphere::bounds() const {

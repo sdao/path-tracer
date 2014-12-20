@@ -1,10 +1,13 @@
 #include "camera.h"
 #include <iostream>
+#include <chrono>
+
+namespace chrono = std::chrono;
 
 camera::camera(ray e, size_t ww, size_t hh, float ff)
   : eye(ray(e.origin, e.direction.normalized())), fovx2(0.5f * ff),
-    masterRng(unsigned(time(0))), rowSeeds(hh),
-    data(hh), exrData(long(hh), long(ww)), w(ww), h(hh), iters(0)
+    masterRng(unsigned(chrono::system_clock::now().time_since_epoch().count())),
+    rowSeeds(hh), data(hh), exrData(long(hh), long(ww)), w(ww), h(hh), iters(0)
 {
   // Size of the image plane projected into world space
   // using the given fovx and cam focal length.
@@ -29,7 +32,8 @@ camera::camera(ray e, size_t ww, size_t hh, float ff)
 
 void camera::renderOnce(const kdtree& kdt, std::string name) {
   iters++;
-  std::cout << "Iteration " << iters << "\n";
+  std::cout << "Iteration " << iters;
+  chrono::steady_clock::time_point startTime = chrono::steady_clock::now();
 
   double newFrac = 1.0 / double(iters);
   double oldFrac = double(iters - 1.0) * newFrac;
@@ -109,6 +113,11 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
   Imf::RgbaOutputFile file(name.c_str(), int(w), int(h), Imf::WRITE_RGBA);
   file.setFrameBuffer(&exrData[0][0], 1, w);
   file.writePixels(int(h));
+  
+  chrono::steady_clock::time_point endTime = chrono::steady_clock::now();
+  chrono::duration<double> runTime =
+    chrono::duration_cast<chrono::duration<double>>(endTime - startTime);
+  std::cout << " [" << runTime.count() << " seconds]\n";
 }
 
 void camera::renderInfinite(

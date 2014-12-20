@@ -11,7 +11,7 @@ geoms::disc::disc(const geoms::disc& other)
   : geom(other.mat), radiusSquared(other.radiusSquared),
     origin(other.origin), normal(other.normal), radius(other.radius) {}
 
-intersection geoms::disc::intersect(const ray& r) const {
+bool geoms::disc::intersect(const ray& r, intersection* isectOut) const {
   // See Wikipedia:
   // <http://en.wikipedia.org/wiki/Line%E2%80%93disc_intersection>
 
@@ -24,13 +24,17 @@ intersection geoms::disc::intersect(const ray& r) const {
       vec isectPoint = r.at(d);
       if ((isectPoint - origin).squaredNorm() < radiusSquared) {
         // In the disc.
-        return intersection(isectPoint, normal, tangent, binormal, d);
+        if (isectOut) {
+          *isectOut = intersection(isectPoint, normal, tangent, binormal, d);
+        }
+        
+        return true;
       }
     }
   }
 
   // Either no isect was found or it was behind us.
-  return intersection();
+  return false;
 }
 
 bbox geoms::disc::bounds() const {

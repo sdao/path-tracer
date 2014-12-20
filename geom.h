@@ -23,11 +23,12 @@ public:
   /**
    * Finds an intersection between the geometry and the given ray.
    *
-   * @param r the ray to find an intersection with
-   * @returns the intersection information; to see whether the ray intersected
-   *          the geometry, use intersection::hit()
+   * @param r              the ray to find an intersection with
+   * @param isectOut [out] the intersection information if the pointer is not
+   *                       null and the ray hit the geometry, null otherwise
+   * @returns              true if the ray hit the geometry, false otherwise
    */
-  virtual intersection intersect(const ray& r) const = 0;
+  virtual bool intersect(const ray& r, intersection* isectOut) const = 0;
   
   /**
    * A bounding box encapsulating the entire geometry.

@@ -53,7 +53,7 @@ namespace geoms {
      */
     poly(const geoms::poly& other);
     
-    virtual intersection intersect(const ray& r) const;
+    virtual bool intersect(const ray& r, intersection* isectOut) const;
     virtual bbox bounds() const;
     
   private:

@@ -36,7 +36,7 @@ namespace geoms {
      */
     disc(const geoms::disc& other);
 
-    virtual intersection intersect(const ray& r) const;
+    virtual bool intersect(const ray& r, intersection* isectOut) const;
     virtual bbox bounds() const;
   };
 
