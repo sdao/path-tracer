@@ -246,7 +246,7 @@ struct intersection {
 
   /**
    * Constructs an intersection with the given position, normal, distance,
-   * tangen, and binormal.
+   * tangent, and binormal.
    *
    * @param p      the point of the intersection in 3D space
    * @param n      the normal of the surface at the intersection
