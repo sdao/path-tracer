@@ -220,46 +220,23 @@ struct bbox {
 struct intersection {
   vec position; /**< The point of the intersection in 3D space. */
   vec normal; /**< The normal of the surface at the intersection. */
-  vec tangent; /**< A tangent to the surface at the intersection. */
-  vec binormal; /**< A vector orthogonal to both the normal and the tangent. */
   float distance; /**< The distance from the ray origin to the intersection. */
 
   /**
    * Constructs an intersection with no information.
    */
   intersection()
-    : position(0, 0, 0), normal(0, 0, 0), tangent(0, 0, 0), binormal(0, 0, 0),
+    : position(0, 0, 0), normal(0, 0, 0),
       distance(std::numeric_limits<float>::max()) {}
 
   /**
-   * Constructs an intersection with the given position, normal, and distance,
-   * but with no tangent or binormal. The tangent and binormal will be
-   * computed on demand when required.
-   *
+   * Constructs an intersection with the given position, normal, and distance.   *
    * @param p the point of the intersection in 3D space
    * @param n the normal of the surface at the intersection
    * @param d the distance from the ray origin to the intersection
    */
   intersection(vec p, vec n, float d)
-    : position(p), normal(n), tangent(0, 0, 0), binormal(0, 0, 0),
-      distance(d) {}
-
-  /**
-   * Constructs an intersection with the given position, normal, distance,
-   * tangent, and binormal.
-   *
-   * @param p      the point of the intersection in 3D space
-   * @param n      the normal of the surface at the intersection
-   * @param tang   a tangent to the surface at the intersection
-   * @param binorm a vector orthogonal to both the normal and the tangent
-   * @param d      the distance from the ray origin to the intersection
-   */
-  intersection(vec p, vec n, vec tang, vec binorm, float d)
-    : position(p),
-      normal(n),
-      tangent(tang),
-      binormal(binorm),
-      distance(d) {}
+    : position(p), normal(n), distance(d) {}
 
   /**
    * Returns whether the intersection represents an actual hit.
@@ -283,30 +260,24 @@ struct intersection {
    * @returns a uniformally-random vector in the hemisphere of the normal
    */
   inline vec uniformSampleHemisphere(randomness& rng) const {
-    vec actualTangent;
-    vec actualBinormal;
-
-    if (math::isExactlyZero(tangent)) {
-      math::coordSystem(normal, &actualTangent, &actualBinormal);
-    } else {
-      actualTangent = tangent;
-      actualBinormal = binormal;
-    }
+    vec tangent;
+    vec binormal;
+    math::coordSystem(normal, &tangent, &binormal);
 
     float z = rng.nextFloat(1.0f);
-    float t = rng.nextFloat(float(M_PI * 2.0));
+    float t = rng.nextFloat(math::TWO_PI);
     float r = sqrtf(1.0f - (z * z));
     float x = r * cosf(t);
     float y = r * sinf(t);
 
-    return (z * normal) + (x * actualTangent) + (y * actualBinormal);
+    return (z * normal) + (x * tangent) + (y * binormal);
   }
 
   /**
    * Generates a random ray in a cone around the normal.
    *
    * Handy Mathematica code for checking that this works:
-   * \code
+   * @code
    * R[a_] := (h = Cos[Pi/2];
    *   z = RandomReal[{h, 1}];
    *   t = RandomReal[{0, 2*Pi}];
@@ -316,7 +287,7 @@ struct intersection {
    *   {x, y, z})
    *
    * ListPointPlot3D[Map[R, Range[1000]], BoxRatios -> Automatic]
-   * \endcode
+   * @endcode
    *
    * @param rng       the per-thread RNG in use
    * @param halfAngle the half-angle of the cone's opening; must be between 0
@@ -325,23 +296,17 @@ struct intersection {
    *                  the normal
    */
   inline vec uniformSampleCone(randomness& rng, float halfAngle) const {
-    vec actualTangent;
-    vec actualBinormal;
-
-    if (math::isExactlyZero(tangent)) {
-      math::coordSystem(normal, &actualTangent, &actualBinormal);
-    } else {
-      actualTangent = tangent;
-      actualBinormal = binormal;
-    }
+    vec tangent;
+    vec binormal;
+    math::coordSystem(normal, &tangent, &binormal);
 
     float h = cosf(halfAngle);
     float z = rng.nextFloat(h, 1.0f);
-    float t = rng.nextFloat(float(M_PI * 2.0));
+    float t = rng.nextFloat(math::TWO_PI);
     float r = sqrtf(1.0f - (z * z));
     float x = r * cosf(t);
     float y = r * sinf(t);
 
-    return (z * normal) + (x * actualTangent) + (y * actualBinormal);
+    return (z * normal) + (x * tangent) + (y * binormal);
   }
 };

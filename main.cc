@@ -14,7 +14,7 @@ void render(size_t w, size_t h, std::string name) {
   material* blue = new materials::diffuse(vec(0.5f, 0.6f, 1));
   material* emit = new materials::emitter(vec(4, 4, 4));
   material* fresnel = new materials::fresnel(materials::fresnel::IOR_GLASS);
-  material* glossy = new materials::glossy(0.10f);
+  material* glossy = new materials::phong(100.0f);
 
   std::vector<geom*> objs;
   // spheres
@@ -61,7 +61,7 @@ void render(size_t w, size_t h, std::string name) {
   kdtree tree(&objs);
   tree.build();
 
-  camera cam(ray(vec(0, 0, 50), vec(0, 0, -1)), w, h, float(M_PI_4));
+  camera cam(ray(vec(0, 0, 50), vec(0, 0, -1)), w, h, math::PI_4);
   cam.renderInfinite(tree, name);
 
   /* Will not return. We do not have to clean up objs or materials! */

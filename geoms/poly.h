@@ -15,15 +15,6 @@ namespace geoms {
     struct point {
       vec position; /**< The position of the point in 3D space. */
       vec normal; /**< The normal of the surface at the point. */
-      vec tangent; /**< A vector tangent to the surface at the point. */
-
-      /**
-       * Computes the tangent vector for the point from its normal.
-       */
-      inline void computeTangents() {
-        vec dummy;
-        math::coordSystem(normal, &tangent, &dummy);
-      }
     };
 
     const mem::id pt0; /** < The index of the first point (in CCW order). */

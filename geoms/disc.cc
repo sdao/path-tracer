@@ -1,15 +1,12 @@
 #include "disc.h"
 
 geoms::disc::disc(material* m, vec o, vec n, float r)
-  : geom(m), radiusSquared(r * r), origin(o), normal(n.normalized()),
-    radius(r)
-{
-  math::coordSystem(normal, &tangent, &binormal);
-}
+  : geom(m), radiusSquared(r * r), radius(r), origin(o),
+    normal(n.normalized()) {}
 
 geoms::disc::disc(const geoms::disc& other)
-  : geom(other.mat), radiusSquared(other.radiusSquared),
-    origin(other.origin), normal(other.normal), radius(other.radius) {}
+  : geom(other.mat), radiusSquared(other.radiusSquared), radius(other.radius),
+    origin(other.origin), normal(other.normal) {}
 
 bool geoms::disc::intersect(const ray& r, intersection* isectOut) const {
   // See Wikipedia:
@@ -25,7 +22,7 @@ bool geoms::disc::intersect(const ray& r, intersection* isectOut) const {
       if ((isectPoint - origin).squaredNorm() < radiusSquared) {
         // In the disc.
         if (isectOut) {
-          *isectOut = intersection(isectPoint, normal, tangent, binormal, d);
+          *isectOut = intersection(isectPoint, normal, d);
         }
 
         return true;
@@ -38,6 +35,10 @@ bool geoms::disc::intersect(const ray& r, intersection* isectOut) const {
 }
 
 bbox geoms::disc::bounds() const {
+  vec tangent;
+  vec binormal;
+  math::coordSystem(normal, &tangent, &binormal);
+
   vec tr = tangent * radius;
   vec br = binormal * radius;
 

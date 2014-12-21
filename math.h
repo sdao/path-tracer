@@ -21,6 +21,18 @@ namespace math {
   /** A very small nonzero value. */
   static constexpr float VERY_SMALL = 0.0001f;
 
+  /** Pi as a single-precision float. */
+  static constexpr float PI = float(M_PI);
+
+  /** 2 * Pi as a single-precision float. */
+  static constexpr float TWO_PI = float(2.0 * M_PI);
+
+  /** Pi / 2 as a single-precision float. */
+  static constexpr float PI_2 = float(M_PI_2);
+
+  /** Pi / 4 as a single-precision float. */
+  static constexpr float PI_4 = float(M_PI_4);
+
   /** Clamps a value between 0 and 1. */
   inline float clamp(float x) {
     return x < 0 ? 0 : (x > 1 ? 1 : x);

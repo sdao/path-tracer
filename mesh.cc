@@ -59,7 +59,6 @@ bool mesh::readPolyModel(
       thisPoint.position = vec(thisPos.x, thisPos.y, thisPos.z) + offset;
       thisPoint.normal =
         vec(thisNorm.x, thisNorm.y, thisNorm.z).normalized();
-      thisPoint.computeTangents();
 
       points.push_back(thisPoint);
     }

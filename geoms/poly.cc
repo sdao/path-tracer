@@ -56,23 +56,8 @@ bool geoms::poly::intersect(const ray& r, intersection* isectOut) const {
     intersection isect;
     isect.position = r.at(dist);
     isect.distance = dist;
-
-    // See Pharr & Humphreys pp. 147-148.
-    // The gist is that interpolation w/ barycentric coordinates will not
-    // preserve the orthonormality of the basis vectors.
     isect.normal =
       w * pt0_data.normal + u * pt1_data.normal + v * pt2_data.normal;
-    isect.tangent =
-      w * pt0_data.tangent + u * pt1_data.tangent + v * pt2_data.tangent;
-    isect.binormal = isect.tangent.cross(isect.normal);
-
-    if (isect.binormal.squaredNorm() > 0.0f) {
-      isect.binormal = isect.binormal.normalized();
-      isect.tangent = isect.binormal.cross(isect.normal);
-    } else {
-      // Force recompute tangent and binormal.
-      math::coordSystem(isect.normal, &isect.tangent, &isect.binormal);
-    }
 
     *isectOut = isect;
   }

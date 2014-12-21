@@ -7,14 +7,12 @@ namespace geoms {
    * A geometric disc, that is, a plane area bounded by a circle.
    */
   class disc : public geom {
-    vec tangent; /**< A vector in the plane of the disc. **/
-    vec binormal; /**< A second orthogonal vector in the plane of the disc. **/
     const float radiusSquared; /** The pre-computed square of the radius. **/
 
   public:
+    const float radius; /**< The distance from the disc's center to its edge. */
     const vec origin; /**< The center of the disc. */
     const vec normal; /**< A vector perpendicular to the disc's plane. */
-    const float radius; /**< The distance from the disc's center to its edge. */
 
     /**
      * Constructs a disc.

@@ -57,7 +57,7 @@ public:
    * @param hh the height of the output image, in pixels
    * @param ff the total horizontal field of view, in radians
    */
-  camera(ray e, size_t ww, size_t hh, float ff = float(M_PI_4));
+  camera(ray e, size_t ww, size_t hh, float ff = math::PI_4);
 
   /**
    * Renders an additional iteration of the image by path-tracing.
