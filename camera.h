@@ -70,15 +70,17 @@ public:
   void renderOnce(const kdtree& kdt, std::string name);
 
   /**
-   * Infinitely renders additional path-tracing iterations.
-   * There is no way to stop execution, short of terminating the thread,
-   * once this function has begun.
+   * Renders multiple additional path-tracing iterations.
+   * To render infinite iterations, specify iterations = -1.
    *
-   * @param kdt  a k-d tree containing the scene's geometry
-   * @param name the name of the output EXR file
+   * @param kdt        a k-d tree containing the scene's geometry
+   * @param name       the name of the output EXR file
+   * @param iterations the number of iterations to render; if < 0, then this
+   *                   function will run forever
    */
-  [[noreturn]] void renderInfinite(
+  void renderMultiple(
     const kdtree& kdt,
-    std::string name
+    std::string name,
+    int iterations
   );
 };

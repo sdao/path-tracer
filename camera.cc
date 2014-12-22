@@ -119,14 +119,24 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
   std::cout << " [" << runTime.count() << " seconds]\n";
 }
 
-void camera::renderInfinite(
+void camera::renderMultiple(
   const kdtree& kdt,
-  std::string name
+  std::string name,
+  int iterations
 ) {
-  std::cout << "Press Ctrl-c to quit\n";
-  while (true) {
-    renderOnce(kdt, name);
-  }
+  if (iterations < 0) {
+    // Run forever.
+    std::cout << "Rendering infinitely, press Ctrl-c to terminate program\n";
 
-  /* Will not return. */
+    while (true) {
+      renderOnce(kdt, name);
+    }
+  } else {
+    // Run finite iterations.
+    std::cout << "Rendering " << iterations << " iterations\n";
+
+    for (int i = 0; i < iterations; ++i) {
+      renderOnce(kdt, name);
+    }
+  }
 }
