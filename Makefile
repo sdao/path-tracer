@@ -6,8 +6,10 @@ CXX = icpc
 CXXFLAGS_DEBUG = -std=c++11 -O0 -g
 
 ifeq ($(strip $(CXX)),icpc)
-	CXXFLAGS = -std=c++11 -O3 -no-prec-div -no-prec-sqrt -ipo -xhost -parallel
+	CXXFLAGS = -std=c++11 -fast
 	WARN = -Werror -Wall
+	PROFGEN = -prof-gen -prof-dir=prof
+	PROFUSE = -prof-use -prof-dir=prof
 else
 	CXXFLAGS = -std=c++11 -O3 -flto
 	WARN = -Werror -Weverything -Wno-c++98-compat -Wno-padded -Wno-float-equal
@@ -23,6 +25,14 @@ path-tracer: $(SOURCES)
 debug: $(SOURCES)
 	mkdir -p bin
 	$(CXX) $(SOURCES) $(LDLIBS) $(CXXFLAGS_DEBUG) $(WARN) -o bin/path-tracer
+
+profile: $(SOURCES)
+	mkdir -p bin
+	$(CXX) $(SOURCES) $(LDLIBS) $(CXXFLAGS) $(WARN) $(PROFGEN) -o bin/path-tracer
+
+useprofile: $(SOURCES)
+	mkdir -p bin
+	$(CXX) $(SOURCES) $(LDLIBS) $(CXXFLAGS) $(WARN) $(PROFUSE) -o bin/path-tracer
 
 clean:
 	rm -rf bin

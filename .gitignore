@@ -1,6 +1,9 @@
 # Xcode project
 *.xcodeproj/
 
+# Profile guided optimization
+prof/
+
 # Test image output
 output.exr
 
