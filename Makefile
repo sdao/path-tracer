@@ -20,7 +20,7 @@ all: path-tracer
 # Standard targets
 path-tracer: $(SOURCES)
 	mkdir -p bin
-	$(CXX) $(SOURCES) $(LDLIBS) $(CXXFLAGS) $(WARN) -o bin/path-tracer
+	$(CXX) $(SOURCES) $(LDLIBS) $(CXXFLAGS) $(WARN) $(PROFUSE) -o bin/path-tracer
 
 debug: $(SOURCES)
 	mkdir -p bin
@@ -29,10 +29,6 @@ debug: $(SOURCES)
 profile: $(SOURCES)
 	mkdir -p bin
 	$(CXX) $(SOURCES) $(LDLIBS) $(CXXFLAGS) $(WARN) $(PROFGEN) -o bin/path-tracer
-
-useprofile: $(SOURCES)
-	mkdir -p bin
-	$(CXX) $(SOURCES) $(LDLIBS) $(CXXFLAGS) $(WARN) $(PROFUSE) -o bin/path-tracer
 
 clean:
 	rm -rf bin
