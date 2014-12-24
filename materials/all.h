@@ -1,6 +1,5 @@
 #pragma once
-#include "emitter.h"
-#include "phong.h"
 #include "dielectric.h"
-#include "normaltest.h"
+#include "emitter.h"
 #include "lambert.h"
+#include "phong.h"

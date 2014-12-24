@@ -2,13 +2,13 @@
 
 #define EIGEN_NO_DEBUG 1
 
-#include <OpenEXR/ImfRgbaFile.h>
-#include <OpenEXR/ImfArray.h>
 #include <cmath>
 #include <limits>
 #include <vector>
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/Geometry>
+#include <OpenEXR/ImfRgbaFile.h>
+#include <OpenEXR/ImfArray.h>
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
 #include "randomness.h"
 
 using std::min;

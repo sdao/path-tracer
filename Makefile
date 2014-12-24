@@ -1,5 +1,6 @@
 SOURCES = *.cc materials/*.cc geoms/*.cc
 LDLIBS = -lIlmImf -lHalf -ltbb -lassimp
+INCLUDES = -isystem /usr/local/include/eigen3
 
 # icpc or c++ or g++ or clang++
 CXX = icpc
@@ -27,19 +28,19 @@ all: path-tracer
 # Standard targets
 path-tracer: $(SOURCES)
 	mkdir -p bin
-	$(CXX) $(SOURCES) $(LDLIBS) $(CXXFLAGS) -o bin/path-tracer
+	$(CXX) $(SOURCES) $(LDLIBS) $(INCLUDES) $(CXXFLAGS) -o bin/path-tracer
 
 debug: $(SOURCES)
 	mkdir -p bin
-	$(CXX) $(SOURCES) $(LDLIBS) $(CXXFLAGS_DEBUG) -o bin/path-tracer
+	$(CXX) $(SOURCES) $(LDLIBS) $(INCLUDES) $(CXXFLAGS_DEBUG) -o bin/path-tracer
 
 profile: $(SOURCES)
 	mkdir -p bin
-	$(CXX) $(SOURCES) $(LDLIBS) $(CXXFLAGS_GENPROF) -o bin/path-tracer
+	$(CXX) $(SOURCES) $(LDLIBS) $(INCLUDES) $(CXXFLAGS_GENPROF) -o bin/path-tracer
 
 useprofile: $(SOURCES)
 	mkdir -p bin
-	$(CXX) $(SOURCES) $(LDLIBS) $(CXXFLAGS_USEPROF) -o bin/path-tracer
+	$(CXX) $(SOURCES) $(LDLIBS) $(INCLUDES) $(CXXFLAGS_USEPROF) -o bin/path-tracer
 
 clean:
 	rm -rf bin
