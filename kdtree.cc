@@ -79,7 +79,7 @@ void kdtree::buildTree(
   float oldCost = ISECT_COST * float(nodeObjCount);
   float totalSA = nodeBounds.surfaceArea();
   float invTotalSA = 1.0f / totalSA;
-  vec d = nodeBounds.max - nodeBounds.min;
+  vec d = nodeBounds.upper - nodeBounds.lower;
 
   // Choose which axis to split along (p. 236).
   axis ax = nodeBounds.maximumExtent();
@@ -91,8 +91,8 @@ retrySplit:
   for (long i = 0; i < nodeObjCount; ++i) {
     mem::id j = nodeObjIds[i];
     const bbox& jBounds = mem::refConst(allObjBounds, j);
-    workEdges[ax][2 * i]     = bboxedge(j, jBounds.min[ax], true);
-    workEdges[ax][2 * i + 1] = bboxedge(j, jBounds.max[ax], false);
+    workEdges[ax][2 * i]     = bboxedge(j, jBounds.lower[ax], true);
+    workEdges[ax][2 * i + 1] = bboxedge(j, jBounds.upper[ax], false);
   }
   std::sort(
     workEdges[ax],
@@ -109,14 +109,14 @@ retrySplit:
     }
 
     float edgePos = workEdges[ax][i].pos;
-    if (edgePos > nodeBounds.min[ax] && edgePos < nodeBounds.max[ax]) {
+    if (edgePos > nodeBounds.lower[ax] && edgePos < nodeBounds.upper[ax]) {
       // Compute cost for split at `i`th edge (p. 238).
       axis otherAx0 = math::axisFromInt((ax + 1) % 3);
       axis otherAx1 = math::axisFromInt((ax + 2) % 3);
       float belowSA = 2.0f * (d[otherAx0] * d[otherAx1]
-        + (edgePos - nodeBounds.min[ax]) * (d[otherAx0] + d[otherAx1]));
+        + (edgePos - nodeBounds.lower[ax]) * (d[otherAx0] + d[otherAx1]));
       float aboveSA = 2.0f * (d[otherAx0] * d[otherAx1]
-        + (nodeBounds.max[ax] - edgePos) * (d[otherAx0] + d[otherAx1]));
+        + (nodeBounds.upper[ax] - edgePos) * (d[otherAx0] + d[otherAx1]));
       float probBelow = belowSA * invTotalSA;
       float probAbove = aboveSA * invTotalSA;
       float eb = (nAbove == 0 || nBelow == 0) ? EMPTY_BONUS : 0.0f;
@@ -174,7 +174,7 @@ retrySplit:
   float splitPos = workEdges[bestAxis][bestOffset].pos;
   bbox bounds0 = nodeBounds;
   bbox bounds1 = nodeBounds;
-  bounds0.max[bestAxis] = bounds1.min[bestAxis] = splitPos;
+  bounds0.upper[bestAxis] = bounds1.lower[bestAxis] = splitPos;
 
   mem::ref(allNodes, nodeId).makeInterior(bestAxis, splitPos, allNodes);
 

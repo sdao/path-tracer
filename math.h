@@ -11,6 +11,9 @@
 #include <eigen3/Eigen/Geometry>
 #include "randomness.h"
 
+using std::min;
+using std::max;
+
 typedef Eigen::Vector3f vec; /**< A 3D single-precision vector. */
 typedef Eigen::Vector3d dvec; /**< A 3D double-precision vector. */
 
@@ -232,7 +235,7 @@ namespace math {
    * vector in spherical coordinates.
    */
   inline float sinTheta2(const vec& v) {
-    return std::max(0.0f, 1.0f - cosTheta(v) * cosTheta(v));
+    return max(0.0f, 1.0f - cosTheta(v) * cosTheta(v));
   }
 
   /**
@@ -341,7 +344,7 @@ namespace math {
   ) {
     vec ret;
     areaSampleDisk(rng, &ret[0], &ret[1]);
-    ret[2] = sqrtf(std::max(0.0f, 1.0f - ret[0] * ret[0] - ret[1] * ret[1]));
+    ret[2] = sqrtf(max(0.0f, 1.0f - ret[0] * ret[0] - ret[1] * ret[1]));
     *directionOut = ret;
     *probabilityOut = absCosTheta(ret) * INV_PI;
   }

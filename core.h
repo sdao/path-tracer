@@ -3,6 +3,9 @@
 #include "math.h"
 #include "randomness.h"
 
+using std::min;
+using std::max;
+
 /**
  * A directed line segment.
  */
@@ -81,7 +84,7 @@ struct lightray : public ray {
    * Returns the largest component of the ray's light color.
    */
   inline float energy() const {
-    return std::max(std::max(color.x(), color.y()), color.z());
+    return max(max(color.x(), color.y()), color.z());
   }
 
   /**
@@ -105,22 +108,30 @@ struct lightray : public ray {
  * An axis-aligned bounding box.
  */
 struct bbox {
-  vec min; /**< The lower X, Y, and Z-axis bounds. */
-  vec max; /**< The upper X, Y, and Z-axis bounds. */
+  vec lower; /**< The lower X, Y, and Z-axis bounds. */
+  vec upper; /**< The upper X, Y, and Z-axis bounds. */
 
   /** Constructs an empty bbox. */
-  bbox() : min(0, 0, 0), max(0, 0, 0) {}
+  bbox() : lower(0, 0, 0), upper(0, 0, 0) {}
 
   /** Constructs a bbox containing the two given points. */
   bbox(vec a, vec b) {
-    min = vec(std::min(a.x(), b.x()), std::min(a.y(), b.y()), std::min(a.z(), b.z()));
-    max = vec(std::max(a.x(), b.x()), std::max(a.y(), b.y()), std::max(a.z(), b.z()));
+    lower = vec(min(a.x(), b.x()), min(a.y(), b.y()), min(a.z(), b.z()));
+    upper = vec(max(a.x(), b.x()), max(a.y(), b.y()), max(a.z(), b.z()));
   }
 
   /** Expands the bbox to also contain the given point. */
   inline void expand(const vec& v) {
-    min = vec(std::min(min.x(), v.x()), std::min(min.y(), v.y()), std::min(min.z(), v.z()));
-    max = vec(std::max(max.x(), v.x()), std::max(max.y(), v.y()), std::max(max.z(), v.z()));
+    lower = vec(
+      min(lower.x(), v.x()),
+      min(lower.y(), v.y()),
+      min(lower.z(), v.z())
+    );
+    upper = vec(
+      max(upper.x(), v.x()),
+      max(upper.y(), v.y()),
+      max(upper.z(), v.z())
+    );
   }
 
   /**
@@ -129,28 +140,28 @@ struct bbox {
    * amount along each axis.
    */
   inline void expand(float f = math::VERY_SMALL) {
-    min.x() -= f;
-    min.y() -= f;
-    min.z() -= f;
+    lower.x() -= f;
+    lower.y() -= f;
+    lower.z() -= f;
 
-    max.x() += f;
-    max.y() += f;
-    max.z() += f;
+    upper.x() += f;
+    upper.y() += f;
+    upper.z() += f;
   }
 
   /**
    * Expands the bbox to also contain another given bbox.
    */
   inline void expand(const bbox& b) {
-    min = vec(
-      std::min(min.x(), b.min.x()),
-      std::min(min.y(), b.min.y()),
-      std::min(min.z(), b.min.z())
+    lower = vec(
+      min(lower.x(), b.lower.x()),
+      min(lower.y(), b.lower.y()),
+      min(lower.z(), b.lower.z())
     );
-    max = vec(
-      std::max(max.x(), b.max.x()),
-      std::max(max.y(), b.max.y()),
-      std::max(max.z(), b.max.z())
+    upper = vec(
+      max(upper.x(), b.upper.x()),
+      max(upper.y(), b.upper.y()),
+      max(upper.z(), b.upper.z())
     );
   }
 
@@ -158,7 +169,7 @@ struct bbox {
    * Returns the surface area of the bbox.
    */
   inline float surfaceArea() const {
-    vec d = max - min;
+    vec d = upper - lower;
     return 2.0f * (d.x() * d.y() + d.x() * d.z() + d.y() * d.z());
   }
 
@@ -166,7 +177,7 @@ struct bbox {
    * Return the longest axis of the bbox.
    */
   inline axis maximumExtent() const {
-    vec d = max - min;
+    vec d = upper - lower;
     if (d.x() > d.y() && d.x() > d.z()) {
       return X_AXIS;
     } else if (d.y() > d.z()) {
@@ -194,8 +205,8 @@ struct bbox {
     for (int i = 0; i < 3; ++i) {
       // Update interval for `i`th bounding box slab.
       float invRayDir = 1.0f / r.direction[i];
-      float tNear = (min[i] - r.origin[i]) * invRayDir;
-      float tFar = (max[i] - r.origin[i]) * invRayDir;
+      float tNear = (lower[i] - r.origin[i]) * invRayDir;
+      float tFar = (upper[i] - r.origin[i]) * invRayDir;
       // Update parametric interval from slab intersection `t`s.
       if (tNear > tFar) std::swap(tNear, tFar);
       t0 = tNear > t0 ? tNear : t0;
@@ -208,8 +219,7 @@ struct bbox {
   }
 
   friend std::ostream& operator<<(std::ostream& os, const bbox& b) {
-    os << "<min: " << b.min
-       << ", max: " << b.max << ">";
+    os << "<lower: " << b.lower << ", upper: " << b.upper << ">";
     return os;
   }
 };
