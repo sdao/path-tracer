@@ -67,8 +67,11 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
             float rv = rng.nextUnitFloat();
             float probLive = 0.1f;
             if (rv < probLive) {
+              // The ray lives (more energy = more likely to live).
+              // Increase its energy to balance out probabilities.
               r.color = r.color / probLive;
             } else {
+              // The ray dies.
               r.kill();
               break;
             }
