@@ -10,18 +10,18 @@ protected:
    * Samples the BSDF at a random output direction. The sampling need not be
    * uniform; the default sampling is cosine-weighted.
    *
-   * @param rng                  the per-thread RNG in use
-   * @param directionOut   [out] the sampled direction; the pointer must not be
-   *                             null
-   * @param probabilityOut [out] the probability of the sample, between 0 and
-   *                             1; the pointer must not be null
-   * @returns                    the value of the BSDF at the incoming/outgoing
-   *                             direction combination
+   * @param rng               the per-thread RNG in use
+   * @param incoming    [out] the sampled direction; the pointer must not be
+   *                          null
+   * @param outgoingOut [out] the probability of the sample, between 0 and 1;
+   *                          the pointer must not be null
+   * @returns                 the value of the BSDF at the incoming/outgoing
+   *                          direction combination
    */
   virtual vec sampleBSDF(
     randomness& rng,
-    const vec& directionIn,
-    vec* directionOut,
+    const vec& incoming,
+    vec* outgoingOut,
     float* probabilityOut
   ) const;
 

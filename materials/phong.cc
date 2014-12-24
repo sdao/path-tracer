@@ -1,24 +1,41 @@
 #include "phong.h"
 
-materials::phong::phong(float e) : invExponent(1.0f / e) {}
+materials::phong::phong(float e, vec c)
+  : exponent(e), color(c),
+    scaleBRDF(c * (e + 2.0f) / math::TWO_PI),
+    scaleProb((e + 1.0f) / math::TWO_PI),
+    invExponent(1.0f / (e + 1.0f)) {}
 
-lightray materials::phong::propagate(
-  const lightray& incoming,
-  const intersection& isect,
-  randomness& rng
+vec materials::phong::evalBSDF(
+  const vec& incoming,
+  const vec& outgoing
 ) const {
-  // See <http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html>.
-  // I tested it in Mathematica, and it seems to work OK!
-  vec reflectVector = math::reflect(incoming.direction, isect.normal);
+  // See Lafortune & Willems <http://www.graphics.cornell.edu/~eric/Phong.html>.
+  vec perfectReflect(-incoming.x(), -incoming.y(), incoming.z());
+  float cosAlpha = std::pow(outgoing.dot(perfectReflect), exponent);
+
+  return scaleBRDF * cosAlpha;
+}
+
+vec materials::phong::sampleBSDF(
+  randomness& rng,
+  const vec& incoming,
+  vec* outgoingOut,
+  float* probabilityOut
+) const {
+  // See Lafortune & Willems <http://www.graphics.cornell.edu/~eric/Phong.html>
+  // for a derivation of the sampling procedure and PDF.
+  vec perfectReflect(-incoming.x(), -incoming.y(), incoming.z());
   vec reflectTangent;
   vec reflectBinormal;
-  math::coordSystem(reflectVector, &reflectTangent, &reflectBinormal);
+
+  math::coordSystem(perfectReflect, &reflectTangent, &reflectBinormal);
 
   /* The below procedure should produce unit vectors.
    *
    * Verify using this Mathematica code:
    * @code
-   * R[a_] := (invExponent = 1/20;
+   * R[a_] := (invExponent = 1/(20+1);
    *   cosTheta = RandomReal[{0, 1}]^invExponent;
    *   sinTheta = Sqrt[1 - cosTheta*cosTheta];
    *   phi = 2*Pi*RandomReal[{0, 1}];
@@ -35,15 +52,18 @@ lightray materials::phong::propagate(
   float cosTheta = std::pow(rng.nextUnitFloat(), invExponent);
   float sinTheta = sqrtf(1.0f - cosTheta * cosTheta);
   float phi = math::TWO_PI * rng.nextUnitFloat();
+  vec local(cosf(phi) * sinTheta, sinf(phi) * sinTheta, cosTheta);
 
-  vec phongVector =
-    cosf(phi) * sinTheta * reflectTangent
-    + cosTheta * reflectVector
-    + sinf(phi) * sinTheta * reflectBinormal;
-
-  return lightray(
-    isect.position + phongVector * math::VERY_SMALL,
-    phongVector,
-    incoming.color
+  *outgoingOut = math::localToWorld(
+    local,
+    reflectTangent,
+    reflectBinormal,
+    perfectReflect
   );
+  float cosAlpha = std::pow(outgoingOut->dot(perfectReflect), exponent);
+  *probabilityOut = scaleProb * cosAlpha;
+
+  // Calculate the BRDF here instead of calling evalBSDF() since we already
+  // have all of the info needed.
+  return scaleBRDF * cosAlpha;
 }

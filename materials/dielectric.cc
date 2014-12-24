@@ -19,13 +19,13 @@ vec materials::dielectric::evalBSDF(
 
 vec materials::dielectric::sampleBSDF(
   randomness& rng,
-  const vec& directionIn,
-  vec* directionOut,
+  const vec& incoming,
+  vec* outgoingOut,
   float* probabilityOut
 ) const {
   // Entering = are normal and incoming direction in opposite directions?
   // Recall that the incoming direction is in the normal's local space.
-  bool entering = directionIn.z() > 0.0f;
+  bool entering = incoming.z() > 0.0f;
 
   vec alignedNormal; // Normal flipped based on ray direction.
   float eta; // Ratio of indices of refraction.
@@ -43,20 +43,20 @@ vec materials::dielectric::sampleBSDF(
 
   // Calculate reflection vector.
   vec reflectVector = math::reflect(
-    -directionIn,
+    -incoming,
     alignedNormal
   );
 
   // Calculate refraction vector.
   vec refractVector = math::refract(
-    -directionIn,
+    -incoming,
     alignedNormal,
     eta
   );
 
   if (math::isNearlyZero(refractVector.squaredNorm())) {
     // Total internal reflection. Must reflect.
-    *directionOut = reflectVector;
+    *outgoingOut = reflectVector;
     *probabilityOut = 1.0f;
     return color / math::absCosTheta(reflectVector);
   }
@@ -70,7 +70,7 @@ vec materials::dielectric::sampleBSDF(
     // Equivalent to condition: entering == true
     // (e.g. nI = 1 (air), nT = 1.5 (glass))
     // Theta = angle of incidence.
-    cosTemp = 1.0f - directionIn.dot(alignedNormal);
+    cosTemp = 1.0f - incoming.dot(alignedNormal);
   } else {
     // Equivalent to condition: entering == false
     // Theta = angle of refraction.
@@ -89,11 +89,11 @@ vec materials::dielectric::sampleBSDF(
   // Probabilistically choose to refract or reflect.
   if (rng.nextUnitFloat() < probRefl) {
     // Higher reflectance = higher probability of reflecting.
-    *directionOut = reflectVector;
+    *outgoingOut = reflectVector;
     *probabilityOut = probRefl;
     return color * refl / math::absCosTheta(reflectVector);
   } else {
-    *directionOut = refractVector;
+    *outgoingOut = refractVector;
     *probabilityOut = probRefr;
     return color * refr / math::absCosTheta(refractVector);
   }

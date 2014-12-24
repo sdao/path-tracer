@@ -11,8 +11,6 @@ namespace materials {
     /** The refractive index for a vacuum (approx. air), nVac. */
     static constexpr float IOR_VACUUM = 1.0f;
 
-    const vec color;
-
     float r0; /** The cached R(0) value for Schlick's approximation. */
     const float etaEntering; /** The refraction ratio nVac / nMaterial. */
     const float etaExiting; /** Inverse of etaEntering (nMaterial / nVac). */
@@ -20,8 +18,8 @@ namespace materials {
   protected:
     virtual vec sampleBSDF(
       randomness& rng,
-      const vec& directionIn,
-      vec* directionOut,
+      const vec& incoming,
+      vec* outgoingOut,
       float* probabilityOut
     ) const;
 
@@ -34,7 +32,15 @@ namespace materials {
     static constexpr float IOR_GLASS = 1.5f; /**< The IOR for glass. */
     static constexpr float IOR_DIAMOND = 2.4f; /**< The IOR for diamond. */
 
-    /** Creates a dielectric material. */
+    /** The reflection and refraction color of the material. */
+    const vec color;
+
+    /**
+     * Creates a dielectric material.
+     *
+     * @param ior the index of reflection on the inside of the material
+     * @param c   the color of the material
+     */
     dielectric(float ior = IOR_GLASS, vec c = vec(1, 1, 1));
   };
 

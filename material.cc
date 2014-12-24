@@ -42,12 +42,19 @@ lightray material::propagate(
 
 vec material::sampleBSDF(
   randomness& rng,
-  const vec& directionIn,
-  vec* directionOut,
+  const vec& incoming,
+  vec* outgoingOut,
   float* probabilityOut
 ) const {
-  math::cosineSampleHemisphere(rng, directionOut, probabilityOut);
-  return evalBSDF(directionIn, *directionOut);
+  math::cosineSampleHemisphere(rng, outgoingOut, probabilityOut);
+
+  // Generate the output direction on the same side of the normal as the
+  // input direction (reflection) by default, i.e. assume BRDF.
+  if (incoming[2] < 0.0f) {
+    outgoingOut[2] *= -1.0f;
+  }
+
+  return evalBSDF(incoming, *outgoingOut);
 }
 
 vec material::evalBSDF(
