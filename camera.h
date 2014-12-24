@@ -10,7 +10,7 @@
 /**
  * Manages rendering by simulating the action of a physical pinhole camera.
  */
-class camera {
+class Camera {
   /**
    * The number of bounces at which a ray is subject to Russian Roulette
    * termination, stage 1 (less aggressive).
@@ -30,17 +30,17 @@ class camera {
    */
   static constexpr float PIXELS_PER_SAMPLE = 1.0f / float(SAMPLES_PER_PIXEL);
 
-  ray eye; /**< The ray representing the eye's position and orientation. */
+  Ray eye; /**< The ray representing the eye's position and orientation. */
   float fovx2; /**< Half of the horizontal field of view angle. */
 
-  vec up; /**< The ray increment moving up in the y-direction. */
-  vec right; /**< The ray increment moving right in the x-direction. */
-  vec cornerRay; /**< The first ray in the lower-left corner. */
+  Vec up; /**< The ray increment moving up in the y-direction. */
+  Vec right; /**< The ray increment moving right in the x-direction. */
+  Vec cornerRay; /**< The first ray in the lower-left corner. */
 
-  randomness masterRng; /**< The RNG used to seed the per-row RNGs. */
+  Randomness masterRng; /**< The RNG used to seed the per-row RNGs. */
   std::vector<unsigned> rowSeeds; /**< The per-row RNG seeds. */
 
-  std::vector< std::vector<dvec> > data; /**< The colors sampled from paths. */
+  std::vector< std::vector<DoubleVec> > data; /**< The raw sampled colors. */
   Imf::Array2D<Imf::Rgba> exrData; /**< The colors converted to OpenEXR. */
 
   size_t w; /**< The width of the output image to generate. */
@@ -56,7 +56,7 @@ public:
    * @param hh the height of the output image, in pixels
    * @param ff the total horizontal field of view, in radians
    */
-  camera(ray e, size_t ww, size_t hh, float ff = math::PI_4);
+  Camera(Ray e, size_t ww, size_t hh, float ff = math::PI_4);
 
   /**
    * Renders an additional iteration of the image by path-tracing.
@@ -66,7 +66,7 @@ public:
    * @param kdt  a k-d tree containing the scene's geometry
    * @param name the name of the output EXR file
    */
-  void renderOnce(const kdtree& kdt, std::string name);
+  void renderOnce(const KDTree& kdt, std::string name);
 
   /**
    * Renders multiple additional path-tracing iterations.
@@ -78,7 +78,7 @@ public:
    *                   function will run forever
    */
   void renderMultiple(
-    const kdtree& kdt,
+    const KDTree& kdt,
     std::string name,
     int iterations
   );

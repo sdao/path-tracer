@@ -1,10 +1,10 @@
 #include "lambert.h"
 
-materials::lambert::lambert(vec a) : albedo(a) {}
+materials::Lambert::Lambert(Vec a) : albedo(a) {}
 
-vec materials::lambert::evalBSDF(
-  const vec& /* incoming */,
-  const vec& /* outgoing */
+Vec materials::Lambert::evalBSDF(
+  const Vec& /* incoming */,
+  const Vec& /* outgoing */
 ) const {
   return albedo * math::INV_PI;
 }

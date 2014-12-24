@@ -5,7 +5,7 @@
  * A unified RNG capable of generating random floating-point and integer
  * values. Not thread-safe; use a separate randomness object for each thread.
  */
-class randomness {
+class Randomness {
   /**
    * Uniform [0, 1) floating-point distribution.
    */
@@ -37,12 +37,12 @@ public:
   /**
    * Constructs a randomness object from a truly random seed.
    */
-  randomness() : unitDist(), intDist(), unsignedDist(), rng(createSeed()) {}
+  Randomness() : unitDist(), intDist(), unsignedDist(), rng(createSeed()) {}
 
   /**
    * Constructs a randomness object from the given seed.
    */
-  randomness(unsigned seed)
+  Randomness(unsigned seed)
     : unitDist(), intDist(), unsignedDist(), rng(seed) {}
 
   /**

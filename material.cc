@@ -1,18 +1,18 @@
 #include "material.h"
 
-material::~material() {}
+Material::~Material() {}
 
-lightray material::propagate(
-  const lightray& incoming,
-  const intersection& isect,
-  randomness& rng
+LightRay Material::propagate(
+  const LightRay& incoming,
+  const Intersection& isect,
+  Randomness& rng
 ) const {
-  vec tangent;
-  vec binormal;
+  Vec tangent;
+  Vec binormal;
   math::coordSystem(isect.normal, &tangent, &binormal);
 
   // BRDF computation expects incoming ray to be in local-space.
-  vec incomingLocal = math::worldToLocal(
+  Vec incomingLocal = math::worldToLocal(
     -incoming.direction,
     tangent,
     binormal,
@@ -20,30 +20,30 @@ lightray material::propagate(
   );
 
   // Sample BSDF for direction, color, and probability.
-  vec outgoingLocal;
+  Vec outgoingLocal;
   float probOutgoing;
-  vec brdf = sampleBSDF(rng, incomingLocal, &outgoingLocal, &probOutgoing);
-  vec scale = brdf * math::absCosTheta(outgoingLocal) / probOutgoing;
+  Vec brdf = sampleBSDF(rng, incomingLocal, &outgoingLocal, &probOutgoing);
+  Vec scale = brdf * math::absCosTheta(outgoingLocal) / probOutgoing;
 
   // Rendering expects outgoing ray to be in world-space.
-  vec outgoingWorld = math::localToWorld(
+  Vec outgoingWorld = math::localToWorld(
     outgoingLocal,
     tangent,
     binormal,
     isect.normal
   );
 
-  return lightray(
+  return LightRay(
     isect.position + outgoingWorld * math::VERY_SMALL,
     outgoingWorld,
     incoming.color.cwiseProduct(scale)
   );
 }
 
-vec material::sampleBSDF(
-  randomness& rng,
-  const vec& incoming,
-  vec* outgoingOut,
+Vec Material::sampleBSDF(
+  Randomness& rng,
+  const Vec& incoming,
+  Vec* outgoingOut,
   float* probabilityOut
 ) const {
   math::cosineSampleHemisphere(rng, outgoingOut, probabilityOut);
@@ -57,9 +57,9 @@ vec material::sampleBSDF(
   return evalBSDF(incoming, *outgoingOut);
 }
 
-vec material::evalBSDF(
-  const vec& /* incoming */,
-  const vec& /* outgoing */
+Vec Material::evalBSDF(
+  const Vec& /* incoming */,
+  const Vec& /* outgoing */
 ) const {
-  return vec(0, 0, 0);
+  return Vec(0, 0, 0);
 }

@@ -6,9 +6,9 @@ namespace geoms {
   /**
    * A geometric sphere.
    */
-  class sphere : public geom {
+  class Sphere : public Geom {
   public:
-    const vec origin; /**< The center of the sphere. */
+    const Vec origin; /**< The center of the sphere. */
     const float radius; /**< The distance between the center and the surface. */
 
     /**
@@ -18,15 +18,15 @@ namespace geoms {
      * @param o the center (origin) of the sphere
      * @param r the radius of the sphere
      */
-    sphere(material* m, vec o = vec(0, 0, 0), float r = 1.0f);
+    Sphere(Material* m, Vec o = Vec(0, 0, 0), float r = 1.0f);
 
     /**
      * Constructs a sphere from another sphere.
      */
-    sphere(const geoms::sphere& other);
+    Sphere(const geoms::Sphere& other);
 
-    virtual bool intersect(const ray& r, intersection* isectOut) const;
-    virtual bbox bounds() const;
+    virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
+    virtual BBox bounds() const override;
   };
 
 }

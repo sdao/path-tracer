@@ -11,15 +11,15 @@ namespace mem {
   /**
    * Represents a typesafe array/vector index.
    */
-  union id {
+  union ID {
     size_t val; /**< The array/vector index stored in this id. */
 
     /**
      * Constructs an id from the specified array/vector index.
      */
-    id(size_t i = ID_INVALID) : val(i) {}
+    ID(size_t i = ID_INVALID) : val(i) {}
 
-    inline id& operator=(size_t other) {
+    inline ID& operator=(size_t other) {
       val = other;
       return *this;
     }
@@ -28,8 +28,8 @@ namespace mem {
      * Creates another id from the current id by adding an unsigned offset to
      * its array/vector index.
      */
-    inline id offset(size_t ofs) const {
-      return id(val + ofs);
+    inline ID offset(size_t ofs) const {
+      return ID(val + ofs);
     }
 
     /**
@@ -45,7 +45,7 @@ namespace mem {
    * id.
    */
   template<typename T>
-  inline T& ref(std::vector<T>& vector, id item) {
+  inline T& ref(std::vector<T>& vector, ID item) {
     return vector[item.val];
   }
 
@@ -54,7 +54,7 @@ namespace mem {
    * given id.
    */
   template<typename T>
-  inline const T& refConst(const std::vector<T>& vector, id item) {
+  inline const T& refConst(const std::vector<T>& vector, ID item) {
     return vector[item.val];
   }
 

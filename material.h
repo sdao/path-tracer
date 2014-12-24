@@ -4,7 +4,7 @@
 /**
  * A material that specified how light interacts with geometry.
  */
-class material {
+class Material {
 protected:
   /**
    * Samples the BSDF at a random output direction. The sampling need not be
@@ -18,23 +18,23 @@ protected:
    * @returns                 the value of the BSDF at the incoming/outgoing
    *                          direction combination
    */
-  virtual vec sampleBSDF(
-    randomness& rng,
-    const vec& incoming,
-    vec* outgoingOut,
+  virtual Vec sampleBSDF(
+    Randomness& rng,
+    const Vec& incoming,
+    Vec* outgoingOut,
     float* probabilityOut
   ) const;
 
   /**
    * Evaluates the BSDF for an incoming and an outgoing direction.
    */
-  virtual vec evalBSDF(
-    const vec& incoming,
-    const vec& outgoing
+  virtual Vec evalBSDF(
+    const Vec& incoming,
+    const Vec& outgoing
   ) const;
 
 public:
-  virtual ~material();
+  virtual ~Material();
 
   /**
    * Determines whether another ray should be cast as a consequence of a
@@ -51,9 +51,9 @@ public:
    *                 and a black zero-length ray to indicate that the path gives
    *                 no light
    */
-  virtual lightray propagate(
-    const lightray& incoming,
-    const intersection& isect,
-    randomness& rng
+  virtual LightRay propagate(
+    const LightRay& incoming,
+    const Intersection& isect,
+    Randomness& rng
   ) const;
 };

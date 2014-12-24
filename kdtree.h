@@ -7,7 +7,7 @@
 /**
  * A k-d tree used to accelerate ray-object intersections.
  */
-class kdtree {
+class KDTree {
   /**
    * The number of objects in a tree leaf at which point the leaf should no
    * longer be refined. (There can be leafs larger than this, however.)
@@ -35,14 +35,14 @@ class kdtree {
   /**
    * A node in the k-d tree.
    */
-  struct kdnode {
-    mem::id below; /**< The index of the child "below" the split. */
+  struct KDNode {
+    mem::ID below; /**< The index of the child "below" the split. */
     axis splitAxis; /**< The axis that the split plane cleaves. */
     float splitPos; /**< The point at which the split axis is cleaved. */
-    std::vector<mem::id> objIds; /**< The indices of the objects at the leaf. */
+    std::vector<mem::ID> objIds; /**< The indices of the objects at the leaf. */
 
     /** Constructs an empty kdnode. */
-    kdnode() : below(),
+    KDNode() : below(),
                splitAxis(INVALID_AXIS),
                splitPos(0.0f),
                objIds() {}
@@ -53,7 +53,7 @@ class kdtree {
      * @param ids   the indexes of objects in the leaf
      * @param count the number of objects in the leaf
      */
-    inline void makeLeaf(const std::vector<mem::id>::iterator ids, long count) {
+    inline void makeLeaf(const std::vector<mem::ID>::iterator ids, long count) {
       for (long i = 0; i < count; ++i) {
         objIds.push_back(ids[i]);
       }
@@ -69,7 +69,7 @@ class kdtree {
      * @param pos   the position at which to split along the axis
      * @param nodes the node lookup table that defines the tree structure
      */
-    inline void makeInterior(axis ax, float pos, std::vector<kdnode>& nodes) {
+    inline void makeInterior(axis ax, float pos, std::vector<KDNode>& nodes) {
       splitAxis = ax;
       splitPos = pos;
 
@@ -78,8 +78,8 @@ class kdtree {
       // Since we change the vector that contains us in this step,
       // we no longer have safe access to our own memory. So all changes
       // must happen before modifying the vector.
-      nodes.push_back(kdnode());
-      nodes.push_back(kdnode());
+      nodes.push_back(KDNode());
+      nodes.push_back(KDNode());
     }
 
     /** Returns true if the node is a leaf, false if the node is interior. */
@@ -88,36 +88,36 @@ class kdtree {
     }
 
     /** Returns the index of the child "above" the split. */
-    inline mem::id aboveId() const {
+    inline mem::ID aboveId() const {
       return below.offset(1);
     }
 
     /** Returns the index of the child "below" the split. */
-    inline mem::id belowId() const {
+    inline mem::ID belowId() const {
       return below;
     }
   };
 
   /** Used to keep track of nodes queued to be checked. */
-  struct kdtodo {
-    mem::id nodeId;
+  struct KDTodo {
+    mem::ID nodeId;
     float tmin;
     float tmax;
   };
 
   /** Used to represent a bbox projected onto a linear axis. */
-  struct bboxedge {
-    mem::id objId;
+  struct BBoxEdge {
+    mem::ID objId;
     float pos;
     bool starting;
 
-    bboxedge()
+    BBoxEdge()
       : objId(mem::ID_INVALID), pos(0.0f), starting(false) {}
 
-    bboxedge(mem::id o, float p,  bool start)
+    BBoxEdge(mem::ID o, float p,  bool start)
       : objId(o), pos(p), starting(start) {}
 
-    bool operator<(const bboxedge &e) const {
+    bool operator<(const BBoxEdge &e) const {
       if (pos == e.pos) {
         return int(starting) < int(e.starting);
       } else {
@@ -126,9 +126,9 @@ class kdtree {
     }
   };
 
-  std::vector<kdnode> allNodes; /**< The node lookup table. */
-  mem::id rootId; /**< The index of the root node (usually 0). */
-  bbox bounds; /**< The bounds encapsulating all the objects in the tree. */
+  std::vector<KDNode> allNodes; /**< The node lookup table. */
+  mem::ID rootId; /**< The index of the root node (usually 0). */
+  BBox bounds; /**< The bounds encapsulating all the objects in the tree. */
 
   /**
    * Recursively constructs the k-d tree.
@@ -145,15 +145,15 @@ class kdtree {
    * @param badRefinesSoFar the number of bad refines in the current branch
    */
   void buildTree(
-    mem::id nodeId,
-    const bbox& nodeBounds,
-    const std::vector<bbox>& allObjBounds,
-    const std::vector<mem::id>::iterator nodeObjIds,
+    mem::ID nodeId,
+    const BBox& nodeBounds,
+    const std::vector<BBox>& allObjBounds,
+    const std::vector<mem::ID>::iterator nodeObjIds,
     long nodeObjCount,
     int depth,
-    std::vector<bboxedge>::iterator workEdges[],
-    std::vector<mem::id>::iterator workObjs0,
-    std::vector<mem::id>::iterator workObjs1,
+    std::vector<BBoxEdge>::iterator workEdges[],
+    std::vector<mem::ID>::iterator workObjs0,
+    std::vector<mem::ID>::iterator workObjs1,
     int badRefinesSoFar
   );
 
@@ -165,17 +165,17 @@ protected:
    * @param os     the output stream to print to
    * @param header whitespace used to indent the printed output
    */
-  void print(mem::id nodeId, std::ostream& os, std::string header = "") const;
+  void print(mem::ID nodeId, std::ostream& os, std::string header = "") const;
 
 public:
-  std::vector<geom*>* objs; /**< The geometric objects in the k-d tree. */
+  std::vector<Geom*>* objs; /**< The geometric objects in the k-d tree. */
 
   /**
    * Constructs an empty kdtree associated with the given objects,
    * but does not actually build out the k-d tree structure.
    * Use the kdtree::build() method to complete building.
    */
-  kdtree(std::vector<geom*>* o);
+  KDTree(std::vector<Geom*>* o);
 
   /**
    * Actually builds out the k-d tree structure.
@@ -191,9 +191,9 @@ public:
    *                       be null
    * @returns              the geom that was hit, or nullptr if none was hit
    */
-  geom* intersect(const ray& r, intersection* isectOut = nullptr) const;
+  Geom* intersect(const Ray& r, Intersection* isectOut = nullptr) const;
 
-  friend std::ostream& operator<<(std::ostream& os, const kdtree& tree) {
+  friend std::ostream& operator<<(std::ostream& os, const KDTree& tree) {
     tree.print(tree.rootId, os);
     return os;
   }

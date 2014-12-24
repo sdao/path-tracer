@@ -1,6 +1,6 @@
 #include "dielectric.h"
 
-materials::dielectric::dielectric(float ior, vec c)
+materials::Dielectric::Dielectric(float ior, Vec c)
   : etaEntering(IOR_VACUUM / ior), etaExiting(ior / IOR_VACUUM), color(c) {
   // Pre-compute values for Fresnel calculations.
 
@@ -8,47 +8,47 @@ materials::dielectric::dielectric(float ior, vec c)
   r0 = r0_temp * r0_temp;
 }
 
-vec materials::dielectric::evalBSDF(
-  const vec& /* incoming */,
-  const vec& /* outgoing */
+Vec materials::Dielectric::evalBSDF(
+  const Vec& /* incoming */,
+  const Vec& /* outgoing */
 ) const {
   // Probabilistically, we are never going to get the exact matching
   // incoming and outgoing vectors.
-  return vec(0, 0, 0);
+  return Vec(0, 0, 0);
 }
 
-vec materials::dielectric::sampleBSDF(
-  randomness& rng,
-  const vec& incoming,
-  vec* outgoingOut,
+Vec materials::Dielectric::sampleBSDF(
+  Randomness& rng,
+  const Vec& incoming,
+  Vec* outgoingOut,
   float* probabilityOut
 ) const {
   // Entering = are normal and incoming direction in opposite directions?
   // Recall that the incoming direction is in the normal's local space.
   bool entering = incoming.z() > 0.0f;
 
-  vec alignedNormal; // Normal flipped based on ray direction.
+  Vec alignedNormal; // Normal flipped based on ray direction.
   float eta; // Ratio of indices of refraction.
   if (entering) {
     // Note: geometry will return surface normal pointing outwards.
     // If we are entering, this is the right normal.
     // If we are exiting, since geometry is single-shelled, we will need
     // to flip the normal.
-    alignedNormal = vec(0, 0, 1);
+    alignedNormal = Vec(0, 0, 1);
     eta = etaEntering;
   } else {
-    alignedNormal = vec(0, 0, -1);
+    alignedNormal = Vec(0, 0, -1);
     eta = etaExiting;
   }
 
   // Calculate reflection vector.
-  vec reflectVector = math::reflect(
+  Vec reflectVector = math::reflect(
     -incoming,
     alignedNormal
   );
 
   // Calculate refraction vector.
-  vec refractVector = math::refract(
+  Vec refractVector = math::refract(
     -incoming,
     alignedNormal,
     eta

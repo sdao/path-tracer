@@ -4,8 +4,8 @@
 
 namespace chrono = std::chrono;
 
-camera::camera(ray e, size_t ww, size_t hh, float ff)
-  : eye(ray(e.origin, e.direction.normalized())), fovx2(0.5f * ff), masterRng(),
+Camera::Camera(Ray e, size_t ww, size_t hh, float ff)
+  : eye(e.origin, e.direction.normalized()), fovx2(0.5f * ff), masterRng(),
     rowSeeds(hh), data(hh), exrData(long(hh), long(ww)), w(ww), h(hh), iters(0)
 {
   // Size of the image plane projected into world space
@@ -14,7 +14,7 @@ camera::camera(ray e, size_t ww, size_t hh, float ff)
   float scaleUp = scaleRight * (float(h) / float(w));
 
   // Corresponding vectors.
-  up = -vec(0, 1, 0) * scaleUp; // Flip the y-axis for image output!
+  up = -Vec(0, 1, 0) * scaleUp; // Flip the y-axis for image output!
   right = -eye.direction.cross(up).normalized() * scaleRight;
 
   // Image corner ray in world space.
@@ -22,14 +22,14 @@ camera::camera(ray e, size_t ww, size_t hh, float ff)
 
   // Prepare raw output data array.
   for (size_t y = 0; y < h; ++y) {
-    data[y] = std::vector<dvec>(w);
+    data[y] = std::vector<DoubleVec>(w);
     for (size_t x = 0; x < w; ++x) {
-      data[y][x] = dvec(0, 0, 0);
+      data[y][x] = DoubleVec(0, 0, 0);
     }
   }
 }
 
-void camera::renderOnce(const kdtree& kdt, std::string name) {
+void Camera::renderOnce(const KDTree& kdt, std::string name) {
   iters++;
   std::cout << "Iteration " << iters;
   chrono::steady_clock::time_point startTime = chrono::steady_clock::now();
@@ -43,17 +43,17 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
 
   tbb::parallel_for(size_t(0), size_t(h), [&](size_t y) {
   //for (size_t y = 0; y < h; ++y) {
-    randomness rng(rowSeeds[y]);
+    Randomness rng(rowSeeds[y]);
 
     for (size_t x = 0; x < w; ++x) {
-      dvec pxColor(0, 0, 0);
+      DoubleVec pxColor(0, 0, 0);
       for (int samps = 0; samps < SAMPLES_PER_PIXEL; ++samps) {
         float frac_y =
           (float(y) - 0.5f + rng.nextUnitFloat()) / (float(h) - 1.0f);
         float frac_x =
           (float(x) - 0.5f + rng.nextUnitFloat()) / (float(w) - 1.0f);
 
-        lightray r(
+        LightRay r(
           eye.origin,
           (cornerRay + (up * frac_y) + (right * frac_x)).normalized()
         );
@@ -85,8 +85,8 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
           }
 
           // Bounce ray and kill if nothing hit.
-          intersection isect;
-          geom* g = kdt.intersect(r, &isect);
+          Intersection isect;
+          Geom* g = kdt.intersect(r, &isect);
 
           if (g) {
             r = g->mat->propagate(r, isect, rng);
@@ -97,12 +97,12 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
         }
 
         // Black if ray died; fill in color otherwise.
-        pxColor += dvec(r.color.x(), r.color.y(), r.color.z());
+        pxColor += DoubleVec(r.color.x(), r.color.y(), r.color.z());
       }
 
       pxColor *= PIXELS_PER_SAMPLE;
 
-      dvec &p = data[y][x];
+      DoubleVec &p = data[y][x];
       if (iters == 1) {
         p = pxColor;
       } else {
@@ -123,8 +123,8 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
   std::cout << " [" << runTime.count() << " seconds]\n";
 }
 
-void camera::renderMultiple(
-  const kdtree& kdt,
+void Camera::renderMultiple(
+  const KDTree& kdt,
   std::string name,
   int iterations
 ) {

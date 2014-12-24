@@ -7,21 +7,21 @@ namespace geoms {
   /**
    * A geometric polygon with three points, i.e. a triangle.
    */
-  class poly : public geom {
+  class Poly : public Geom {
   public:
     /**
      * A point of a poly. Can be shared between multiple polys.
      */
-    struct point {
-      vec position; /**< The position of the point in 3D space. */
-      vec normal; /**< The normal of the surface at the point. */
+    struct Point {
+      Vec position; /**< The position of the point in 3D space. */
+      Vec normal; /**< The normal of the surface at the point. */
     };
 
-    const mem::id pt0; /** < The index of the first point (in CCW order). */
-    const mem::id pt1; /** < The index of the second point (in CCW order). */
-    const mem::id pt2; /** < The index of the third point (in CCW order). */
+    const mem::ID pt0; /** < The index of the first point (in CCW order). */
+    const mem::ID pt1; /** < The index of the second point (in CCW order). */
+    const mem::ID pt2; /** < The index of the third point (in CCW order). */
     /** A point lookup table. We DO NOT own the pointer. */
-    std::vector<geoms::poly::point>* pointLookup;
+    std::vector<geoms::Poly::Point>* pointLookup;
 
     /**
      * Constructs a poly.
@@ -32,20 +32,20 @@ namespace geoms {
      * @param c          the index of the third point (in CCW winding order)
      * @param lookup     a pointer to a point lookup table
      */
-    poly(
-      material* m,
-      mem::id a,
-      mem::id b,
-      mem::id c,
-      std::vector<geoms::poly::point>* lookup
+    Poly(
+      Material* m,
+      mem::ID a,
+      mem::ID b,
+      mem::ID c,
+      std::vector<geoms::Poly::Point>* lookup
     );
     /**
      * Constructs a poly from another poly.
      */
-    poly(const geoms::poly& other);
+    Poly(const geoms::Poly& other);
 
-    virtual bool intersect(const ray& r, intersection* isectOut) const;
-    virtual bbox bounds() const;
+    virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
+    virtual BBox bounds() const override;
 
   private:
     /**
@@ -55,7 +55,7 @@ namespace geoms {
      * @param i the index to look up in the table
      * @return  the point at the given index
      */
-    inline const point get(mem::id i) const {
+    inline const Point get(mem::ID i) const {
       return mem::ref(*pointLookup, i);
     }
   };

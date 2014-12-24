@@ -1,30 +1,30 @@
 #include "poly.h"
 
-geoms::poly::poly(
-  material* m,
-  mem::id a,
-  mem::id b,
-  mem::id c,
-  std::vector<geoms::poly::point>* lookup
-) : geom(m), pt0(a), pt1(b), pt2(c), pointLookup(lookup) {}
+geoms::Poly::Poly(
+  Material* m,
+  mem::ID a,
+  mem::ID b,
+  mem::ID c,
+  std::vector<geoms::Poly::Point>* lookup
+) : Geom(m), pt0(a), pt1(b), pt2(c), pointLookup(lookup) {}
 
-geoms::poly::poly(const geoms::poly& other)
-  : geom(other.mat), pt0(other.pt0), pt1(other.pt1), pt2(other.pt2),
+geoms::Poly::Poly(const geoms::Poly& other)
+  : Geom(other.mat), pt0(other.pt0), pt1(other.pt1), pt2(other.pt2),
     pointLookup(other.pointLookup) {}
 
-bool geoms::poly::intersect(const ray& r, intersection* isectOut) const {
+bool geoms::Poly::intersect(const Ray& r, Intersection* isectOut) const {
   // Uses the Moller-Trumbore intersection algorithm.
   // See <http://en.wikipedia.org/wiki/
   // M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm> for more info.
 
-  const point& pt0_data = get(pt0);
-  const point& pt1_data = get(pt1);
-  const point& pt2_data = get(pt2);
+  const Point& pt0_data = get(pt0);
+  const Point& pt1_data = get(pt1);
+  const Point& pt2_data = get(pt2);
 
-  const vec edge1 = pt1_data.position - pt0_data.position;
-  const vec edge2 = pt2_data.position - pt0_data.position;
+  const Vec edge1 = pt1_data.position - pt0_data.position;
+  const Vec edge2 = pt2_data.position - pt0_data.position;
 
-  const vec p = r.direction.cross(edge2);
+  const Vec p = r.direction.cross(edge2);
   const float det = edge1.dot(p);
 
   if (math::isNearlyZero(det)) {
@@ -32,14 +32,14 @@ bool geoms::poly::intersect(const ray& r, intersection* isectOut) const {
   }
 
   const float invDet = 1.0f / det;
-  const vec t = r.origin - pt0_data.position;
+  const Vec t = r.origin - pt0_data.position;
 
   const float u = t.dot(p) * invDet;
   if (u < 0.0f || u > 1.0f) {
     return false; // In plane but not triangle.
   }
 
-  const vec q = t.cross(edge1);
+  const Vec q = t.cross(edge1);
   const float v = r.direction.dot(q) * invDet;
   if (v < 0.0f || (u + v) > 1.0f) {
     return false; // In plane but not triangle.
@@ -52,7 +52,7 @@ bool geoms::poly::intersect(const ray& r, intersection* isectOut) const {
 
   const float w = 1.0f - u - v;
 
-  intersection isect;
+  Intersection isect;
   isect.position = r.at(dist);
   isect.distance = dist;
   isect.normal =
@@ -62,8 +62,8 @@ bool geoms::poly::intersect(const ray& r, intersection* isectOut) const {
   return true;
 }
 
-bbox geoms::poly::bounds() const {
-  bbox b(get(pt0).position, get(pt1).position);
+BBox geoms::Poly::bounds() const {
+  BBox b(get(pt0).position, get(pt1).position);
   b.expand(get(pt2).position);
 
   return b;

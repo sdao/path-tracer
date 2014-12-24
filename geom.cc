@@ -1,5 +1,5 @@
 #include "geom.h"
 
-geom::geom(material* m) : mat(m) {}
+Geom::Geom(Material* m) : mat(m) {}
 
-geom::~geom() {}
+Geom::~Geom() {}

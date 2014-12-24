@@ -7,7 +7,7 @@ namespace materials {
    * A dielectric (nonconductive) material following the Fresnel equations.
    * This material provides for both reflection and refraction.
    */
-  class dielectric : public material {
+  class Dielectric : public Material {
     /** The refractive index for a vacuum (approx. air), nVac. */
     static constexpr float IOR_VACUUM = 1.0f;
 
@@ -16,16 +16,16 @@ namespace materials {
     const float etaExiting; /** Inverse of etaEntering (nMaterial / nVac). */
 
   protected:
-    virtual vec sampleBSDF(
-      randomness& rng,
-      const vec& incoming,
-      vec* outgoingOut,
+    virtual Vec sampleBSDF(
+      Randomness& rng,
+      const Vec& incoming,
+      Vec* outgoingOut,
       float* probabilityOut
     ) const override;
 
-    virtual vec evalBSDF(
-      const vec& incoming,
-      const vec& outgoing
+    virtual Vec evalBSDF(
+      const Vec& incoming,
+      const Vec& outgoing
     ) const override;
   
   public:
@@ -33,7 +33,7 @@ namespace materials {
     static constexpr float IOR_DIAMOND = 2.4f; /**< The IOR for diamond. */
 
     /** The reflection and refraction color of the material. */
-    const vec color;
+    const Vec color;
 
     /**
      * Creates a dielectric material.
@@ -41,7 +41,7 @@ namespace materials {
      * @param ior the index of reflection on the inside of the material
      * @param c   the color of the material
      */
-    dielectric(float ior = IOR_GLASS, vec c = vec(1, 1, 1));
+    Dielectric(float ior = IOR_GLASS, Vec c = Vec(1, 1, 1));
   };
 
 }

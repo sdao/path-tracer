@@ -3,13 +3,13 @@
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 
-mesh::mesh() : points(), faces() {}
+Mesh::Mesh() : points(), faces() {}
 
-bool mesh::readPolyModel(
-  material* m,
+bool Mesh::readPolyModel(
+  Material* m,
   std::string name,
-  vec offset,
-  std::vector<geom*>* geomList
+  Vec offset,
+  std::vector<Geom*>* geomList
 ) {
   // Create an instance of the Importer class
   Assimp::Importer importer;
@@ -55,10 +55,10 @@ bool mesh::readPolyModel(
       aiVector3D thisPos = mesh->mVertices[i];
       aiVector3D thisNorm = mesh->mNormals[i];
 
-      geoms::poly::point thisPoint;
-      thisPoint.position = vec(thisPos.x, thisPos.y, thisPos.z) + offset;
+      geoms::Poly::Point thisPoint;
+      thisPoint.position = Vec(thisPos.x, thisPos.y, thisPos.z) + offset;
       thisPoint.normal =
-        vec(thisNorm.x, thisNorm.y, thisNorm.z).normalized();
+        Vec(thisNorm.x, thisNorm.y, thisNorm.z).normalized();
 
       points.push_back(thisPoint);
     }
@@ -69,11 +69,11 @@ bool mesh::readPolyModel(
 
       // Only add the triangles (we should have a triangulated mesh).
       if (face.mNumIndices == 3) {
-        geoms::poly thisPoly(
+        geoms::Poly thisPoly(
           m,
-          mem::id(face.mIndices[0]),
-          mem::id(face.mIndices[1]),
-          mem::id(face.mIndices[2]),
+          mem::ID(face.mIndices[0]),
+          mem::ID(face.mIndices[1]),
+          mem::ID(face.mIndices[2]),
           &points
         );
 
@@ -90,7 +90,7 @@ bool mesh::readPolyModel(
   return true;
 }
 
-void mesh::appendFacesTo(std::vector<geom*>* geomList) {
+void Mesh::appendFacesTo(std::vector<Geom*>* geomList) {
   if (geomList) {
     for (size_t i = 0; i < faces.size(); ++i) {
       geomList->push_back(&faces[i]);
@@ -98,7 +98,7 @@ void mesh::appendFacesTo(std::vector<geom*>* geomList) {
   }
 }
 
-void mesh::clear() {
+void Mesh::clear() {
   points.clear();
   faces.clear();
 }

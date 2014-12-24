@@ -4,20 +4,20 @@
 namespace materials {
 
   /**
-   * A perfectly-ideal diffuse reflector.
+   * A perfectly-ideal diffuse reflector using Lambertian reflectance.
    */
-  class lambert : public material {
+  class Lambert : public Material {
   protected:
-    virtual vec evalBSDF(
-      const vec& incoming,
-      const vec& outgoing
+    virtual Vec evalBSDF(
+      const Vec& incoming,
+      const Vec& outgoing
     ) const override;
 
   public:
-    const vec albedo; /**< The albedo (diffuse color). */
+    const Vec albedo; /**< The albedo (diffuse color). */
 
     /** Constructs a diffuse material with the given albedo (diffuse color). */
-    lambert(vec a);
+    Lambert(Vec a);
   };
 
 }

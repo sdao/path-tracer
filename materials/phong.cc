@@ -1,33 +1,33 @@
 #include "phong.h"
 
-materials::phong::phong(float e, vec c)
+materials::Phong::Phong(float e, Vec c)
   : scaleBRDF(c * (e + 2.0f) / math::TWO_PI),
     scaleProb((e + 1.0f) / math::TWO_PI),
     invExponent(1.0f / (e + 1.0f)),
     exponent(e), color(c) {}
 
-vec materials::phong::evalBSDF(
-  const vec& incoming,
-  const vec& outgoing
+Vec materials::Phong::evalBSDF(
+  const Vec& incoming,
+  const Vec& outgoing
 ) const {
   // See Lafortune & Willems <http://www.graphics.cornell.edu/~eric/Phong.html>.
-  vec perfectReflect(-incoming.x(), -incoming.y(), incoming.z());
+  Vec perfectReflect(-incoming.x(), -incoming.y(), incoming.z());
   float cosAlpha = std::pow(outgoing.dot(perfectReflect), exponent);
 
   return scaleBRDF * cosAlpha;
 }
 
-vec materials::phong::sampleBSDF(
-  randomness& rng,
-  const vec& incoming,
-  vec* outgoingOut,
+Vec materials::Phong::sampleBSDF(
+  Randomness& rng,
+  const Vec& incoming,
+  Vec* outgoingOut,
   float* probabilityOut
 ) const {
   // See Lafortune & Willems <http://www.graphics.cornell.edu/~eric/Phong.html>
   // for a derivation of the sampling procedure and PDF.
-  vec perfectReflect(-incoming.x(), -incoming.y(), incoming.z());
-  vec reflectTangent;
-  vec reflectBinormal;
+  Vec perfectReflect(-incoming.x(), -incoming.y(), incoming.z());
+  Vec reflectTangent;
+  Vec reflectBinormal;
 
   math::coordSystem(perfectReflect, &reflectTangent, &reflectBinormal);
 
@@ -52,7 +52,7 @@ vec materials::phong::sampleBSDF(
   float cosTheta = std::pow(rng.nextUnitFloat(), invExponent);
   float sinTheta = sqrtf(1.0f - cosTheta * cosTheta);
   float phi = math::TWO_PI * rng.nextUnitFloat();
-  vec local(cosf(phi) * sinTheta, sinf(phi) * sinTheta, cosTheta);
+  Vec local(cosf(phi) * sinTheta, sinf(phi) * sinTheta, cosTheta);
 
   *outgoingOut = math::localToWorld(
     local,

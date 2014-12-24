@@ -4,25 +4,25 @@
 namespace materials {
 
   /**
-   * A glossy reflective material using Phong shading.
-   * Note that Phong shading is not physically plausible.
+   * A glossy reflective material using Phong reflectance.
+   * Note that Phong reflectance is not physically plausible.
    */
-  class phong : public material {
+  class Phong : public Material {
   protected:
-    virtual vec sampleBSDF(
-      randomness& rng,
-      const vec& incoming,
-      vec* outgoingOut,
+    virtual Vec sampleBSDF(
+      Randomness& rng,
+      const Vec& incoming,
+      Vec* outgoingOut,
       float* probabilityOut
     ) const override;
 
-    virtual vec evalBSDF(
-      const vec& incoming,
-      const vec& outgoing
+    virtual Vec evalBSDF(
+      const Vec& incoming,
+      const Vec& outgoing
     ) const override;
 
     /** Cached scaling term in the Phong BRDF. */
-    const vec scaleBRDF;
+    const Vec scaleBRDF;
 
     /** Cached scaling term in the PDF. */
     const float scaleProb;
@@ -35,7 +35,7 @@ namespace materials {
     const float exponent;
 
     /** The color of the material. */
-    const vec color;
+    const Vec color;
 
     /**
      * Constructs a Phong material.
@@ -44,7 +44,7 @@ namespace materials {
      *          ~1000 = almost perfectly specular, lower values are more glossy
      * @param c the color of the material
      */
-    phong(float e, vec c = vec(1, 1, 1));
+    Phong(float e, Vec c = Vec(1, 1, 1));
   };
 
 }

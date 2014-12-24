@@ -10,40 +10,40 @@
 void render(size_t w, size_t h, int iterations);
 
 void render(size_t w, size_t h, int iterations) {
-  materials::lambert    green(vec(0.5f, 0.9f, 0.4f));
-  materials::lambert    white(vec(1, 1, 1));
-  materials::lambert    red(vec(0.9f, 0.4f, 0.5f));
-  materials::emitter    emit(vec(4, 4, 4));
-  materials::dielectric dielectric(materials::dielectric::IOR_GLASS);
-  materials::phong      glossy(100.0f);
+  materials::Lambert    green(Vec(0.5f, 0.9f, 0.4f));
+  materials::Lambert    white(Vec(1, 1, 1));
+  materials::Lambert    red(Vec(0.9f, 0.4f, 0.5f));
+  materials::Emitter    emit(Vec(4, 4, 4));
+  materials::Dielectric dielectric(materials::Dielectric::IOR_GLASS);
+  materials::Phong      glossy(100.0f);
 
-  geoms::sphere smallSphere(&dielectric, vec(-6, -14, -16), 4.0f);
-  geoms::sphere bigSphere(&dielectric, vec(10, -12, -24), 6.0f);
-  geoms::disc   bottom(&white, vec(0, -18, -25), vec(0, 1, 0), 100.0f);
-  geoms::disc   top(&white, vec(0, 18, -25), vec(0, -1, 0), 100.0f);
-  geoms::disc   back(&white, vec(0, 0, -50), vec(0, 0, 1), 100.0f);
-  geoms::disc   left(&red, vec(-20, 0, -25), vec(1, 0, 0), 100.0f);
-  geoms::disc   right(&green, vec(20, 0, -25), vec(-1, 0, 0), 100.0f);
-  geoms::sphere light(&emit, vec(0, 46, -25), 30.0f);
+  geoms::Sphere smallSphere(&dielectric, Vec(-6, -14, -16), 4.0f);
+  geoms::Sphere bigSphere(&dielectric, Vec(10, -12, -24), 6.0f);
+  geoms::Disc   bottom(&white, Vec(0, -18, -25), Vec(0, 1, 0), 100.0f);
+  geoms::Disc   top(&white, Vec(0, 18, -25), Vec(0, -1, 0), 100.0f);
+  geoms::Disc   back(&white, Vec(0, 0, -50), Vec(0, 0, 1), 100.0f);
+  geoms::Disc   left(&red, Vec(-20, 0, -25), Vec(1, 0, 0), 100.0f);
+  geoms::Disc   right(&green, Vec(20, 0, -25), Vec(-1, 0, 0), 100.0f);
+  geoms::Sphere light(&emit, Vec(0, 46, -25), 30.0f);
 
-  std::vector<geom*> objs {
+  std::vector<Geom*> objs {
     &smallSphere, &bigSphere, &bottom, &top, &back, &left, &right, &light
   };
 
   // external model
-  mesh externalModel;
+  Mesh externalModel;
   externalModel.readPolyModel(
     &glossy,
     "assets/dragon.obj",
-    vec(-6, -18, -28),
+    Vec(-6, -18, -28),
     &objs
   );
 
   // Construct k-d tree acceleration structure.
-  kdtree tree(&objs);
+  KDTree tree(&objs);
   tree.build();
 
-  camera cam(ray(vec(0, 0, 50), vec(0, 0, -1)), w, h, math::PI_4);
+  Camera cam(Ray(Vec(0, 0, 50), Vec(0, 0, -1)), w, h, math::PI_4);
   cam.renderMultiple(tree, "output.exr", iterations);
 }
 

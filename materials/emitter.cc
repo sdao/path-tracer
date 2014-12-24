@@ -1,15 +1,15 @@
 #include "emitter.h"
 
-materials::emitter::emitter(vec c) : color(c) {}
+materials::Emitter::Emitter(Vec c) : color(c) {}
 
-lightray materials::emitter::propagate(
-  const lightray& incoming,
-  const intersection& /* isect */,
-  randomness& /* rng */
+LightRay materials::Emitter::propagate(
+  const LightRay& incoming,
+  const Intersection& /* isect */,
+  Randomness& /* rng */
 ) const {
-  return lightray(
-    vec(0, 0, 0),
-    vec(0, 0, 0),
+  return LightRay(
+    Vec(0, 0, 0),
+    Vec(0, 0, 0),
     incoming.color.cwiseProduct(color)
   );
 }

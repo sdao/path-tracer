@@ -5,7 +5,7 @@
 /**
  * The base interface for all renderable geometry.
  */
-class geom {
+class Geom {
 protected:
   /**
    * Constructs a geom with the specified material. All classes inheriting geom
@@ -13,12 +13,12 @@ protected:
    *
    * @param m the material used to render the geometry
    */
-  geom(material* m);
+  Geom(Material* m);
 
 public:
-  material* mat; /**< The material used to render the geometry. */
+  Material* mat; /**< The material used to render the geometry. */
 
-  virtual ~geom();
+  virtual ~Geom();
 
   /**
    * Finds an intersection between the geometry and the given ray.
@@ -29,10 +29,10 @@ public:
    *                       be null
    * @returns              true if the ray hit the geometry, false otherwise
    */
-  virtual bool intersect(const ray& r, intersection* isectOut) const = 0;
+  virtual bool intersect(const Ray& r, Intersection* isectOut) const = 0;
 
   /**
    * A bounding box encapsulating the entire geometry.
    */
-  virtual bbox bounds() const = 0;
+  virtual BBox bounds() const = 0;
 };

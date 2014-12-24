@@ -14,8 +14,8 @@
 using std::min;
 using std::max;
 
-typedef Eigen::Vector3f vec; /**< A 3D single-precision vector. */
-typedef Eigen::Vector3d dvec; /**< A 3D double-precision vector. */
+typedef Eigen::Vector3f Vec; /**< A 3D single-precision vector. */
+typedef Eigen::Vector3d DoubleVec; /**< A 3D double-precision vector. */
 
 /** An enumeration of standard axes in 3D space. */
 enum axis { X_AXIS = 0, Y_AXIS = 1, Z_AXIS = 2, INVALID_AXIS = -1 };
@@ -54,13 +54,13 @@ namespace math {
    * @param v2 [out] the second unit vector, generated from the first
    * @param v3 [out] the third unit vector, generated from the first
    */
-  inline void coordSystem(const vec& v1, vec* v2, vec* v3) {
+  inline void coordSystem(const Vec& v1, Vec* v2, Vec* v3) {
     if (fabsf(v1.x()) > fabsf(v1.y())) {
       float invLen = 1.0f / sqrtf(v1.x() * v1.x() + v1.z() * v1.z());
-      *v2 = vec(-v1.z() * invLen, 0.0f, v1.x() * invLen);
+      *v2 = Vec(-v1.z() * invLen, 0.0f, v1.x() * invLen);
     } else {
       float invLen = 1.0f / sqrtf(v1.y() * v1.y() + v1.z() * v1.z());
-      *v2 = vec(0.0f, v1.z() * invLen, -v1.y() * invLen);
+      *v2 = Vec(0.0f, v1.z() * invLen, -v1.y() * invLen);
     }
     *v3 = v1.cross(*v2);
   }
@@ -71,13 +71,13 @@ namespace math {
    * tangent, y is the weight of the binormal, and z is the weight of the
    * normal.
    */
-  inline vec worldToLocal(
-    const vec& world,
-    const vec& tangent,
-    const vec& binormal,
-    const vec& normal
+  inline Vec worldToLocal(
+    const Vec& world,
+    const Vec& tangent,
+    const Vec& binormal,
+    const Vec& normal
   ) {
-    return vec(
+    return Vec(
       world.dot(tangent),
       world.dot(binormal),
       world.dot(normal)
@@ -89,13 +89,13 @@ namespace math {
    * should be (x, y, z), where x is the weight of the tangent, y is the weight
    * of the binormal, and z is the weight of the normal.
    */
-  inline vec localToWorld(
-    const vec& local,
-    const vec& tangent,
-    const vec& binormal,
-    const vec& normal
+  inline Vec localToWorld(
+    const Vec& local,
+    const Vec& tangent,
+    const Vec& binormal,
+    const Vec& normal
   ) {
-    return vec(
+    return Vec(
       tangent.x() * local.x() + binormal.x() * local.y()
         + normal.x() * local.z(),
       tangent.y() * local.x() + binormal.y() * local.y()
@@ -117,13 +117,13 @@ namespace math {
   inline void copyData(
     size_t w,
     size_t h,
-    const std::vector< std::vector<dvec> >& data,
+    const std::vector< std::vector<DoubleVec> >& data,
     Imf::Array2D<Imf::Rgba>& exrData
   ) {
     for (size_t y = 0; y < h; ++y) {
       for (size_t x = 0; x < w; ++x) {
         Imf::Rgba& rgba = exrData[long(y)][long(x)];
-        const dvec &p = data[y][x];
+        const DoubleVec &p = data[y][x];
         rgba.r = float(p.x());
         rgba.g = float(p.y());
         rgba.b = float(p.z());
@@ -142,14 +142,14 @@ namespace math {
   /**
    * Determines whether a vec's magnitude is zero, within a small epsilon.
    */
-  inline bool isNearlyZero(const vec& v) {
+  inline bool isNearlyZero(const Vec& v) {
     return isNearlyZero(v.squaredNorm());
   }
 
   /**
    * Determines whether a vec's components are each exactly 0.
    */
-  inline bool isExactlyZero(const vec& v) {
+  inline bool isExactlyZero(const Vec& v) {
     return v.x() == 0.0f && v.y() == 0.0f && v.z() == 0.0f;
   }
 
@@ -193,7 +193,7 @@ namespace math {
    * @param N the normal at the surface over which to reflect
    * @returns the outgoing reflection vector
    */
-  inline vec reflect(const vec& I, const vec& N) {
+  inline Vec reflect(const Vec& I, const Vec& N) {
     return I - 2.0f * N.dot(I) * N;
   }
 
@@ -208,11 +208,11 @@ namespace math {
    * @param eta the ratio of the incoming IOR over the transmitting IOR
    * @returns   the outgoing refraction vector
    */
-  inline vec refract(const vec& I, const vec& N, float eta) {
+  inline Vec refract(const Vec& I, const Vec& N, float eta) {
     float d = N.dot(I);
     float k = 1.0f - eta * eta * (1.0f - d * d);
     if (k < 0.0f) {
-      return vec(0, 0, 0);
+      return Vec(0, 0, 0);
     } else {
       return (eta * I) - ((eta * d + sqrtf(k)) * N);
     }
@@ -222,19 +222,19 @@ namespace math {
    * Returns Cos[Theta] of a vector where Theta is the polar angle of the vector
    * in spherical coordinates.
    */
-  inline float cosTheta(const vec& v) { return v.z(); }
+  inline float cosTheta(const Vec& v) { return v.z(); }
 
   /**
    * Returns Abs[Cos[Theta]] of a vector where Theta is the polar angle of the
    * vector in spherical coordinates.
    */
-  inline float absCosTheta(const vec& v) { return fabsf(v.z()); }
+  inline float absCosTheta(const Vec& v) { return fabsf(v.z()); }
 
   /**
    * Returns Sin[Theta]^2 of a vector where Theta is the polar angle of the
    * vector in spherical coordinates.
    */
-  inline float sinTheta2(const vec& v) {
+  inline float sinTheta2(const Vec& v) {
     return max(0.0f, 1.0f - cosTheta(v) * cosTheta(v));
   }
 
@@ -242,7 +242,7 @@ namespace math {
    * Returns Sin[Theta] of a vector where Theta is the polar angle of the vector
    * in spherical coordinates.
    */
-  inline float sinTheta(const vec& v) {
+  inline float sinTheta(const Vec& v) {
     return sqrtf(sinTheta2(v));
   }
 
@@ -250,7 +250,7 @@ namespace math {
    * Returns Cos[Phi] of a vector where Phi is the azimuthal angle of the vector
    * in spherical coordinates.
    */
-  inline float cosPhi(const vec& v) {
+  inline float cosPhi(const Vec& v) {
     float sinT = sinTheta(v);
     if (sinT == 0.0f) {
       return 1.0f;
@@ -262,7 +262,7 @@ namespace math {
    * Returns Sin[Phi] of a vector where Phi is the azimuthal angle of the vector
    * in spherical coordinates.
    */
-  inline float sinPhi(const vec& v) {
+  inline float sinPhi(const Vec& v) {
     float sinT = sinTheta(v);
     if (sinT == 0.0f) {
       return 0.0f;
@@ -280,7 +280,7 @@ namespace math {
    * @param dx [out] the x-coordinate of the sample
    * @param dy [out] the y-coordinate of the sample
    */
-  inline void areaSampleDisk(randomness& rng, float* dx, float* dy) {
+  inline void areaSampleDisk(Randomness& rng, float* dx, float* dy) {
     float sx = rng.nextFloat(-1.0f, 1.0f);
     float sy = rng.nextFloat(-1.0f, 1.0f);
 
@@ -338,11 +338,11 @@ namespace math {
    *                             pointer must not be null
    */
   inline void cosineSampleHemisphere(
-    randomness& rng,
-    vec* directionOut,
+    Randomness& rng,
+    Vec* directionOut,
     float* probabilityOut
   ) {
-    vec ret;
+    Vec ret;
     areaSampleDisk(rng, &ret[0], &ret[1]);
     ret[2] = sqrtf(max(0.0f, 1.0f - ret[0] * ret[0] - ret[1] * ret[1]));
     *directionOut = ret;

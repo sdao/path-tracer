@@ -5,13 +5,13 @@
 /**
  * A collection of polys loaded from an external 3D model file.
  */
-class mesh {
-    std::vector<geoms::poly::point> points; /**< The point lookup table. */
-    std::vector<geoms::poly> faces; /**< The faces of the mesh. */
+class Mesh {
+    std::vector<geoms::Poly::Point> points; /**< The point lookup table. */
+    std::vector<geoms::Poly> faces; /**< The faces of the mesh. */
 
 public:
     /** Constructs an empty mesh. Use mesh::readPolyModel() to populate. */
-    mesh();
+    Mesh();
 
     /**
      * Reads a polygon model from a file and populates a mesh.
@@ -30,17 +30,17 @@ public:
      * @returns        true if the mesh could be read, false otherwise
      */
     bool readPolyModel(
-      material* m,
+      Material* m,
       std::string name,
-      vec offset,
-      std::vector<geom*>* geomList = nullptr
+      Vec offset,
+      std::vector<Geom*>* geomList = nullptr
     );
 
     /**
      * Appends a pointer to each poly face of the mesh to the specified
      * geometry vector. (The given geometry vector must already exist.)
      */
-    void appendFacesTo(std::vector<geom*>* geomList);
+    void appendFacesTo(std::vector<Geom*>* geomList);
 
     /**
      * Destroys the existing poly faces and points in the mesh.

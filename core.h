@@ -9,9 +9,9 @@ using std::max;
 /**
  * A directed line segment.
  */
-struct ray {
-  vec origin; /**< The point at which the ray starts. */
-  vec direction; /**< The direction and magnitude of the ray. */
+struct Ray {
+  Vec origin; /**< The point at which the ray starts. */
+  Vec direction; /**< The direction and magnitude of the ray. */
 
   /**
    * Constructs a ray with the given origin and direction.
@@ -19,13 +19,13 @@ struct ray {
    * @param o the ray's origin
    * @param d the ray's direction (and magnitude, if desired)
    */
-  ray(vec o, vec d) : origin(o), direction(d) {}
+  Ray(Vec o, Vec d) : origin(o), direction(d) {}
 
   /**
    * Constructs a ray with origin at (0, 0, 0) and neither direction nor
    * magnitude.
    */
-  ray() : origin(0, 0, 0), direction(0, 0, 0) {}
+  Ray() : origin(0, 0, 0), direction(0, 0, 0) {}
 
   /**
    * Returns an interpolated point on the ray, parameterized by a number d.
@@ -35,9 +35,9 @@ struct ray {
    * @param d the parameter at which to return a point
    * @returns the point on the ray given by the parameter
    */
-  inline vec at(float d) const { return origin + direction * d; }
+  inline Vec at(float d) const { return origin + direction * d; }
 
-  friend std::ostream& operator<<(std::ostream& os, const ray& r) {
+  friend std::ostream& operator<<(std::ostream& os, const Ray& r) {
     os << "<origin: " << r.origin
        << ", direction: " << r.direction << ">";
     return os;
@@ -47,8 +47,8 @@ struct ray {
 /**
  * A ray of light, i.e. a ray with an additional color component.
  */
-struct lightray : public ray {
-  vec color; /**< The light color of the ray. */
+struct LightRay : public Ray {
+  Vec color; /**< The light color of the ray. */
 
   /**
    * Constructs a lightray with the given origin, direction, and color.
@@ -57,7 +57,7 @@ struct lightray : public ray {
    * @param d the ray's direction (and magnitude, if desired)
    * @param c the ray's light color
    */
-  lightray(vec o, vec d, vec c) : ray(o, d), color(c) {}
+  LightRay(Vec o, Vec d, Vec c) : Ray(o, d), color(c) {}
 
   /**
    * Constructs a white lightray with the given origin and direction.
@@ -65,13 +65,13 @@ struct lightray : public ray {
    * @param o the ray's origin
    * @param d the ray's direction (and magnitude, if desired)
    */
-  lightray(vec o, vec d) : ray(o, d), color(1, 1, 1) {}
+  LightRay(Vec o, Vec d) : Ray(o, d), color(1, 1, 1) {}
 
   /**
    * Constructs a white lightray with origin at (0, 0, 0) and neither direction
    * nor magnitude.
    */
-  lightray() : ray(), color(1, 1, 1) {}
+  LightRay() : Ray(), color(1, 1, 1) {}
 
   /**
    * Determines whether the ray's color is black, within a small epsilon.
@@ -98,36 +98,36 @@ struct lightray : public ray {
    * Makes the ray black, and sets its origin and direction to (0, 0, 0).
    */
   inline void kill() {
-    origin = vec(0, 0, 0);
-    direction = vec(0, 0, 0);
-    color = vec(0, 0, 0);
+    origin = Vec(0, 0, 0);
+    direction = Vec(0, 0, 0);
+    color = Vec(0, 0, 0);
   }
 };
 
 /**
  * An axis-aligned bounding box.
  */
-struct bbox {
-  vec lower; /**< The lower X, Y, and Z-axis bounds. */
-  vec upper; /**< The upper X, Y, and Z-axis bounds. */
+struct BBox {
+  Vec lower; /**< The lower X, Y, and Z-axis bounds. */
+  Vec upper; /**< The upper X, Y, and Z-axis bounds. */
 
   /** Constructs an empty bbox. */
-  bbox() : lower(0, 0, 0), upper(0, 0, 0) {}
+  BBox() : lower(0, 0, 0), upper(0, 0, 0) {}
 
   /** Constructs a bbox containing the two given points. */
-  bbox(vec a, vec b) {
-    lower = vec(min(a.x(), b.x()), min(a.y(), b.y()), min(a.z(), b.z()));
-    upper = vec(max(a.x(), b.x()), max(a.y(), b.y()), max(a.z(), b.z()));
+  BBox(Vec a, Vec b) {
+    lower = Vec(min(a.x(), b.x()), min(a.y(), b.y()), min(a.z(), b.z()));
+    upper = Vec(max(a.x(), b.x()), max(a.y(), b.y()), max(a.z(), b.z()));
   }
 
   /** Expands the bbox to also contain the given point. */
-  inline void expand(const vec& v) {
-    lower = vec(
+  inline void expand(const Vec& v) {
+    lower = Vec(
       min(lower.x(), v.x()),
       min(lower.y(), v.y()),
       min(lower.z(), v.z())
     );
-    upper = vec(
+    upper = Vec(
       max(upper.x(), v.x()),
       max(upper.y(), v.y()),
       max(upper.z(), v.z())
@@ -152,13 +152,13 @@ struct bbox {
   /**
    * Expands the bbox to also contain another given bbox.
    */
-  inline void expand(const bbox& b) {
-    lower = vec(
+  inline void expand(const BBox& b) {
+    lower = Vec(
       min(lower.x(), b.lower.x()),
       min(lower.y(), b.lower.y()),
       min(lower.z(), b.lower.z())
     );
-    upper = vec(
+    upper = Vec(
       max(upper.x(), b.upper.x()),
       max(upper.y(), b.upper.y()),
       max(upper.z(), b.upper.z())
@@ -169,7 +169,7 @@ struct bbox {
    * Returns the surface area of the bbox.
    */
   inline float surfaceArea() const {
-    vec d = upper - lower;
+    Vec d = upper - lower;
     return 2.0f * (d.x() * d.y() + d.x() * d.z() + d.y() * d.z());
   }
 
@@ -177,7 +177,7 @@ struct bbox {
    * Return the longest axis of the bbox.
    */
   inline axis maximumExtent() const {
-    vec d = upper - lower;
+    Vec d = upper - lower;
     if (d.x() > d.y() && d.x() > d.z()) {
       return X_AXIS;
     } else if (d.y() > d.z()) {
@@ -199,7 +199,7 @@ struct bbox {
    *                     point (the exit point)
    * @returns            true if intersections were found, false if no hit
    */
-  inline bool intersect(const ray &r, float* t0_out, float* t1_out) const {
+  inline bool intersect(const Ray &r, float* t0_out, float* t1_out) const {
     float t0 = 0.0f;
     float t1 = std::numeric_limits<float>::max();
     for (int i = 0; i < 3; ++i) {
@@ -218,7 +218,7 @@ struct bbox {
     return true;
   }
 
-  friend std::ostream& operator<<(std::ostream& os, const bbox& b) {
+  friend std::ostream& operator<<(std::ostream& os, const BBox& b) {
     os << "<lower: " << b.lower << ", upper: " << b.upper << ">";
     return os;
   }
@@ -227,15 +227,15 @@ struct bbox {
 /**
  * Contains the information for a ray-object intersection.
  */
-struct intersection {
-  vec position; /**< The point of the intersection in 3D space. */
-  vec normal; /**< The normal of the surface at the intersection. */
+struct Intersection {
+  Vec position; /**< The point of the intersection in 3D space. */
+  Vec normal; /**< The normal of the surface at the intersection. */
   float distance; /**< The distance from the ray origin to the intersection. */
 
   /**
    * Constructs an intersection with no information.
    */
-  intersection()
+  Intersection()
     : position(0, 0, 0), normal(0, 0, 0),
       distance(std::numeric_limits<float>::max()) {}
 
@@ -245,7 +245,7 @@ struct intersection {
    * @param n the normal of the surface at the intersection
    * @param d the distance from the ray origin to the intersection
    */
-  intersection(vec p, vec n, float d)
+  Intersection(Vec p, Vec n, float d)
     : position(p), normal(n), distance(d) {}
 
   /**

@@ -1,14 +1,14 @@
 #include "sphere.h"
 
-geoms::sphere::sphere(material* m, vec o, float r)
-  : geom(m), origin(o), radius(r) {}
+geoms::Sphere::Sphere(Material* m, Vec o, float r)
+  : Geom(m), origin(o), radius(r) {}
 
-geoms::sphere::sphere(const geoms::sphere& other)
-  : geom(other.mat), origin(other.origin), radius(other.radius) {}
+geoms::Sphere::Sphere(const geoms::Sphere& other)
+  : Geom(other.mat), origin(other.origin), radius(other.radius) {}
 
-bool geoms::sphere::intersect(const ray& r, intersection* isectOut) const {
-  vec diff = r.origin - origin;
-  vec l = r.direction;
+bool geoms::Sphere::intersect(const Ray& r, Intersection* isectOut) const {
+  Vec diff = r.origin - origin;
+  Vec l = r.direction;
 
   // See Wikipedia:
   // <http://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection>
@@ -26,16 +26,16 @@ bool geoms::sphere::intersect(const ray& r, intersection* isectOut) const {
 
     // Neg before pos because we want to return closest isect first.
     if (math::isPositive(resNeg)) {
-      vec pt = r.at(resNeg);
-      vec normal = (pt - origin).normalized();
+      Vec pt = r.at(resNeg);
+      Vec normal = (pt - origin).normalized();
 
-      *isectOut = intersection(pt, normal, resNeg);
+      *isectOut = Intersection(pt, normal, resNeg);
       return true;
     } else if (math::isPositive(resPos)) {
-      vec pt = r.at(resPos);
-      vec normal = (pt - origin).normalized();
+      Vec pt = r.at(resPos);
+      Vec normal = (pt - origin).normalized();
 
-      *isectOut = intersection(pt, normal, resPos);
+      *isectOut = Intersection(pt, normal, resPos);
       return true;
     }
   }
@@ -44,7 +44,7 @@ bool geoms::sphere::intersect(const ray& r, intersection* isectOut) const {
   return false;
 }
 
-bbox geoms::sphere::bounds() const {
-  vec boundsDiag(radius, radius, radius);
-  return bbox(origin - boundsDiag, origin + boundsDiag);
+BBox geoms::Sphere::bounds() const {
+  Vec boundsDiag(radius, radius, radius);
+  return BBox(origin - boundsDiag, origin + boundsDiag);
 }

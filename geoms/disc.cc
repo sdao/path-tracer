@@ -1,14 +1,14 @@
 #include "disc.h"
 
-geoms::disc::disc(material* m, vec o, vec n, float r)
-  : geom(m), radiusSquared(r * r), radius(r), origin(o),
+geoms::Disc::Disc(Material* m, Vec o, Vec n, float r)
+  : Geom(m), radiusSquared(r * r), radius(r), origin(o),
     normal(n.normalized()) {}
 
-geoms::disc::disc(const geoms::disc& other)
-  : geom(other.mat), radiusSquared(other.radiusSquared), radius(other.radius),
+geoms::Disc::Disc(const geoms::Disc& other)
+  : Geom(other.mat), radiusSquared(other.radiusSquared), radius(other.radius),
     origin(other.origin), normal(other.normal) {}
 
-bool geoms::disc::intersect(const ray& r, intersection* isectOut) const {
+bool geoms::Disc::intersect(const Ray& r, Intersection* isectOut) const {
   // See Wikipedia:
   // <http://en.wikipedia.org/wiki/Line%E2%80%93disc_intersection>
 
@@ -18,10 +18,10 @@ bool geoms::disc::intersect(const ray& r, intersection* isectOut) const {
 
     if (math::isPositive(d)) {
       // In the plane, but are we in the disc?
-      vec isectPoint = r.at(d);
+      Vec isectPoint = r.at(d);
       if ((isectPoint - origin).squaredNorm() < radiusSquared) {
         // In the disc.
-        *isectOut = intersection(isectPoint, normal, d);
+        *isectOut = Intersection(isectPoint, normal, d);
 
         return true;
       }
@@ -32,15 +32,15 @@ bool geoms::disc::intersect(const ray& r, intersection* isectOut) const {
   return false;
 }
 
-bbox geoms::disc::bounds() const {
-  vec tangent;
-  vec binormal;
+BBox geoms::Disc::bounds() const {
+  Vec tangent;
+  Vec binormal;
   math::coordSystem(normal, &tangent, &binormal);
 
-  vec tr = tangent * radius;
-  vec br = binormal * radius;
+  Vec tr = tangent * radius;
+  Vec br = binormal * radius;
 
-  bbox b(origin + tr + br, origin - tr - br);
+  BBox b(origin + tr + br, origin - tr - br);
   b.expand(origin + tr - br);
   b.expand(origin - tr + br);
 
