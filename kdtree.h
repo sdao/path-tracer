@@ -186,8 +186,9 @@ public:
    * Determines what object (if any) in the k-d tree a given ray intersects.
    *
    * @param r              the ray to send through the k-d tree
-   * @param isectOut [out] the intersection information if the pointer is not
-   *                       null and the ray hit some geometry, null otherwise
+   * @param isectOut [out] the intersection information if the ray hit some
+   *                       geometry, otherwise unmodified; the pointer must not
+   *                       be null
    * @returns              the geom that was hit, or nullptr if none was hit
    */
   geom* intersect(const ray& r, intersection* isectOut = nullptr) const;

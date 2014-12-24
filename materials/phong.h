@@ -8,25 +8,43 @@ namespace materials {
    * Note that Phong shading is not physically plausible.
    */
   class phong : public material {
-  public:
-    /**
-     * The inverse of the Phong exponent of the material.
-     */
+  protected:
+    virtual vec sampleBSDF(
+      randomness& rng,
+      const vec& incoming,
+      vec* outgoingOut,
+      float* probabilityOut
+    ) const;
+
+    virtual vec evalBSDF(
+      const vec& incoming,
+      const vec& outgoing
+    ) const;
+
+    /** Cached scaling term in the Phong BRDF. */
+    const vec scaleBRDF;
+
+    /** Cached scaling term in the PDF. */
+    const float scaleProb;
+
+    /** Cached inverse exponent term. */
     const float invExponent;
 
+  public:
+    /** The Phong exponent of the material. */
+    const float exponent;
+
+    /** The color of the material. */
+    const vec color;
+
     /**
-     * Constructs a glossy material.
+     * Constructs a Phong material.
      *
      * @param e the Phong exponent (e >= 1); 1 = almost perfectly diffuse,
      *          ~1000 = almost perfectly specular, lower values are more glossy
+     * @param c the color of the material
      */
-    phong(float e);
-
-    virtual lightray propagate(
-      const lightray& incoming,
-      const intersection& isect,
-      randomness& rng
-    ) const;
+    phong(float e, vec c = vec(1, 1, 1));
   };
 
 }

@@ -24,8 +24,8 @@ public:
      * @param offset   a vector offset to add to every point in the mesh
      * @param geomList as a convenience, if a geometry vector is specified,
      *                 pointers to all the poly faces in the mesh will be
-     *                 appended to the end of geomList; alternatively, use
-     *                 mesh::appendFacesTo(...) later
+     *                 appended to the end of geomList; alternatively, leave
+     *                 null and use mesh::appendFacesTo(...) later
      *
      * @returns        true if the mesh could be read, false otherwise
      */

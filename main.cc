@@ -10,15 +10,15 @@
 void render(size_t w, size_t h, int iterations);
 
 void render(size_t w, size_t h, int iterations) {
-  materials::diffuse green(vec(0.5f, 0.9f, 0.4f));
-  materials::diffuse white(vec(1, 1, 1));
-  materials::diffuse red(vec(0.9f, 0.4f, 0.5f));
-  materials::emitter emit(vec(4, 4, 4));
-  materials::fresnel fresnel(materials::fresnel::IOR_GLASS);
-  materials::phong   glossy(100.0f);
+  materials::lambert    green(vec(0.5f, 0.9f, 0.4f));
+  materials::lambert    white(vec(1, 1, 1));
+  materials::lambert    red(vec(0.9f, 0.4f, 0.5f));
+  materials::emitter    emit(vec(4, 4, 4));
+  materials::dielectric dielectric(materials::dielectric::IOR_GLASS);
+  materials::phong      glossy(100.0f);
 
-  geoms::sphere smallSphere(&fresnel, vec(-6, -14, -16), 4.0f);
-  geoms::sphere bigSphere(&fresnel, vec(10, -12, -24), 6.0f);
+  geoms::sphere smallSphere(&dielectric, vec(-6, -14, -16), 4.0f);
+  geoms::sphere bigSphere(&dielectric, vec(10, -12, -24), 6.0f);
   geoms::disc   bottom(&white, vec(0, -18, -25), vec(0, 1, 0), 100.0f);
   geoms::disc   top(&white, vec(0, 18, -25), vec(0, -1, 0), 100.0f);
   geoms::disc   back(&white, vec(0, 0, -50), vec(0, 0, 1), 100.0f);

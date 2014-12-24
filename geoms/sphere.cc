@@ -29,19 +29,13 @@ bool geoms::sphere::intersect(const ray& r, intersection* isectOut) const {
       vec pt = r.at(resNeg);
       vec normal = (pt - origin).normalized();
 
-      if (isectOut) {
-        *isectOut = intersection(pt, normal, resNeg);
-      }
-
+      *isectOut = intersection(pt, normal, resNeg);
       return true;
     } else if (math::isPositive(resPos)) {
       vec pt = r.at(resPos);
       vec normal = (pt - origin).normalized();
 
-      if (isectOut) {
-        *isectOut = intersection(pt, normal, resPos);
-      }
-
+      *isectOut = intersection(pt, normal, resPos);
       return true;
     }
   }

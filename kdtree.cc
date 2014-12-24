@@ -300,10 +300,7 @@ geom* kdtree::intersect(
   }
 
   if (winnerObj) {
-    if (isectOut) {
-      *isectOut = winnerIsect;
-    }
-
+    *isectOut = winnerIsect;
     return winnerObj;
   }
 

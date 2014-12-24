@@ -1,20 +1,31 @@
-#include "fresnel.h"
+#include "dielectric.h"
 
-materials::fresnel::fresnel(float ior)
-  : etaEntering(IOR_VACUUM / ior), etaExiting(ior / IOR_VACUUM) {
+materials::dielectric::dielectric(float ior, vec c)
+  : etaEntering(IOR_VACUUM / ior), etaExiting(ior / IOR_VACUUM), color(c) {
   // Pre-compute values for Fresnel calculations.
 
   float r0_temp = (IOR_VACUUM - ior) / (IOR_VACUUM + ior);
   r0 = r0_temp * r0_temp;
 }
 
-lightray materials::fresnel::propagate(
-  const lightray& incoming,
-  const intersection& isect,
-  randomness& rng
+vec materials::dielectric::evalBSDF(
+  const vec& incoming,
+  const vec& outgoing
 ) const {
-  // Entering = are normal and ray in opposite directions?
-  bool entering = isect.normal.dot(incoming.direction) < 0;
+  // Probabilistically, we are never going to get the exact matching
+  // incoming and outgoing vectors.
+  return vec(0, 0, 0);
+}
+
+vec materials::dielectric::sampleBSDF(
+  randomness& rng,
+  const vec& incoming,
+  vec* outgoingOut,
+  float* probabilityOut
+) const {
+  // Entering = are normal and incoming direction in opposite directions?
+  // Recall that the incoming direction is in the normal's local space.
+  bool entering = incoming.z() > 0.0f;
 
   vec alignedNormal; // Normal flipped based on ray direction.
   float eta; // Ratio of indices of refraction.
@@ -23,33 +34,31 @@ lightray materials::fresnel::propagate(
     // If we are entering, this is the right normal.
     // If we are exiting, since geometry is single-shelled, we will need
     // to flip the normal.
-    alignedNormal = isect.normal;
+    alignedNormal = vec(0, 0, 1);
     eta = etaEntering;
   } else {
-    alignedNormal = -isect.normal;
+    alignedNormal = vec(0, 0, -1);
     eta = etaExiting;
   }
 
   // Calculate reflection vector.
   vec reflectVector = math::reflect(
-    incoming.direction,
+    -incoming,
     alignedNormal
   );
 
   // Calculate refraction vector.
   vec refractVector = math::refract(
-    incoming.direction,
+    -incoming,
     alignedNormal,
     eta
   );
 
   if (math::isNearlyZero(refractVector.squaredNorm())) {
     // Total internal reflection. Must reflect.
-    return lightray(
-      isect.position + reflectVector * math::VERY_SMALL,
-      reflectVector,
-      incoming.color
-    );
+    *outgoingOut = reflectVector;
+    *probabilityOut = 1.0f;
+    return color / math::absCosTheta(reflectVector);
   }
 
   // Calculates Fresnel reflectance factor using Schlick's approximation.
@@ -61,7 +70,7 @@ lightray materials::fresnel::propagate(
     // Equivalent to condition: entering == true
     // (e.g. nI = 1 (air), nT = 1.5 (glass))
     // Theta = angle of incidence.
-    cosTemp = 1.0f - (-incoming.direction).dot(alignedNormal);
+    cosTemp = 1.0f - incoming.dot(alignedNormal);
   } else {
     // Equivalent to condition: entering == false
     // Theta = angle of refraction.
@@ -80,16 +89,12 @@ lightray materials::fresnel::propagate(
   // Probabilistically choose to refract or reflect.
   if (rng.nextUnitFloat() < probRefl) {
     // Higher reflectance = higher probability of reflecting.
-    return lightray(
-      isect.position + reflectVector * math::VERY_SMALL,
-      reflectVector,
-      incoming.color * refl / probRefl // Adjust color for probabilities.
-    );
+    *outgoingOut = reflectVector;
+    *probabilityOut = probRefl;
+    return color * refl / math::absCosTheta(reflectVector);
   } else {
-    return lightray(
-      isect.position + refractVector * math::VERY_SMALL,
-      refractVector,
-      incoming.color * refr / probRefr // Adjust color for probabilities.
-    );
+    *outgoingOut = refractVector;
+    *probabilityOut = probRefr;
+    return color * refr / math::absCosTheta(refractVector);
   }
 }
