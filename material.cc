@@ -58,8 +58,8 @@ vec material::sampleBSDF(
 }
 
 vec material::evalBSDF(
-  const vec& incoming,
-  const vec& outgoing
+  const vec& /* incoming */,
+  const vec& /* outgoing */
 ) const {
   return vec(0, 0, 0);
 }

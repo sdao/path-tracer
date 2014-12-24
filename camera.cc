@@ -63,10 +63,16 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
           depth++;
 
           // Do Russian Roulette if this ray is "old".
-          if (depth > MAX_DEPTH) {
-            r.kill();
-            break;
-          } else if (depth > RUSSIAN_ROULETTE_DEPTH || r.isBlack()) {
+          if (depth > RUSSIAN_ROULETTE_DEPTH_2) {
+            float rv = rng.nextUnitFloat();
+            float probLive = 0.1f;
+            if (rv < probLive) {
+              r.color = r.color / probLive;
+            } else {
+              r.kill();
+              break;
+            }
+          } else if (depth > RUSSIAN_ROULETTE_DEPTH_1 || r.isBlack()) {
             float rv = rng.nextUnitFloat();
             float probLive = math::clamp(r.energy());
             if (rv < probLive) {

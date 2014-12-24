@@ -21,12 +21,12 @@ namespace materials {
       const vec& incoming,
       vec* outgoingOut,
       float* probabilityOut
-    ) const;
+    ) const override;
 
     virtual vec evalBSDF(
       const vec& incoming,
       const vec& outgoing
-    ) const;
+    ) const override;
   
   public:
     static constexpr float IOR_GLASS = 1.5f; /**< The IOR for glass. */

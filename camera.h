@@ -12,16 +12,15 @@
  */
 class camera {
   /**
-   * The maximum amount of "bounces" a ray can take.
-   * This amount is used to prevent pathological cases from causing a ray to
-   * infinitely bounce. It should be high enough to prevent sampling bias.
+   * The number of bounces at which a ray is subject to Russian Roulette
+   * termination, stage 1 (less aggressive).
    */
-  static constexpr int MAX_DEPTH = 50;
+  static constexpr int RUSSIAN_ROULETTE_DEPTH_1 = 5;
   /**
    * The number of bounces at which a ray is subject to Russian Roulette
-   * termination.
+   * termination, stage 2 (more aggressive).
    */
-  static constexpr int RUSSIAN_ROULETTE_DEPTH = 5;
+  static constexpr int RUSSIAN_ROULETTE_DEPTH_2 = 25;
   /**
    * The number of samples to take per pixel in each iteration (supersampling).
    */

@@ -9,8 +9,8 @@ materials::dielectric::dielectric(float ior, vec c)
 }
 
 vec materials::dielectric::evalBSDF(
-  const vec& incoming,
-  const vec& outgoing
+  const vec& /* incoming */,
+  const vec& /* outgoing */
 ) const {
   // Probabilistically, we are never going to get the exact matching
   // incoming and outgoing vectors.

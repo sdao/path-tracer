@@ -14,12 +14,12 @@ namespace materials {
       const vec& incoming,
       vec* outgoingOut,
       float* probabilityOut
-    ) const;
+    ) const override;
 
     virtual vec evalBSDF(
       const vec& incoming,
       const vec& outgoing
-    ) const;
+    ) const override;
 
     /** Cached scaling term in the Phong BRDF. */
     const vec scaleBRDF;

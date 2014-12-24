@@ -1,10 +1,10 @@
 #include "phong.h"
 
 materials::phong::phong(float e, vec c)
-  : exponent(e), color(c),
-    scaleBRDF(c * (e + 2.0f) / math::TWO_PI),
+  : scaleBRDF(c * (e + 2.0f) / math::TWO_PI),
     scaleProb((e + 1.0f) / math::TWO_PI),
-    invExponent(1.0f / (e + 1.0f)) {}
+    invExponent(1.0f / (e + 1.0f)),
+    exponent(e), color(c) {}
 
 vec materials::phong::evalBSDF(
   const vec& incoming,
