@@ -20,7 +20,7 @@ class camera {
    * The number of bounces at which a ray is subject to Russian Roulette
    * termination, stage 2 (more aggressive).
    */
-  static constexpr int RUSSIAN_ROULETTE_DEPTH_2 = 25;
+  static constexpr int RUSSIAN_ROULETTE_DEPTH_2 = 50;
   /**
    * The number of samples to take per pixel in each iteration (supersampling).
    */

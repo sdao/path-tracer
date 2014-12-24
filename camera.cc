@@ -63,21 +63,16 @@ void camera::renderOnce(const kdtree& kdt, std::string name) {
           depth++;
 
           // Do Russian Roulette if this ray is "old".
-          if (depth > RUSSIAN_ROULETTE_DEPTH_2) {
-            float rv = rng.nextUnitFloat();
-            float probLive = 0.1f;
-            if (rv < probLive) {
-              // The ray lives (more energy = more likely to live).
-              // Increase its energy to balance out probabilities.
-              r.color = r.color / probLive;
-            } else {
-              // The ray dies.
-              r.kill();
-              break;
-            }
-          } else if (depth > RUSSIAN_ROULETTE_DEPTH_1 || r.isBlack()) {
+          if (depth > RUSSIAN_ROULETTE_DEPTH_1 || r.isBlack()) {
             float rv = rng.nextUnitFloat();
             float probLive = math::clamp(r.energy());
+
+            if (depth > RUSSIAN_ROULETTE_DEPTH_2) {
+              // More aggressive ray killing when ray is very old.
+              // At 75%, chance of living another 16 rounds is 1%.
+              probLive *= 0.75f;
+            }
+
             if (rv < probLive) {
               // The ray lives (more energy = more likely to live).
               // Increase its energy to balance out probabilities.
