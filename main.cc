@@ -10,9 +10,9 @@
 void render(size_t w, size_t h, int iterations);
 
 void render(size_t w, size_t h, int iterations) {
-  materials::diffuse green(vec(0.5f, 0.9f, 0.4f));
-  materials::diffuse white(vec(1, 1, 1));
-  materials::diffuse red(vec(0.9f, 0.4f, 0.5f));
+  materials::lambert green(vec(0.5f, 0.9f, 0.4f));
+  materials::lambert white(vec(1, 1, 1));
+  materials::lambert red(vec(0.9f, 0.4f, 0.5f));
   materials::emitter emit(vec(4, 4, 4));
   materials::fresnel fresnel(materials::fresnel::IOR_GLASS);
   materials::phong   glossy(100.0f);

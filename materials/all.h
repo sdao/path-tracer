@@ -5,3 +5,4 @@
 #include "phong.h"
 #include "specular.h"
 #include "normaltest.h"
+#include "lambert.h"

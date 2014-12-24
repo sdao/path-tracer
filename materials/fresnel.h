@@ -26,7 +26,7 @@ namespace materials {
       const lightray& incoming,
       const intersection& isect,
       randomness& rng
-    ) const;
+    ) const override;
   };
 
 }

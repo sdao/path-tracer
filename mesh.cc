@@ -91,10 +91,10 @@ bool mesh::readPolyModel(
 }
 
 void mesh::appendFacesTo(std::vector<geom*>* geomList) {
-  assert(geomList);
-
-  for (size_t i = 0; i < faces.size(); ++i) {
-    geomList->push_back(&faces[i]);
+  if (geomList) {
+    for (size_t i = 0; i < faces.size(); ++i) {
+      geomList->push_back(&faces[i]);
+    }
   }
 }
 

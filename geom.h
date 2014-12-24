@@ -24,8 +24,9 @@ public:
    * Finds an intersection between the geometry and the given ray.
    *
    * @param r              the ray to find an intersection with
-   * @param isectOut [out] the intersection information if the pointer is not
-   *                       null and the ray hit the geometry, null otherwise
+   * @param isectOut [out] the intersection information if the ray hit the
+   *                       geometry, otherwise unmodified; the pointer must not
+   *                       be null
    * @returns              true if the ray hit the geometry, false otherwise
    */
   virtual bool intersect(const ray& r, intersection* isectOut) const = 0;

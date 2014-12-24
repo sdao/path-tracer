@@ -5,6 +5,18 @@
  * A material that specified how light interacts with geometry.
  */
 class material {
+protected:
+  virtual vec evalBRDF(
+    const vec& incoming,
+    const vec& outgoing
+  ) const;
+
+  virtual void sampleDirection(
+    randomness& rng,
+    vec* directionOut,
+    float* probabilityOut
+  ) const;
+
 public:
   virtual ~material();
 
@@ -24,5 +36,5 @@ public:
     const lightray& incoming,
     const intersection& isect,
     randomness& rng
-  ) const = 0;
+  ) const;
 };

@@ -7,7 +7,15 @@ lightray materials::diffuse::propagate(
   const intersection& isect,
   randomness& rng
 ) const {
-  vec reflectVector = isect.uniformSampleHemisphere(rng);
+  vec tangent;
+  vec binormal;
+  math::coordSystem(isect.normal, &tangent, &binormal);
+
+  vec dir;
+  float prob;
+  math::cosineSampleHemisphere(rng, &dir, &prob);
+
+  vec reflectVector = math::localToWorld(dir, tangent, binormal, isect.normal);
 
   return lightray(
     isect.position + reflectVector * math::VERY_SMALL,

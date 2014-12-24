@@ -9,6 +9,7 @@
 #include <vector>
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
+#include "randomness.h"
 
 typedef Eigen::Vector3f vec; /**< A 3D single-precision vector. */
 typedef Eigen::Vector3d dvec; /**< A 3D double-precision vector. */
@@ -33,6 +34,9 @@ namespace math {
   /** Pi / 4 as a single-precision float. */
   static constexpr float PI_4 = float(M_PI_4);
 
+  /** 1 / Pi as a single-precision float. */
+  static constexpr float INV_PI = float(M_1_PI);
+
   /** Clamps a value between 0 and 1. */
   inline float clamp(float x) {
     return x < 0 ? 0 : (x > 1 ? 1 : x);
@@ -56,6 +60,46 @@ namespace math {
       *v2 = vec(0.0f, v1.z() * invLen, -v1.y() * invLen);
     }
     *v3 = v1.cross(*v2);
+  }
+
+  /**
+   * Converts a world-space vector to a local coordinate system.
+   * The resulting coordinates are (x, y, z), where x is the weight of the
+   * tangent, y is the weight of the binormal, and z is the weight of the
+   * normal.
+   */
+  inline vec worldToLocal(
+    const vec& world,
+    const vec& tangent,
+    const vec& binormal,
+    const vec& normal
+  ) {
+    return vec(
+      world.dot(tangent),
+      world.dot(binormal),
+      world.dot(normal)
+    );
+  }
+
+  /**
+   * Converts a local-space vector back to world-space. The local-space vector
+   * should be (x, y, z), where x is the weight of the tangent, y is the weight
+   * of the binormal, and z is the weight of the normal.
+   */
+  inline vec localToWorld(
+    const vec& local,
+    const vec& tangent,
+    const vec& binormal,
+    const vec& normal
+  ) {
+    return vec(
+      tangent.x() * local.x() + binormal.x() * local.y()
+        + normal.x() * local.z(),
+      tangent.y() * local.x() + binormal.y() * local.y()
+        + normal.y() * local.z(),
+      tangent.z() * local.x() + binormal.z() * local.y()
+        + normal.z() * local.z()
+    );
   }
 
   /**
@@ -169,6 +213,97 @@ namespace math {
     } else {
       return (eta * I) - ((eta * d + sqrtf(k)) * N);
     }
+  }
+
+  /**
+   * Returns Cos[Theta] of a vector where Theta is the polar angle of the vector
+   * in spherical coordinates.
+   */
+  inline float cosTheta(const vec& v) { return v.z(); }
+
+  /**
+   * Returns Abs[Cos[Theta]] of a vector where Theta is the polar angle of the
+   * vector in spherical coordinates.
+   */
+  inline float absCosTheta(const vec& v) { return fabsf(v.z()); }
+
+  /**
+   * Samples a unit disk, ensuring that the samples are uniformally distributed
+   * throughout the area of the disk.
+   *
+   * Taken from Pharr & Humphreys' p. 667.
+   *
+   * @param rng      the per-thread RNG in use
+   * @param dx [out] the x-coordinate of the sample
+   * @param dy [out] the y-coordinate of the sample
+   */
+  inline void areaSampleDisk(randomness& rng, float* dx, float* dy) {
+    float sx = rng.nextFloat(-1.0f, 1.0f);
+    float sy = rng.nextFloat(-1.0f, 1.0f);
+
+    // Handle degeneracy at the origin.
+    if (sx == 0.0f && sy == 0.0f) {
+      *dx = 0.0f;
+      *dy = 0.0f;
+      return;
+    }
+
+    float r;
+    float theta;
+    if (sx >= -sy) {
+      if (sx > sy) {
+        // Region 1.
+        r = sx;
+        if (sy > 0.0f) {
+          theta = sy / r;
+        } else {
+          theta = 8.0f + sy / r;
+        }
+      } else {
+        // Region 2.
+        r = sy;
+        theta = 2.0f - sx / r;
+      }
+    } else {
+      if (sx <= sy) {
+        // Region 3.
+        r = -sx;
+        theta = 4.0f - sy / r;
+      } else {
+        // Region 4.
+        r = -sy;
+        theta = 6.0f + sx / r;
+      }
+    }
+    theta *= math::PI_4;
+    *dx = r * cosf(theta);
+    *dy = r * sinf(theta);
+  }
+
+  /**
+   * Samples a unit hemisphere with a cosine-weighted distribution.
+   * Directions with a higher cosine value (more parallel to the normal) are
+   * more likely to be chosen than those with a lower cosine value (more
+   * perpendicular to the normal).
+   *
+   * Taken from Pharr & Humphreys' p. 669.
+   *
+   * @param rng                  the per-thread RNG in use
+   * @param directionOut   [out] a cosine-weighted random vector in the
+   *                             hemisphere; the pointer must not be null
+   * @param probabilityOut [out] the probability of the sampled direction; the
+   *                             pointer must not be null
+   */
+  inline void cosineSampleHemisphere(
+    randomness& rng,
+    vec* directionOut,
+    float* probabilityOut
+  ) {
+    vec ret;
+    areaSampleDisk(rng, &ret[0], &ret[1]);
+    ret[2] = sqrtf(std::max(0.0f, 1.0f - ret[0] * ret[0] - ret[1] * ret[1]));
+    *directionOut = ret;
+    *probabilityOut = absCosTheta(ret) * INV_PI;
   }
 
 }

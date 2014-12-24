@@ -21,9 +21,7 @@ bool geoms::disc::intersect(const ray& r, intersection* isectOut) const {
       vec isectPoint = r.at(d);
       if ((isectPoint - origin).squaredNorm() < radiusSquared) {
         // In the disc.
-        if (isectOut) {
-          *isectOut = intersection(isectPoint, normal, d);
-        }
+        *isectOut = intersection(isectPoint, normal, d);
 
         return true;
       }
