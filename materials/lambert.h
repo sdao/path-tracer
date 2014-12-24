@@ -8,7 +8,7 @@ namespace materials {
    */
   class lambert : public material {
   protected:
-    virtual vec evalBRDF(
+    virtual vec evalBSDF(
       const vec& incoming,
       const vec& outgoing
     ) const override;

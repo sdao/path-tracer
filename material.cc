@@ -13,20 +13,17 @@ lightray material::propagate(
 
   // BRDF computation expects incoming ray to be in local-space.
   vec incomingLocal = math::worldToLocal(
-    incoming.direction,
+    -incoming.direction,
     tangent,
     binormal,
     isect.normal
   );
 
-  // Use hemisphere sampling for default.
+  // Sample BSDF for direction, color, and probability.
   vec outgoingLocal;
   float probOutgoing;
-  sampleDirection(rng, &outgoingLocal, &probOutgoing);
-
-  // Compute BRDF value and final scale factor.
-  vec brdf = evalBRDF(incomingLocal, outgoingLocal);
-  vec scale = brdf * math::cosTheta(outgoingLocal) / probOutgoing;
+  vec brdf = sampleBSDF(rng, incomingLocal, &outgoingLocal, &probOutgoing);
+  vec scale = brdf * math::absCosTheta(outgoingLocal) / probOutgoing;
 
   // Rendering expects outgoing ray to be in world-space.
   vec outgoingWorld = math::localToWorld(
@@ -43,15 +40,17 @@ lightray material::propagate(
   );
 }
 
-void material::sampleDirection(
+vec material::sampleBSDF(
   randomness& rng,
+  const vec& directionIn,
   vec* directionOut,
   float* probabilityOut
 ) const {
   math::cosineSampleHemisphere(rng, directionOut, probabilityOut);
+  return evalBSDF(directionIn, *directionOut);
 }
 
-vec material::evalBRDF(
+vec material::evalBSDF(
   const vec& incoming,
   const vec& outgoing
 ) const {

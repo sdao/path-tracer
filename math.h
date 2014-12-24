@@ -37,9 +37,9 @@ namespace math {
   /** 1 / Pi as a single-precision float. */
   static constexpr float INV_PI = float(M_1_PI);
 
-  /** Clamps a value between 0 and 1. */
-  inline float clamp(float x) {
-    return x < 0 ? 0 : (x > 1 ? 1 : x);
+  /** Clamps a value x between a and b. */
+  inline float clamp(float x, float a = 0.0f, float b = 1.0f) {
+    return x < a ? a : (x > b ? b : x);
   }
 
   /**
@@ -226,6 +226,46 @@ namespace math {
    * vector in spherical coordinates.
    */
   inline float absCosTheta(const vec& v) { return fabsf(v.z()); }
+
+  /**
+   * Returns Sin[Theta]^2 of a vector where Theta is the polar angle of the
+   * vector in spherical coordinates.
+   */
+  inline float sinTheta2(const vec& v) {
+    return std::max(0.0f, 1.0f - cosTheta(v) * cosTheta(v));
+  }
+
+  /**
+   * Returns Sin[Theta] of a vector where Theta is the polar angle of the vector
+   * in spherical coordinates.
+   */
+  inline float sinTheta(const vec& v) {
+    return sqrtf(sinTheta2(v));
+  }
+
+  /**
+   * Returns Cos[Phi] of a vector where Phi is the azimuthal angle of the vector
+   * in spherical coordinates.
+   */
+  inline float cosPhi(const vec& v) {
+    float sinT = sinTheta(v);
+    if (sinT == 0.0f) {
+      return 1.0f;
+    }
+    return clamp(v.x() / sinT, -1.0f, 1.0f);
+  }
+
+  /**
+   * Returns Sin[Phi] of a vector where Phi is the azimuthal angle of the vector
+   * in spherical coordinates.
+   */
+  inline float sinPhi(const vec& v) {
+    float sinT = sinTheta(v);
+    if (sinT == 0.0f) {
+      return 0.0f;
+    }
+    return clamp(v.y() / sinT, -1.0f, 1.0f);
+  }
 
   /**
    * Samples a unit disk, ensuring that the samples are uniformally distributed

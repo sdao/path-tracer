@@ -2,7 +2,7 @@
 
 materials::lambert::lambert(vec a) : albedo(a) {}
 
-vec materials::lambert::evalBRDF(
+vec materials::lambert::evalBSDF(
   const vec& incoming,
   const vec& outgoing
 ) const {
