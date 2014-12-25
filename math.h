@@ -106,30 +106,97 @@ namespace math {
   }
 
   /**
-   * Copies color data from a 2D vector into an OpenEXR array.
+   * Reconstructs an image from an accumulated color vector and a weight vector,
+   * placing the results in a 2D OpenEXR array.
    *
    * @param w       the width of the vector (number of elements per row)
    * @param h       the height of the vector (number of row elements)
-   * @param data    the vector to copy from; its elements are rows, whose
+   * @param colors  the accumulated color vector; its elements are rows, whose
    *                elements in turn contain the actual color data
+   * @param weights the filter weight vector; its elements are rows, whose
+   *                elements in turn contain the actual filter weights
    * @param exrData the 2D OpenEXR array to which the data will be copied
    */
-  inline void copyData(
+  inline void reconstructImage(
     size_t w,
     size_t h,
-    const std::vector< std::vector<DoubleVec> >& data,
+    const std::vector< std::vector<DoubleVec> >& colors,
+    const std::vector< std::vector<double> >& weights,
     Imf::Array2D<Imf::Rgba>& exrData
   ) {
     for (size_t y = 0; y < h; ++y) {
       for (size_t x = 0; x < w; ++x) {
         Imf::Rgba& rgba = exrData[long(y)][long(x)];
-        const DoubleVec &p = data[y][x];
-        rgba.r = float(p.x());
-        rgba.g = float(p.y());
-        rgba.b = float(p.z());
+        const DoubleVec& pxColor = colors[y][x];
+        const double& pxWeight = weights[y][x];
+        rgba.r = float(pxColor.x() / pxWeight);
+        rgba.g = float(pxColor.y() / pxWeight);
+        rgba.b = float(pxColor.z() / pxWeight);
         rgba.a = 1.0f;
       }
     }
+  }
+
+  /**
+   * Evaluates a triangle filter with width = 0.5 (support = 1.0) for a
+   * specified offset from the pixel center. The values are not normalized,
+   * i.e., the integral of the filter over the 1x1 square around the point.
+   * Thus, you should only use the filter weights relative to other weights.
+   * 
+   * In fact, Mathematica says that:
+   * @code
+   * In := Integrate[(0.5-Abs[x])*(0.5-Abs[y]), {x, -0.5, 0.5}, {y, -0.5, 0.5}]
+   * Out = 0.0625
+   * @endcode
+   *
+   * @param x the x-offset from the pixel center, -0.5 <= x <= 0.5
+   * @param y the y-offset from the pixel center, -0.5 <= y <= 0.5
+   * @returns the value of the filter, where 0 <= value <= 0.25
+   */
+  inline double triangleFilter(double x, double y) {
+    return max(0.0, 0.5 - fabs(x)) * max(0.0, 0.5 - fabs(y));
+  }
+
+  /**
+   * Computes the 1-dimensional Mitchell filter with B = 1/3 and C = 1/3 for a
+   * specified offset from the pixel center. The values are not normalized.
+   *
+   * Pharr and Humphreys suggest on p. 398 of PBR that values of B and C should
+   * be chosen such that B + 2C = 1.
+   * GPU Gems <http://http.developer.nvidia.com/GPUGems/gpugems_ch24.html>
+   * suggests the above values of B = 1/3 and C = 1/3.
+   *
+   * @param x the x-offset from the pixel center, -0.5 <= x <= 0.5
+   */
+  inline double mitchellFilter(double x) {
+    const double B = 1.0 / 3.0;
+    const double C = 1.0 / 3.0;
+
+    x = fabs(4.0 * x); // Convert to the range [0, 2].
+
+    if (x > 1.0) {
+      return ((-B - 6 * C) * (x * x * x)
+        + (6 * B + 30 * C) * (x * x)
+        + (-12 * B - 48 * C) * x
+        + (8 * B + 24 * C)) * (1.0 / 6.0);
+    } else {
+      return ((12 - 9 * B - 6 * C) * (x * x * x)
+        + (-18 + 12 * B + 6 * C) * (x * x)
+        + (6 - 2 * B)) * (1.0 / 6.0);
+    }
+  }
+
+  /**
+   * Evaluates a 2-dimensional Mitchell filter at a specified offset from the
+   * pixel center by separating and computing the 1-dimensional Mitchell
+   * filter for the x- and y- offsets.
+   *
+   * @param x the x-offset from the pixel center, -0.5 <= x <= 0.5
+   * @param y the y-offset from the pixel center, -0.5 <= y <= 0.5
+   * @returns the value of the filter
+   */
+  inline double mitchellFilter(double x, double y) {
+    return mitchellFilter(x) * mitchellFilter(y);
   }
 
   /**

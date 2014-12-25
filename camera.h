@@ -25,10 +25,6 @@ class Camera {
    * The number of samples to take per pixel in each iteration (supersampling).
    */
   static constexpr int SAMPLES_PER_PIXEL = 4;
-  /**
-   * The inverse of SAMPLES_PER_PIXEL.
-   */
-  static constexpr float PIXELS_PER_SAMPLE = 1.0f / float(SAMPLES_PER_PIXEL);
 
   Ray eye; /**< The ray representing the eye's position and orientation. */
   float fovx2; /**< Half of the horizontal field of view angle. */
@@ -40,8 +36,9 @@ class Camera {
   Randomness masterRng; /**< The RNG used to seed the per-row RNGs. */
   std::vector<unsigned> rowSeeds; /**< The per-row RNG seeds. */
 
-  std::vector< std::vector<DoubleVec> > data; /**< The raw sampled colors. */
-  Imf::Array2D<Imf::Rgba> exrData; /**< The colors converted to OpenEXR. */
+  std::vector< std::vector<DoubleVec> > colors; /**< The raw sampled colors. */
+  std::vector< std::vector<double> > weights; /**< The raw filter weights. */
+  Imf::Array2D<Imf::Rgba> exrData; /**< The filtered image for OpenEXR. */
 
   size_t w; /**< The width of the output image to generate. */
   size_t h; /**< The height of the output image to generate. */

@@ -7,7 +7,8 @@ void KDTree::build() {
   allNodes.push_back(KDNode());
 
   // Build kd-tree for accelerator (p. 232).
-  int maxDepth = int(roundf(8.0f + 1.3f * floorf(math::log2(objs->size()))));
+  float logOfSize = math::log2(float(objs->size()));
+  int maxDepth = int(roundf(8.0f + 1.3f * floorf(logOfSize)));
 
   // Compute bounds for kd-tree construction (Pharr & Humphreys p. 232).
   bounds = BBox();

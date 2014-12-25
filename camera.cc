@@ -6,7 +6,8 @@ namespace chrono = std::chrono;
 
 Camera::Camera(Ray e, size_t ww, size_t hh, float ff)
   : eye(e.origin, e.direction.normalized()), fovx2(0.5f * ff), masterRng(),
-    rowSeeds(hh), data(hh), exrData(long(hh), long(ww)), w(ww), h(hh), iters(0)
+    rowSeeds(hh), colors(hh), weights(hh), exrData(long(hh), long(ww)),
+    w(ww), h(hh), iters(0)
 {
   // Size of the image plane projected into world space
   // using the given fovx and cam focal length.
@@ -20,11 +21,13 @@ Camera::Camera(Ray e, size_t ww, size_t hh, float ff)
   // Image corner ray in world space.
   cornerRay = eye.direction - (0.5f * up) - (0.5f * right);
 
-  // Prepare raw output data array.
+  // Prepare accumulated color and weight buffers.
   for (size_t y = 0; y < h; ++y) {
-    data[y] = std::vector<DoubleVec>(w);
+    colors[y] = std::vector<DoubleVec>(w);
+    weights[y] = std::vector<double>(w);
     for (size_t x = 0; x < w; ++x) {
-      data[y][x] = DoubleVec(0, 0, 0);
+      colors[y][x] = DoubleVec(0, 0, 0);
+      weights[y][x] = 0.0;
     }
   }
 }
@@ -33,9 +36,6 @@ void Camera::renderOnce(const KDTree& kdt, std::string name) {
   iters++;
   std::cout << "Iteration " << iters;
   chrono::steady_clock::time_point startTime = chrono::steady_clock::now();
-
-  double newFrac = 1.0 / double(iters);
-  double oldFrac = double(iters - 1.0) * newFrac;
 
   for (size_t y = 0; y < h; ++y) {
     rowSeeds[y] = masterRng.nextUnsigned();
@@ -46,16 +46,19 @@ void Camera::renderOnce(const KDTree& kdt, std::string name) {
     Randomness rng(rowSeeds[y]);
 
     for (size_t x = 0; x < w; ++x) {
-      DoubleVec pxColor(0, 0, 0);
+      DoubleVec& pxColor = colors[y][x];
+      double& pxWeight = weights[y][x];
+
+      // Begin pixel sampling loop.
       for (int samps = 0; samps < SAMPLES_PER_PIXEL; ++samps) {
-        float frac_y =
-          (float(y) - 0.5f + rng.nextUnitFloat()) / (float(h) - 1.0f);
-        float frac_x =
-          (float(x) - 0.5f + rng.nextUnitFloat()) / (float(w) - 1.0f);
+        float offsetY = rng.nextFloat(-0.5f, 0.5f);
+        float offsetX = rng.nextFloat(-0.5f, 0.5f);
+        float fracY = (float(y) + offsetY) / (float(h) - 1.0f);
+        float fracX = (float(x) + offsetX) / (float(w) - 1.0f);
 
         LightRay r(
           eye.origin,
-          (cornerRay + (up * frac_y) + (right * frac_x)).normalized()
+          (cornerRay + (up * fracY) + (right * fracX)).normalized()
         );
 
         int depth = 0;
@@ -94,25 +97,20 @@ void Camera::renderOnce(const KDTree& kdt, std::string name) {
             r.kill();
             break;
           }
-        }
+        } // End pixel sampling loop.
+
+        // Filter value.
+        double smpWeight = math::mitchellFilter(offsetX, offsetY);
 
         // Black if ray died; fill in color otherwise.
-        pxColor += DoubleVec(r.color.x(), r.color.y(), r.color.z());
-      }
-
-      pxColor *= PIXELS_PER_SAMPLE;
-
-      DoubleVec &p = data[y][x];
-      if (iters == 1) {
-        p = pxColor;
-      } else {
-        p = p * oldFrac + pxColor * newFrac;
+        pxColor += smpWeight * DoubleVec(r.color.x(), r.color.y(), r.color.z());
+        pxWeight += smpWeight;
       }
     } // end of x-for loop
   //} // end of y-for loop
   });
 
-  math::copyData(w, h, data, exrData);
+  math::reconstructImage(w, h, colors, weights, exrData);
   Imf::RgbaOutputFile file(name.c_str(), int(w), int(h), Imf::WRITE_RGBA);
   file.setFrameBuffer(&exrData[0][0], 1, w);
   file.writePixels(int(h));
