@@ -1,6 +1,6 @@
 #pragma once
 
-#define EIGEN_NO_DEBUG 1
+#define EIGEN_NO_DEBUG
 
 #include <cmath>
 #include <limits>
