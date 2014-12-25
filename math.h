@@ -396,7 +396,7 @@ namespace math {
    * more likely to be chosen than those with a lower cosine value (more
    * perpendicular to the normal).
    *
-   * Taken from Pharr & Humphreys' p. 669.
+   * Taken from Pharr & Humphreys p. 669.
    *
    * @param rng                  the per-thread RNG in use
    * @param directionOut   [out] a cosine-weighted random vector in the

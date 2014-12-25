@@ -6,6 +6,8 @@
 
 /**
  * A k-d tree used to accelerate ray-object intersections.
+ * This implementation is mostly taken from Pharr and Humphreys' Physically
+ * Based Rendering, second edition.
  */
 class KDTree {
   /**

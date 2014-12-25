@@ -5,10 +5,17 @@ Little global illumination Monte Carlo path tracer
 
 Dependencies
 ------------
-* Eigen
-* Intel Threading Building Blocks (tbb)
-* OpenEXR libraries (IlmImf and Half)
-* Open Asset Import Library (assimp) 
+If you're on OS X, I suggest using [Homebrew](http://brew.sh/) to get the right
+dependencies. If you're on Linux, you can use your package manager.
+
+* [Eigen](http://eigen.tuxfamily.org/)
+  (template library)
+* [Intel Threading Building Blocks](https://www.threadingbuildingblocks.org/)
+  (links with libtbb)
+* [OpenEXR libraries](http://openexr.com/)
+  (links with libIlmImf and libHalf)
+* [Open Asset Import Library](http://assimp.sourceforge.net/)
+  (links with libassimp) 
 
 Reference
 ---------
