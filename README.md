@@ -7,8 +7,8 @@ Dependencies
 ------------
 * Eigen
 * Intel Threading Building Blocks (tbb)
-* OpenEXR libraries (IlmImf)
-* Open Asset Import Library (Assimp) 
+* OpenEXR libraries (IlmImf and Half)
+* Open Asset Import Library (assimp) 
 
 Reference
 ---------
