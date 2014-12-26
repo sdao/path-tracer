@@ -1,11 +1,17 @@
 #include "disc.h"
 
-geoms::Disc::Disc(Material* m, Vec o, Vec n, float r)
-  : Geom(m), radiusSquared(r * r), radius(r), origin(o),
-    normal(n.normalized()) {}
+geoms::Disc::Disc(Material* m, Vec o, Vec n, float rOuter, float rInner)
+  : Geom(m),
+    radiusOuterSquared(rOuter * rOuter), radiusInnerSquared(rInner * rInner),
+    radiusOuter(rOuter), radiusInner(rInner),
+    origin(o), normal(n.normalized()) {}
 
 geoms::Disc::Disc(const geoms::Disc& other)
-  : Geom(other.mat), radiusSquared(other.radiusSquared), radius(other.radius),
+  : Geom(other.mat),
+    radiusOuterSquared(other.radiusOuterSquared),
+    radiusInnerSquared(other.radiusInnerSquared),
+    radiusOuter(other.radiusOuter),
+    radiusInner(other.radiusInner),
     origin(other.origin), normal(other.normal) {}
 
 bool geoms::Disc::intersect(const Ray& r, Intersection* isectOut) const {
@@ -19,7 +25,9 @@ bool geoms::Disc::intersect(const Ray& r, Intersection* isectOut) const {
     if (math::isPositive(d)) {
       // In the plane, but are we in the disc?
       Vec isectPoint = r.at(d);
-      if ((isectPoint - origin).squaredNorm() < radiusSquared) {
+      float isectToOriginDist = (isectPoint - origin).squaredNorm();
+      if (isectToOriginDist <= radiusOuterSquared
+          && isectToOriginDist >= radiusInnerSquared) {
         // In the disc.
         *isectOut = Intersection(isectPoint, normal, d);
 
@@ -37,8 +45,8 @@ BBox geoms::Disc::bounds() const {
   Vec binormal;
   math::coordSystem(normal, &tangent, &binormal);
 
-  Vec tr = tangent * radius;
-  Vec br = binormal * radius;
+  Vec tr = tangent * radiusOuter;
+  Vec br = binormal * radiusOuter;
 
   BBox b(origin + tr + br, origin - tr - br);
   b.expand(origin + tr - br);
