@@ -1,12 +1,12 @@
 #pragma once
-#include "../material.h"
+#include "bsdf.h"
 
 namespace materials {
 
   /**
    * A perfectly-ideal diffuse reflector using Lambertian reflectance.
    */
-  class Lambert : public Material {
+  class Lambert : public BSDF {
   protected:
     virtual Vec evalBSDF(
       const Vec& incoming,

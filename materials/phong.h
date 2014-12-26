@@ -1,5 +1,5 @@
 #pragma once
-#include "../material.h"
+#include "bsdf.h"
 
 namespace materials {
 
@@ -7,7 +7,7 @@ namespace materials {
    * A glossy reflective material using Phong reflectance.
    * Note that Phong reflectance is not physically plausible.
    */
-  class Phong : public Material {
+  class Phong : public BSDF {
   protected:
     virtual Vec sampleBSDF(
       Randomness& rng,

@@ -1,5 +1,5 @@
 #pragma once
-#include "../material.h"
+#include "bsdf.h"
 
 namespace materials {
 
@@ -7,7 +7,7 @@ namespace materials {
    * A dielectric (nonconductive) material following the Fresnel equations.
    * This material provides for both reflection and refraction.
    */
-  class Dielectric : public Material {
+  class Dielectric : public BSDF {
     /** The refractive index for a vacuum (approx. air), nVac. */
     static constexpr float IOR_VACUUM = 1.0f;
 

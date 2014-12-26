@@ -4,7 +4,8 @@
 namespace materials {
 
   /**
-   * An emissive light source.
+   * A material that emits light equally from all points and directions, while
+   * absorbing (not reflecting) any incoming light.
    */
   class Emitter : public Material {
   public:
