@@ -35,4 +35,10 @@ public:
    * A bounding box encapsulating the entire geometry.
    */
   virtual BBox bounds() const = 0;
+
+  /**
+   * Randomly samples a point on the geometry, uniform with respect to the area
+   * of the geometry.
+   */
+  virtual Vec samplePoint(Randomness& rng) const = 0;
 };

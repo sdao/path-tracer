@@ -54,3 +54,18 @@ BBox geoms::Disc::bounds() const {
 
   return b;
 }
+
+Vec geoms::Disc::samplePoint(Randomness& rng) const {
+  // See Bostock <http://bl.ocks.org/mbostock/d8b1e0a25467e6034bb9>.
+  Vec tangent;
+  Vec binormal;
+  math::coordSystem(normal, &tangent, &binormal);
+
+  float thickness = radiusOuterSquared - radiusInnerSquared;
+  float a = rng.nextFloat(math::TWO_PI);
+  float r = sqrtf(rng.nextFloat(thickness) + radiusInnerSquared);
+  float x = r * cosf(a);
+  float y = r * sinf(a);
+
+  return origin + (x * tangent) + (y * binormal);
+}

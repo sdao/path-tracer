@@ -41,6 +41,7 @@ namespace geoms {
 
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
     virtual BBox bounds() const override;
+    virtual Vec samplePoint(Randomness& rng) const override;
   };
 
 }

@@ -19,6 +19,10 @@ class Randomness {
    */
   std::uniform_int_distribution<unsigned> unsignedDist;
   /**
+   * Standard Gaussian (normal) distribution.
+   */
+  std::normal_distribution<float> normalDist;
+  /**
    * The engine used internally for the RNG.
    */
   std::mt19937 rng;
@@ -37,7 +41,8 @@ public:
   /**
    * Constructs a randomness object from a truly random seed.
    */
-  Randomness() : unitDist(), intDist(), unsignedDist(), rng(createSeed()) {}
+  Randomness()
+    : unitDist(), intDist(), unsignedDist(), normalDist(), rng(createSeed()) {}
 
   /**
    * Constructs a randomness object from the given seed.
@@ -73,4 +78,9 @@ public:
   inline float nextFloat(float min, float max) {
     return min + (max - min) * unitDist(rng);
   }
+
+  /**
+   * Samples a normally-distributed float with mean 0 and standard deviation 1.
+   */
+  inline float nextNormalFloat() { return normalDist(rng); }
 };

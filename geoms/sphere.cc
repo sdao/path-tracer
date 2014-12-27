@@ -48,3 +48,17 @@ BBox geoms::Sphere::bounds() const {
   Vec boundsDiag(radius, radius, radius);
   return BBox(origin - boundsDiag, origin + boundsDiag);
 }
+
+Vec geoms::Sphere::samplePoint(Randomness& rng) const {
+  // See MathWorld <http://mathworld.wolfram.com/SpherePointPicking.html>.
+  float x = rng.nextNormalFloat();
+  float y = rng.nextNormalFloat();
+  float z = rng.nextNormalFloat();
+  float scale = radius / sqrtf(x * x + y * y + z * z);
+
+  return Vec(
+    origin.x() + scale * x,
+    origin.y() + scale * y,
+    origin.z() + scale * z
+  );
+}
