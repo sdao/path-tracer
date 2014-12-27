@@ -72,10 +72,10 @@ void Camera::renderOnce(const KDTree& kdt, std::string name) {
             float probLive;
             if (depth > RUSSIAN_ROULETTE_DEPTH_2) {
               // More aggressive ray killing when ray is very old.
-              probLive = math::clampedLerp(0.0f, 0.7f, r.energy());
+              probLive = math::clampedLerp(0.0f, 0.5f, r.energy());
             } else {
               // Less aggressive ray killing.
-              probLive = math::clampedLerp(0.3f, 1.0f, r.energy());
+              probLive = math::clamp(r.energy());
             }
 
             if (rv < probLive) {

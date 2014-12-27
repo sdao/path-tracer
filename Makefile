@@ -7,7 +7,7 @@ CXX = icpc
 
 ifeq ($(strip $(CXX)),icpc)
 	WARN = -Werror -Wall -Wcheck
-	CXXFLAGS = $(WARN) -std=c++11 -DNDEBUG -fast
+	CXXFLAGS = $(WARN) -std=c++11 -DNDEBUG -fast -parallel
 	CXXFLAGS_DEBUG = $(WARN) -std=c++11 -DDEBUG -O0 -g
 
 	# Enable profile guided optimization for Intel compiler
