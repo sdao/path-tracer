@@ -83,7 +83,7 @@ Vec materials::Dielectric::sampleBSDF(
 
   // Importance sampling probabilities.
   // Pr[cast reflect ray] = [0.25, 0.75] based on reflectance.
-  float probRefl = 0.25f + 0.5f * refl;
+  float probRefl = math::lerp(0.25f, 0.75f, refl);
   float probRefr = 1.0f - probRefl;
 
   // Probabilistically choose to refract or reflect.

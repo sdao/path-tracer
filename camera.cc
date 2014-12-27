@@ -65,15 +65,17 @@ void Camera::renderOnce(const KDTree& kdt, std::string name) {
         while (!r.isZeroLength()) {
           depth++;
 
-          // Do Russian Roulette if this ray is "old".
+          // Do Russian Roulette if this path is "old".
           if (depth > RUSSIAN_ROULETTE_DEPTH_1 || r.isBlack()) {
             float rv = rng.nextUnitFloat();
-            float probLive = math::clamp(r.energy());
 
+            float probLive;
             if (depth > RUSSIAN_ROULETTE_DEPTH_2) {
               // More aggressive ray killing when ray is very old.
-              // At 75%, chance of living another 16 rounds is 1%.
-              probLive *= 0.75f;
+              probLive = math::clampedLerp(0.0f, 0.7f, r.energy());
+            } else {
+              // Less aggressive ray killing.
+              probLive = math::clampedLerp(0.3f, 1.0f, r.energy());
             }
 
             if (rv < probLive) {

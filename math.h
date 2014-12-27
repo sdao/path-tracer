@@ -416,4 +416,21 @@ namespace math {
     *probabilityOut = absCosTheta(ret) * INV_PI;
   }
 
+  /**
+   * Linearly interpolates between x and y. Where a = 0, x is returned, and
+   * where a = 1, y is returned. If a < 0 or a > 1, this function will
+   * extrapolate.
+   */
+  inline float lerp(float x, float y, float a) {
+    return x + a * (y - x);
+  }
+
+  /**
+   * Linearly interpolates between x and y. Where a <= 0, x is returned, and
+   * where a >= 1, y is returned. No extrapolation will occur.
+   */
+  inline float clampedLerp(float x, float y, float a) {
+    return lerp(x, y, clamp(a));
+  }
+
 }
