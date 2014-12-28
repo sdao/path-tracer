@@ -43,6 +43,20 @@ class Camera {
   size_t h; /**< The height of the output image to generate. */
   int iters; /** The current number of path-tracing iterations done. */
 
+  /**
+   * Randomly picks a light and samples it for direct illumination. The
+   * radiance returned will be scaled according to the probability of picking
+   * the light.
+   *
+   * @param rng         the per-thread RNG in use
+   * @param incoming    the ray coming into the intersection on the target
+   *                    geometry (on the reflector)
+   * @param isect       the intersection on the target geometry that should be
+   *                    illuminated
+   * @param mat         the material of the target geometry being illuminated
+   * @param lights      a list of light-emitting objects to randomly pick from
+   * @param kdt         the k-d tree containing all geometry in the scene
+   */
   Vec uniformSampleOneLight(
     Randomness& rng,
     const LightRay& incoming,

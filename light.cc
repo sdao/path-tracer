@@ -10,22 +10,28 @@ Vec AreaLight::directIlluminate(
   const Geom* emissionObj,
   const KDTree& kdt
 ) const {
-  Vec randOnLight = emissionObj->samplePoint(rng);
-  Vec outgoing = (randOnLight - isect.position).normalized();
+  Vec lightPosition;
+  Vec lightNormal;
+  emissionObj->samplePoint(rng, &lightPosition, &lightNormal);
+
+  Vec outgoing = (lightPosition - isect.position).normalized();
   Ray pointToLight(isect.position + outgoing * math::VERY_SMALL, outgoing);
+  float distToLight2 = (lightPosition - isect.position).squaredNorm();
+
+  // Why do we subtract 2 * VERY_SMALL?
+  // 1. To balance out the added VERY_SMALL in the ray pointToLight, and
+  // 2. Because we don't want to actually hit the light itself!
+  float shadowDist = sqrtf(distToLight2) - 2.0f * math::VERY_SMALL;
 
   // Send a shadow ray.
-  Intersection lightIsect;
-  if (emissionObj != kdt.intersect(pointToLight, &lightIsect)) {
-    // No intersection at all with this light.
-    return Vec(0, 0, 0);
-  } else if (!math::isNearlyZero(lightIsect.position - randOnLight)) {
-    // The first intersection is not the random sampled point.
+  if (kdt.intersectShadow(pointToLight, shadowDist)) {
+    // Uh-oh, something intersected before the ray hit the light!
     return Vec(0, 0, 0);
   }
 
-  float prob = (lightIsect.distance * lightIsect.distance)
-    / (lightIsect.normal.dot(-outgoing) * emissionObj->area());
+  // Calculate BSDF and probability of hitting light.
+  float prob =
+    distToLight2 / (lightNormal.dot(-outgoing) * emissionObj->area());
   Vec bsdf = mat->evalBSDFWorld(isect, -incoming.direction, outgoing);
 
   return bsdf.cwiseProduct(color) * (isect.normal.dot(outgoing)) / prob;

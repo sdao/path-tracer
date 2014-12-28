@@ -46,6 +46,30 @@ bool geoms::Disc::intersect(const Ray& r, Intersection* isectOut) const {
   return false;
 }
 
+bool geoms::Disc::intersectShadow(const Ray& r, float maxDist) const {
+  // See Wikipedia:
+  // <http://en.wikipedia.org/wiki/Line%E2%80%93disc_intersection>
+
+  float denom = r.direction.dot(normal);
+  if (denom != 0.0f) {
+    float d = (origin - r.origin).dot(normal) / denom;
+
+    if (math::isPositive(d) && math::isPositive(maxDist - d)) {
+      // In the plane (and in range), but are we in the disc?
+      Vec isectPoint = r.at(d);
+      float isectToOriginDist = (isectPoint - origin).squaredNorm();
+      if (isectToOriginDist <= radiusOuterSquared
+          && isectToOriginDist >= radiusInnerSquared) {
+        // In the disc.
+        return true;
+      }
+    }
+  }
+
+  // Either no isect was found or it was behind us.
+  return false;
+}
+
 BBox geoms::Disc::bounds() const {
   Vec tangent;
   Vec binormal;
@@ -61,7 +85,11 @@ BBox geoms::Disc::bounds() const {
   return b;
 }
 
-Vec geoms::Disc::samplePoint(Randomness& rng) const {
+void geoms::Disc::samplePoint(
+  Randomness& rng,
+  Vec* positionOut,
+  Vec* normalOut
+) const {
   // See Bostock <http://bl.ocks.org/mbostock/d8b1e0a25467e6034bb9>.
   Vec tangent;
   Vec binormal;
@@ -73,7 +101,8 @@ Vec geoms::Disc::samplePoint(Randomness& rng) const {
   float x = r * cosf(a);
   float y = r * sinf(a);
 
-  return origin + (x * tangent) + (y * binormal);
+  *positionOut = origin + (x * tangent) + (y * binormal);
+  *normalOut = normal;
 }
 
 float geoms::Disc::area() const {

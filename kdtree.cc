@@ -308,6 +308,90 @@ Geom* KDTree::intersect(
   return nullptr;
 }
 
+bool KDTree::intersectShadow(const Ray& r, float maxDist) const {
+  // Compute initial parametric range of ray inside kd-tree extent (p. 240).
+  float tmin, tmax;
+  if (!bounds.intersect(r, &tmin, &tmax)) {
+    return false;
+  }
+
+  // Prepare to traverse kd-tree for ray (p. 241).
+  Vec invDir(
+    1.0f / r.direction.x(),
+    1.0f / r.direction.y(),
+    1.0f / r.direction.z()
+  );
+  KDTodo todo[MAX_TODO];
+  int todoPos = 0;
+
+  // Traverse kd-tree nodes in order for ray (p. 242).
+  mem::ID nodeId = rootId;
+
+  while (nodeId.isValid()) {
+    const KDNode& node = mem::refConst(allNodes, nodeId);
+
+    if (node.isLeaf()) {
+      // Check for shadow ray intersections inside leaf node.
+      for (mem::ID objId : node.objIds) {
+        Geom* obj = mem::ref(*objs, objId);
+
+        if (obj->intersectShadow(r, maxDist)) {
+          return true;
+        }
+      }
+
+      // Grab next node to process from todo list (p. 245).
+      if (todoPos > 0) {
+        --todoPos;
+        nodeId = todo[todoPos].nodeId;
+        tmin = todo[todoPos].tmin;
+        tmax = todo[todoPos].tmax;
+      } else {
+        break;
+      }
+    } else {
+      // Process kd-tree interior node (p. 242).
+      // ---------------------------------------
+
+      // Compute parametric distance along ray to split plane.
+      axis ax = node.splitAxis;
+      float tplane = (node.splitPos - r.origin[ax]) * invDir[ax];
+
+      // Get node children pointers for ray.
+      mem::ID firstChild;
+      mem::ID secondChild;
+      bool belowFirst = (r.origin[ax] < node.splitPos) ||
+                        ((r.origin[ax] == node.splitPos)
+                         && r.direction[ax] <= 0);
+      if (belowFirst) {
+        firstChild = node.belowId();
+        secondChild = node.aboveId();
+      } else {
+        firstChild = node.aboveId();
+        secondChild = node.belowId();
+      }
+
+      // Advance to next child node, possibly enqueue other child (p. 244).
+      if (tplane > tmax || tplane <= 0) {
+        nodeId = firstChild;
+      } else if (tplane < tmin) {
+        nodeId = secondChild;
+      } else {
+        // Enqueue secondChild in todo list (p. 244).
+        todo[todoPos].nodeId = secondChild;
+        todo[todoPos].tmin = tplane;
+        todo[todoPos].tmax = tmax;
+        ++todoPos;
+
+        nodeId = firstChild;
+        tmax = tplane;
+      }
+    }
+  }
+
+  return false;
+}
+
 void KDTree::print(mem::ID nodeId, std::ostream& os, std::string header) const {
   const KDNode& node = mem::refConst<KDNode>(allNodes, nodeId);
 

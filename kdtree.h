@@ -195,6 +195,16 @@ public:
    */
   Geom* intersect(const Ray& r, Intersection* isectOut) const;
 
+  /**
+   * Determines if any object in the k-d tree intersects the given shadow ray
+   * within a maximum distance.
+   *
+   * @param r       the shadow ray to send through the k-d tree
+   * @param maxDist the maximum distance to check for intersections
+   * @returns       true if any geom hit within maxDist, otherwise false
+   */
+  bool intersectShadow(const Ray& r, float maxDist) const;
+
   friend std::ostream& operator<<(std::ostream& os, const KDTree& tree) {
     tree.print(tree.rootId, os);
     return os;
