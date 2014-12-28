@@ -248,13 +248,4 @@ struct Intersection {
   Intersection(Vec p, Vec n, float d)
     : position(p), normal(n), distance(d) {}
 
-  /**
-   * Returns whether the intersection represents an actual hit.
-   *
-   * @returns true if there was a hit, false if the ray never hit any geometry
-   */
-  inline bool hit() const {
-    return distance < std::numeric_limits<float>::max();
-  }
-
 };

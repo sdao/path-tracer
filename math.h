@@ -214,13 +214,6 @@ namespace math {
   }
 
   /**
-   * Determines whether a vec's components are each exactly 0.
-   */
-  inline bool isExactlyZero(const Vec& v) {
-    return v.x() == 0.0f && v.y() == 0.0f && v.z() == 0.0f;
-  }
-
-  /**
    * Determines whether a number is positive, within a small epsilon.
    */
   inline bool isPositive(float x) {
