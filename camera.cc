@@ -193,6 +193,7 @@ Vec Camera::uniformSampleOneLight(
   Geom* emissionObj = lights[min(lightIdx, numLights - 1)];
   AreaLight* areaLight = emissionObj->light;
 
-  return int(numLights)
+  // P[this light] = 1 / numLights, so 1 / P[this light] = numLights.
+  return float(numLights)
     * areaLight->directIlluminate(rng, incoming, isect, mat, emissionObj, kdt);
 }
