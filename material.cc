@@ -21,9 +21,10 @@ LightRay Material::scatter(
 
   // Sample BSDF for direction, color, and probability.
   Vec outgoingLocal;
-  float probOutgoing;
-  Vec bsdf = sampleBSDFLocal(rng, incomingLocal, &outgoingLocal, &probOutgoing);
-  Vec scale = bsdf * math::absCosTheta(outgoingLocal) / probOutgoing;
+  Vec bsdf;
+  float pdf;
+  sampleLocal(rng, incomingLocal, &outgoingLocal, &bsdf, &pdf);
+  Vec scale = bsdf * math::absCosTheta(outgoingLocal) / pdf;
 
   // Rendering expects outgoing ray to be in world-space.
   Vec outgoingWorld = math::localToWorld(
@@ -40,33 +41,40 @@ LightRay Material::scatter(
   );
 }
 
-Vec Material::sampleBSDFLocal(
+float Material::evalPDFLocal(const Vec& incoming, const Vec& outgoing) const {
+  if (!math::localSameHemisphere(incoming, outgoing)) {
+    return 0.0f;
+  }
+
+  return math::cosineSampleHemispherePDF(outgoing);
+}
+
+void Material::sampleLocal(
   Randomness& rng,
   const Vec& incoming,
   Vec* outgoingOut,
-  float* probabilityOut
+  Vec* bsdfOut,
+  float* pdfOut
 ) const {
-  math::cosineSampleHemisphere(rng, outgoingOut, probabilityOut);
+  Vec outgoing = math::cosineSampleHemisphere(rng, incoming.z() < 0.0f);
 
-  // Generate the output direction on the same side of the normal as the
-  // input direction (reflection) by default, i.e. assume BRDF.
-  if (incoming[2] < 0.0f) {
-    (*outgoingOut)[2] *= -1.0f;
-  }
-
-  return evalBSDFLocal(incoming, *outgoingOut);
+  *outgoingOut = outgoing;
+  *bsdfOut = evalBSDFLocal(incoming, outgoing);
+  *pdfOut = math::cosineSampleHemispherePDF(outgoing);
 }
 
-Vec Material::evalBSDFWorld(
+void Material::evalWorld(
   const Intersection& isect,
   const Vec& incoming,
-  const Vec& outgoing
+  const Vec& outgoing,
+  Vec* bsdfOut,
+  float* pdfOut
 ) const {
   Vec tangent;
   Vec binormal;
   math::coordSystem(isect.normal, &tangent, &binormal);
 
-  // BSDF computation expects rays to be in local-space.
+  // BSDF and PDF computation expects rays to be in local-space.
   Vec incomingLocal = math::worldToLocal(
     incoming,
     tangent,
@@ -81,5 +89,6 @@ Vec Material::evalBSDFWorld(
     isect.normal
   );
 
-  return evalBSDFLocal(incomingLocal, outgoingLocal);
+  *bsdfOut = evalBSDFLocal(incomingLocal, outgoingLocal);
+  *pdfOut = evalPDFLocal(incomingLocal, outgoingLocal);
 }

@@ -9,6 +9,26 @@ materials::Phong::Phong(float e, Vec c)
     invExponent(1.0f / (e + 1.0f)),
     exponent(e), color(c) {}
 
+inline Vec materials::Phong::evalBSDFInternal(
+  const Vec& perfectReflect,
+  const Vec& outgoing
+) const {
+  float cosAlpha = max(0.0f, outgoing.dot(perfectReflect));
+  float cosAlphaPow = std::pow(cosAlpha, exponent);
+
+  return scaleBRDF * cosAlphaPow;
+}
+
+inline float materials::Phong::evalPDFInternal(
+  const Vec& perfectReflect,
+  const Vec& outgoing
+) const {
+  float cosAlpha = max(0.0f, outgoing.dot(perfectReflect));
+  float cosAlphaPow = std::pow(cosAlpha, exponent);
+
+  return scaleProb * cosAlphaPow;
+}
+
 Vec materials::Phong::evalBSDFLocal(
   const Vec& incoming,
   const Vec& outgoing
@@ -19,17 +39,27 @@ Vec materials::Phong::evalBSDFLocal(
   }
 
   Vec perfectReflect(-incoming.x(), -incoming.y(), incoming.z());
-  float cosAlpha = max(0.0f, outgoing.dot(perfectReflect));
-  float cosAlphaPow = std::pow(cosAlpha, exponent);
-
-  return scaleBRDF * cosAlphaPow;
+  return evalBSDFInternal(perfectReflect, outgoing);
 }
 
-Vec materials::Phong::sampleBSDFLocal(
+float materials::Phong::evalPDFLocal(
+  const Vec& incoming,
+  const Vec& outgoing
+) const {
+  if (!math::localSameHemisphere(incoming, outgoing)) {
+    return 0.0f;
+  }
+
+  Vec perfectReflect(-incoming.x(), -incoming.y(), incoming.z());
+  return evalPDFInternal(perfectReflect, outgoing);
+}
+
+void materials::Phong::sampleLocal(
   Randomness& rng,
   const Vec& incoming,
   Vec* outgoingOut,
-  float* probabilityOut
+  Vec* bsdfOut,
+  float* pdfOut
 ) const {
   // See Lafortune & Willems <http://www.graphics.cornell.edu/~eric/Phong.html>
   // for a derivation of the sampling procedure and PDF.
@@ -68,12 +98,8 @@ Vec materials::Phong::sampleBSDFLocal(
     reflectBinormal,
     perfectReflect
   );
-  float cosAlpha = std::pow(outgoingOut->dot(perfectReflect), exponent);
-  *probabilityOut = scaleProb * cosAlpha;
-
-  // Calculate the BRDF here instead of calling evalBSDF() since we already
-  // have all of the info needed.
-  return scaleBRDF * cosAlpha;
+  *bsdfOut = evalBSDFInternal(perfectReflect, *outgoingOut);
+  *pdfOut = evalPDFInternal(perfectReflect, *outgoingOut);
 }
 
 bool materials::Phong::shouldDirectIlluminate() const {

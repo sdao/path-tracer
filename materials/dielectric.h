@@ -30,11 +30,17 @@ namespace materials {
      */
     Dielectric(float ior = IOR_GLASS, Vec c = Vec(1, 1, 1));
 
-    virtual Vec sampleBSDFLocal(
+    virtual void sampleLocal(
       Randomness& rng,
       const Vec& incoming,
       Vec* outgoingOut,
-      float* probabilityOut
+      Vec* bsdfOut,
+      float* pdfOut
+    ) const override;
+
+    virtual float evalPDFLocal(
+      const Vec& incoming,
+      const Vec& outgoing
     ) const override;
 
     virtual Vec evalBSDFLocal(

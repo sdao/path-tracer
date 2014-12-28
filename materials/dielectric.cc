@@ -17,11 +17,21 @@ Vec materials::Dielectric::evalBSDFLocal(
   return Vec(0, 0, 0);
 }
 
-Vec materials::Dielectric::sampleBSDFLocal(
+float materials::Dielectric::evalPDFLocal(
+  const Vec& /* incoming */,
+  const Vec& /* outgoing */
+) const {
+  // Probabilistically, we are never going to get the exact matching
+  // incoming and outgoing vectors.
+  return 0.0f;
+}
+
+void materials::Dielectric::sampleLocal(
   Randomness& rng,
   const Vec& incoming,
   Vec* outgoingOut,
-  float* probabilityOut
+  Vec* bsdfOut,
+  float* pdfOut
 ) const {
   // Entering = are normal and incoming direction in opposite directions?
   // Recall that the incoming direction is in the normal's local space.
@@ -57,8 +67,9 @@ Vec materials::Dielectric::sampleBSDFLocal(
   if (math::isNearlyZero(refractVector.squaredNorm())) {
     // Total internal reflection. Must reflect.
     *outgoingOut = reflectVector;
-    *probabilityOut = 1.0f;
-    return color / math::absCosTheta(reflectVector);
+    *bsdfOut = color / math::absCosTheta(reflectVector);
+    *pdfOut = 1.0f;
+    return;
   }
 
   // Calculates Fresnel reflectance factor using Schlick's approximation.
@@ -90,12 +101,12 @@ Vec materials::Dielectric::sampleBSDFLocal(
   if (rng.nextUnitFloat() < probRefl) {
     // Higher reflectance = higher probability of reflecting.
     *outgoingOut = reflectVector;
-    *probabilityOut = probRefl;
-    return color * refl / math::absCosTheta(reflectVector);
+    *bsdfOut = color * refl / math::absCosTheta(reflectVector);
+    *pdfOut = probRefl;
   } else {
     *outgoingOut = refractVector;
-    *probabilityOut = probRefr;
-    return color * refr / math::absCosTheta(refractVector);
+    *bsdfOut = color * refr / math::absCosTheta(refractVector);
+    *pdfOut = probRefr;
   }
 }
 

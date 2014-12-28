@@ -392,6 +392,15 @@ namespace math {
   }
 
   /**
+   * Returns the probability that the given direction was sampled from a unit
+   * hemisphere using a cosine-weighted distribution. (It does not matter
+   * whether the hemisphere is on the positive or negative Z-axis.)
+   */
+  inline float cosineSampleHemispherePDF(const Vec& direction) {
+    return absCosTheta(direction) * INV_PI;
+  }
+
+  /**
    * Samples a unit hemisphere with a cosine-weighted distribution.
    * Directions with a higher cosine value (more parallel to the normal) are
    * more likely to be chosen than those with a lower cosine value (more
@@ -399,22 +408,21 @@ namespace math {
    *
    * Taken from Pharr & Humphreys p. 669.
    *
-   * @param rng                  the per-thread RNG in use
-   * @param directionOut   [out] a cosine-weighted random vector in the
-   *                             hemisphere; the pointer must not be null
-   * @param probabilityOut [out] the probability of the sampled direction; the
-   *                             pointer must not be null
+   * @param rng     the per-thread RNG in use
+   * @param flipped whether to sample from the hemisphere on the negative
+   *                Z-axis instead; false will sample from the positive
+   *                hemisphere and true will sample from the negative hemisphere
+   * @returns       a cosine-weighted random vector in the hemisphere;
+   *                the pointer must not be null
    */
-  inline void cosineSampleHemisphere(
-    Randomness& rng,
-    Vec* directionOut,
-    float* probabilityOut
-  ) {
+  inline Vec cosineSampleHemisphere(Randomness& rng, bool flipped) {
     Vec ret;
     areaSampleDisk(rng, &ret[0], &ret[1]);
     ret[2] = sqrtf(max(0.0f, 1.0f - ret[0] * ret[0] - ret[1] * ret[1]));
-    *directionOut = ret;
-    *probabilityOut = absCosTheta(ret) * INV_PI;
+    if (flipped) {
+      ret[2] *= -1.0f;
+    }
+    return ret;
   }
 
   /**

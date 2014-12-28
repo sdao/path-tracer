@@ -18,6 +18,16 @@ namespace materials {
     /** Cached inverse exponent term. */
     const float invExponent;
 
+    inline Vec evalBSDFInternal(
+      const Vec& perfectReflect,
+      const Vec& outgoing
+    ) const;
+
+    inline float evalPDFInternal(
+      const Vec& perfectReflect,
+      const Vec& outgoing
+    ) const;
+
   public:
     /** The Phong exponent of the material. */
     const float exponent;
@@ -34,11 +44,17 @@ namespace materials {
      */
     Phong(float e, Vec c = Vec(1, 1, 1));
 
-    virtual Vec sampleBSDFLocal(
+    virtual void sampleLocal(
       Randomness& rng,
       const Vec& incoming,
       Vec* outgoingOut,
-      float* probabilityOut
+      Vec* bsdfOut,
+      float* pdfOut
+    ) const override;
+
+    virtual float evalPDFLocal(
+      const Vec& incoming,
+      const Vec& outgoing
     ) const override;
 
     virtual Vec evalBSDFLocal(

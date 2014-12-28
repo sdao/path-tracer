@@ -30,9 +30,11 @@ Vec AreaLight::directIlluminate(
   }
 
   // Calculate BSDF and probability of hitting light.
-  float prob =
+  float lightProb =
     distToLight2 / (lightNormal.dot(-outgoing) * emissionObj->area());
-  Vec bsdf = mat->evalBSDFWorld(isect, -incoming.direction, outgoing);
+  Vec bsdf;
+  float bsdfProb;
+  mat->evalWorld(isect, -incoming.direction, outgoing, &bsdf, &bsdfProb);
 
-  return bsdf.cwiseProduct(color) * (isect.normal.dot(outgoing)) / prob;
+  return bsdf.cwiseProduct(color) * (isect.normal.dot(outgoing)) / lightProb;
 }
