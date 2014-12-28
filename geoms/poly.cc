@@ -1,15 +1,16 @@
 #include "poly.h"
 
 geoms::Poly::Poly(
-  Material* m,
   mem::ID a,
   mem::ID b,
   mem::ID c,
-  std::vector<geoms::Poly::Point>* lookup
-) : Geom(m), pt0(a), pt1(b), pt2(c), pointLookup(lookup) {}
+  std::vector<geoms::Poly::Point>* lookup,
+  Material* m,
+  AreaLight* l
+) : Geom(m, l), pt0(a), pt1(b), pt2(c), pointLookup(lookup) {}
 
 geoms::Poly::Poly(const geoms::Poly& other)
-  : Geom(other.mat), pt0(other.pt0), pt1(other.pt1), pt2(other.pt2),
+  : Geom(other.mat, other.light), pt0(other.pt0), pt1(other.pt1), pt2(other.pt2),
     pointLookup(other.pointLookup) {}
 
 bool geoms::Poly::intersect(const Ray& r, Intersection* isectOut) const {
@@ -81,4 +82,13 @@ Vec geoms::Poly::samplePoint(Randomness& rng) const {
   float c = 1.0f - a - b;
 
   return a * get(pt0).position + b * get(pt1).position + c * get(pt2).position;
+}
+
+float geoms::Poly::area() const {
+  // See MathWorld <http://mathworld.wolfram.com/TriangleArea.html>.
+  Vec x0 = get(pt0).position;
+  Vec x1 = get(pt1).position;
+  Vec x2 = get(pt2).position;
+
+  return 0.5f * (x1 - x0).cross(x0 - x2).norm();
 }

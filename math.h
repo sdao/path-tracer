@@ -338,6 +338,14 @@ namespace math {
   }
 
   /**
+   * Determines if two vectors in the same local coordinate space are in the 
+   * same hemisphere.
+   */
+  inline bool localSameHemisphere(const Vec& u, const Vec& v) {
+    return u.z() * v.z() >= 0.0f;
+  }
+
+  /**
    * Samples a unit disk, ensuring that the samples are uniformally distributed
    * throughout the area of the disk.
    *

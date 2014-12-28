@@ -30,9 +30,9 @@ public:
      * @returns        true if the mesh could be read, false otherwise
      */
     bool readPolyModel(
-      Material* m,
       std::string name,
       Vec offset,
+      Material* m,
       std::vector<Geom*>* geomList = nullptr
     );
 

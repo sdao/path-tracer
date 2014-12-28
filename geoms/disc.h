@@ -20,18 +20,20 @@ namespace geoms {
     /**
      * Constructs a disc.
      *
-     * @param m      the material used to render the disc
      * @param o      the center (origin) of the disc
      * @param n      the normal vector perpendicular to the disc's plane
      * @param rOuter the outer radius of the disc
      * @param rInner the inner radius of the disc (the radius of its hole)
+     * @param m      the material used to render the disc
+     * @param l      the area light causing emission from the disc
      */
     Disc(
-      Material* m,
       Vec o = Vec(0, 0, 0),
       Vec n = Vec(0, 1, 0),
       float rOuter = 10.0f,
-      float rInner = 0.0f
+      float rInner = 0.0f,
+      Material* m = nullptr,
+      AreaLight* l = nullptr
     );
 
     /**
@@ -42,6 +44,7 @@ namespace geoms {
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
     virtual BBox bounds() const override;
     virtual Vec samplePoint(Randomness& rng) const override;
+    virtual float area() const override;
   };
 
 }

@@ -1,10 +1,10 @@
 #include "sphere.h"
 
-geoms::Sphere::Sphere(Material* m, Vec o, float r)
-  : Geom(m), origin(o), radius(r) {}
+geoms::Sphere::Sphere(Vec o, float r, Material* m, AreaLight* l)
+  : Geom(m, l), origin(o), radius(r) {}
 
 geoms::Sphere::Sphere(const geoms::Sphere& other)
-  : Geom(other.mat), origin(other.origin), radius(other.radius) {}
+  : Geom(other.mat, other.light), origin(other.origin), radius(other.radius) {}
 
 bool geoms::Sphere::intersect(const Ray& r, Intersection* isectOut) const {
   Vec diff = r.origin - origin;
@@ -61,4 +61,8 @@ Vec geoms::Sphere::samplePoint(Randomness& rng) const {
     origin.y() + scale * y,
     origin.z() + scale * z
   );
+}
+
+float geoms::Sphere::area() const {
+  return 4.0f * math::PI * radius * radius;
 }

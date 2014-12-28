@@ -193,7 +193,7 @@ public:
    *                       be null
    * @returns              the geom that was hit, or nullptr if none was hit
    */
-  Geom* intersect(const Ray& r, Intersection* isectOut = nullptr) const;
+  Geom* intersect(const Ray& r, Intersection* isectOut) const;
 
   friend std::ostream& operator<<(std::ostream& os, const KDTree& tree) {
     tree.print(tree.rootId, os);

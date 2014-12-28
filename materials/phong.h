@@ -1,5 +1,5 @@
 #pragma once
-#include "bsdf.h"
+#include "../material.h"
 
 namespace materials {
 
@@ -7,20 +7,8 @@ namespace materials {
    * A glossy reflective material using Phong reflectance.
    * Note that Phong reflectance is not physically plausible.
    */
-  class Phong : public BSDF {
-  protected:
-    virtual Vec sampleBSDF(
-      Randomness& rng,
-      const Vec& incoming,
-      Vec* outgoingOut,
-      float* probabilityOut
-    ) const override;
-
-    virtual Vec evalBSDF(
-      const Vec& incoming,
-      const Vec& outgoing
-    ) const override;
-
+  class Phong : public Material {
+  private:
     /** Cached scaling term in the Phong BRDF. */
     const Vec scaleBRDF;
 
@@ -45,6 +33,20 @@ namespace materials {
      * @param c the color of the material
      */
     Phong(float e, Vec c = Vec(1, 1, 1));
+
+    virtual Vec sampleBSDFLocal(
+      Randomness& rng,
+      const Vec& incoming,
+      Vec* outgoingOut,
+      float* probabilityOut
+    ) const override;
+
+    virtual Vec evalBSDFLocal(
+      const Vec& incoming,
+      const Vec& outgoing
+    ) const override;
+
+    virtual bool shouldDirectIlluminate() const override;
   };
 
 }

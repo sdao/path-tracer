@@ -27,7 +27,6 @@ class Camera {
   static constexpr int SAMPLES_PER_PIXEL = 4;
 
   Ray eye; /**< The ray representing the eye's position and orientation. */
-  float fovx2; /**< Half of the horizontal field of view angle. */
 
   Vec up; /**< The ray increment moving up in the y-direction. */
   Vec right; /**< The ray increment moving right in the x-direction. */
@@ -43,6 +42,15 @@ class Camera {
   size_t w; /**< The width of the output image to generate. */
   size_t h; /**< The height of the output image to generate. */
   int iters; /** The current number of path-tracing iterations done. */
+
+  Vec uniformSampleOneLight(
+    Randomness& rng,
+    const LightRay& incoming,
+    const Intersection& isect,
+    const Material* mat,
+    const std::vector<Geom*>& lights,
+    const KDTree& kdt
+  ) const;
 
 public:
   /**
@@ -60,22 +68,29 @@ public:
    * If there are existing iterations, the additional iteration will be
    * combined in a weighted manner.
    *
-   * @param kdt  a k-d tree containing the scene's geometry
-   * @param name the name of the output EXR file
+   * @param kdt     a k-d tree containing the scene's geometry
+   * @param lights  a vector containing all area lights in the scene
+   * @param name    the name of the output EXR file
    */
-  void renderOnce(const KDTree& kdt, std::string name);
+  void renderOnce(
+    const KDTree& kdt,
+    const std::vector<Geom*>& lights,
+    std::string name
+  );
 
   /**
    * Renders multiple additional path-tracing iterations.
    * To render infinite iterations, specify iterations = -1.
    *
    * @param kdt        a k-d tree containing the scene's geometry
+   * @param lights     a vector containing all area lights in the scene
    * @param name       the name of the output EXR file
    * @param iterations the number of iterations to render; if < 0, then this
    *                   function will run forever
    */
   void renderMultiple(
     const KDTree& kdt,
+    const std::vector<Geom*>& lights,
     std::string name,
     int iterations
   );

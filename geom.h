@@ -1,6 +1,8 @@
 #pragma once
 #include "core.h"
-#include "material.h"
+
+class Material;
+class AreaLight;
 
 /**
  * The base interface for all renderable geometry.
@@ -8,15 +10,16 @@
 class Geom {
 protected:
   /**
-   * Constructs a geom with the specified material. All classes inheriting geom
-   * must call this constructor in their own constructors.
+   * Constructs a geom with the specified material.
    *
    * @param m the material used to render the geometry
+   * @param l the area light causing emission from the geometry
    */
-  Geom(Material* m);
+  Geom(Material* m = nullptr, AreaLight* l = nullptr);
 
 public:
   Material* mat; /**< The material used to render the geometry. */
+  AreaLight* light; /**< The area light causing emission from the geometry. */
 
   virtual ~Geom();
 
@@ -41,4 +44,9 @@ public:
    * of the geometry.
    */
   virtual Vec samplePoint(Randomness& rng) const = 0;
+
+  /**
+   * Gets the total surface area of the geometry.
+   */
+  virtual float area() const = 0;
 };

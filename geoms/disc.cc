@@ -1,13 +1,19 @@
 #include "disc.h"
 
-geoms::Disc::Disc(Material* m, Vec o, Vec n, float rOuter, float rInner)
-  : Geom(m),
+geoms::Disc::Disc(
+  Vec o,
+  Vec n,
+  float rOuter,
+  float rInner,
+  Material* m,
+  AreaLight* l
+) : Geom(m, l),
     radiusOuterSquared(rOuter * rOuter), radiusInnerSquared(rInner * rInner),
     radiusOuter(rOuter), radiusInner(rInner),
     origin(o), normal(n.normalized()) {}
 
 geoms::Disc::Disc(const geoms::Disc& other)
-  : Geom(other.mat),
+  : Geom(other.mat, other.light),
     radiusOuterSquared(other.radiusOuterSquared),
     radiusInnerSquared(other.radiusInnerSquared),
     radiusOuter(other.radiusOuter),
@@ -68,4 +74,8 @@ Vec geoms::Disc::samplePoint(Randomness& rng) const {
   float y = r * sinf(a);
 
   return origin + (x * tangent) + (y * binormal);
+}
+
+float geoms::Disc::area() const {
+  return (math::PI * radiusOuterSquared) - (math::PI * radiusInnerSquared);
 }

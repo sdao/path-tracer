@@ -14,11 +14,17 @@ namespace geoms {
     /**
      * Constructs a sphere.
      *
-     * @param m the material used to render the sphere
      * @param o the center (origin) of the sphere
      * @param r the radius of the sphere
+     * @param m the material used to render the sphere
+     * @param l the area light causing emission from the sphere
      */
-    Sphere(Material* m, Vec o = Vec(0, 0, 0), float r = 1.0f);
+    Sphere(
+      Vec o = Vec(0, 0, 0),
+      float r = 1.0f,
+      Material* m = nullptr,
+      AreaLight* l = nullptr
+    );
 
     /**
      * Constructs a sphere from another sphere.
@@ -28,6 +34,7 @@ namespace geoms {
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
     virtual BBox bounds() const override;
     virtual Vec samplePoint(Randomness& rng) const override;
+    virtual float area() const override;
   };
 
 }

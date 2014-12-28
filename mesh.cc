@@ -6,9 +6,9 @@
 Mesh::Mesh() : points(), faces() {}
 
 bool Mesh::readPolyModel(
-  Material* m,
   std::string name,
   Vec offset,
+  Material* m,
   std::vector<Geom*>* geomList
 ) {
   // Create an instance of the Importer class
@@ -70,11 +70,11 @@ bool Mesh::readPolyModel(
       // Only add the triangles (we should have a triangulated mesh).
       if (face.mNumIndices == 3) {
         geoms::Poly thisPoly(
-          m,
           mem::ID(face.mIndices[0]),
           mem::ID(face.mIndices[1]),
           mem::ID(face.mIndices[2]),
-          &points
+          &points,
+          m
         );
 
         faces.push_back(thisPoly);

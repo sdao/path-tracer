@@ -8,7 +8,7 @@ materials::Dielectric::Dielectric(float ior, Vec c)
   r0 = r0_temp * r0_temp;
 }
 
-Vec materials::Dielectric::evalBSDF(
+Vec materials::Dielectric::evalBSDFLocal(
   const Vec& /* incoming */,
   const Vec& /* outgoing */
 ) const {
@@ -17,7 +17,7 @@ Vec materials::Dielectric::evalBSDF(
   return Vec(0, 0, 0);
 }
 
-Vec materials::Dielectric::sampleBSDF(
+Vec materials::Dielectric::sampleBSDFLocal(
   Randomness& rng,
   const Vec& incoming,
   Vec* outgoingOut,
@@ -97,4 +97,8 @@ Vec materials::Dielectric::sampleBSDF(
     *probabilityOut = probRefr;
     return color * refr / math::absCosTheta(refractVector);
   }
+}
+
+bool materials::Dielectric::shouldDirectIlluminate() const {
+  return false;
 }

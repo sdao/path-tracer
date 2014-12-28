@@ -26,18 +26,20 @@ namespace geoms {
     /**
      * Constructs a poly.
      *
-     * @param m          the material used to render the poly
      * @param a          the index of the first point (in CCW winding order)
      * @param b          the index of the second point (in CCW winding order)
      * @param c          the index of the third point (in CCW winding order)
      * @param lookup     a pointer to a point lookup table
+     * @param m          the material used to render the poly
+     * @param l          the area light causing emission from the poly
      */
     Poly(
-      Material* m,
       mem::ID a,
       mem::ID b,
       mem::ID c,
-      std::vector<geoms::Poly::Point>* lookup
+      std::vector<geoms::Poly::Point>* lookup,
+      Material* m = nullptr,
+      AreaLight* l = nullptr
     );
     /**
      * Constructs a poly from another poly.
@@ -47,6 +49,7 @@ namespace geoms {
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
     virtual BBox bounds() const override;
     virtual Vec samplePoint(Randomness& rng) const override;
+    virtual float area() const override;
 
   private:
     /**

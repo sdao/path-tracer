@@ -1,17 +1,20 @@
 #include "camera.h"
 #include <iostream>
 #include <chrono>
+#include "light.h"
 
+using std::max;
+using std::min;
 namespace chrono = std::chrono;
 
 Camera::Camera(Ray e, size_t ww, size_t hh, float ff)
-  : eye(e.origin, e.direction.normalized()), fovx2(0.5f * ff), masterRng(),
+  : eye(e.origin, e.direction.normalized()), masterRng(),
     rowSeeds(hh), colors(hh), weights(hh), exrData(long(hh), long(ww)),
     w(ww), h(hh), iters(0)
 {
   // Size of the image plane projected into world space
   // using the given fovx and cam focal length.
-  float scaleRight = 2.0f * eye.direction.norm() * tanf(fovx2);
+  float scaleRight = 2.0f * eye.direction.norm() * tanf(0.5f * ff);
   float scaleUp = scaleRight * (float(h) / float(w));
 
   // Corresponding vectors.
@@ -32,7 +35,11 @@ Camera::Camera(Ray e, size_t ww, size_t hh, float ff)
   }
 }
 
-void Camera::renderOnce(const KDTree& kdt, std::string name) {
+void Camera::renderOnce(
+  const KDTree& kdt,
+  const std::vector<Geom*>& lights,
+  std::string name
+) {
   iters++;
   std::cout << "Iteration " << iters;
   chrono::steady_clock::time_point startTime = chrono::steady_clock::now();
@@ -61,21 +68,21 @@ void Camera::renderOnce(const KDTree& kdt, std::string name) {
           (cornerRay + (up * fracY) + (right * fracX)).normalized()
         );
 
-        int depth = 0;
-        while (!r.isZeroLength()) {
-          depth++;
-
+        // Begin path tracing loop.
+        Vec L(0, 0, 0);
+        bool didDirectIlluminate = false;
+        for (int depth = 0; ; ++depth) {
           // Do Russian Roulette if this path is "old".
-          if (depth > RUSSIAN_ROULETTE_DEPTH_1 || r.isBlack()) {
+          if (depth >= RUSSIAN_ROULETTE_DEPTH_1 || r.isBlack()) {
             float rv = rng.nextUnitFloat();
 
             float probLive;
-            if (depth > RUSSIAN_ROULETTE_DEPTH_2) {
+            if (depth >= RUSSIAN_ROULETTE_DEPTH_2) {
               // More aggressive ray killing when ray is very old.
-              probLive = math::clampedLerp(0.0f, 0.5f, r.energy());
+              probLive = math::clampedLerp(0.0f, 0.75f, r.energy());
             } else {
               // Less aggressive ray killing.
-              probLive = math::clamp(r.energy());
+              probLive = math::clampedLerp(0.25f, 1.00f, r.energy());
             }
 
             if (rv < probLive) {
@@ -84,7 +91,6 @@ void Camera::renderOnce(const KDTree& kdt, std::string name) {
               r.color = r.color / probLive;
             } else {
               // The ray dies.
-              r.kill();
               break;
             }
           }
@@ -92,22 +98,46 @@ void Camera::renderOnce(const KDTree& kdt, std::string name) {
           // Bounce ray and kill if nothing hit.
           Intersection isect;
           Geom* g = kdt.intersect(r, &isect);
-
-          if (g) {
-            r = g->mat->propagate(r, isect, rng);
-          } else {
-            r.kill();
+          if (!g) {
+            // End path in empty space.
             break;
           }
-        } // End pixel sampling loop.
+
+          // Check for lighting.
+          if (g->light && !didDirectIlluminate) {
+            // Accumulate emission normally.
+            L += r.color.cwiseProduct(g->light->color);
+          } else if (g->light && didDirectIlluminate) {
+            // Skip emission accumulation because it was accumulated already
+            // in a direct lighting calculation. We don't want to double-count.
+          }
+
+          // Check for scattering (reflection/transmission).
+          if (!g->mat) {
+            // Cannot continue path without a material.
+            break;
+          } else if (g->mat && !g->mat->shouldDirectIlluminate()) {
+            // Continue path normally.
+            r = g->mat->scatter(rng, r, isect);
+            didDirectIlluminate = false;
+          } else if (g->mat && g->mat->shouldDirectIlluminate()) {
+            // Sample direct lighting and then continue path.
+            L += r.color.cwiseProduct(
+              uniformSampleOneLight(rng, r, isect, g->mat, lights, kdt)
+            );
+            r = g->mat->scatter(rng, r, isect);
+            didDirectIlluminate = true;
+          }
+
+        } // End path tracing loop.
 
         // Filter value.
         double smpWeight = math::mitchellFilter(offsetX, offsetY);
 
         // Black if ray died; fill in color otherwise.
-        pxColor += smpWeight * DoubleVec(r.color.x(), r.color.y(), r.color.z());
+        pxColor += smpWeight * L.cast<double>();
         pxWeight += smpWeight;
-      }
+      } // End pixel sampling loop.
     } // end of x-for loop
   //} // end of y-for loop
   });
@@ -125,6 +155,7 @@ void Camera::renderOnce(const KDTree& kdt, std::string name) {
 
 void Camera::renderMultiple(
   const KDTree& kdt,
+  const std::vector<Geom*>& lights,
   std::string name,
   int iterations
 ) {
@@ -133,14 +164,35 @@ void Camera::renderMultiple(
     std::cout << "Rendering infinitely, press Ctrl-c to terminate program\n";
 
     while (true) {
-      renderOnce(kdt, name);
+      renderOnce(kdt, lights, name);
     }
   } else {
     // Run finite iterations.
     std::cout << "Rendering " << iterations << " iterations\n";
 
     for (int i = 0; i < iterations; ++i) {
-      renderOnce(kdt, name);
+      renderOnce(kdt, lights, name);
     }
   }
+}
+
+Vec Camera::uniformSampleOneLight(
+  Randomness& rng,
+  const LightRay& incoming,
+  const Intersection& isect,
+  const Material* mat,
+  const std::vector<Geom*>& lights,
+  const KDTree& kdt
+) const {
+  size_t numLights = lights.size();
+  if (numLights == 0) {
+    return Vec(0, 0, 0);
+  }
+
+  size_t lightIdx = size_t(floorf(rng.nextUnitFloat() * numLights));
+  Geom* emissionObj = lights[min(lightIdx, numLights - 1)];
+  AreaLight* areaLight = emissionObj->light;
+
+  return int(numLights)
+    * areaLight->directIlluminate(rng, incoming, isect, mat, emissionObj, kdt);
 }
