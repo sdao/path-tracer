@@ -12,14 +12,15 @@ inline Vec AreaLight::directIlluminateByLightPDF(
 ) const {
   // Sample random from light PDF.
   Vec outgoingWorld;
+  float outgoingDist;
   Vec lightColor;
   float lightPdf;
   sampleLight(
     rng,
     emissionObj,
-    kdt,
     isect.position,
     &outgoingWorld,
+    &outgoingDist,
     &lightColor,
     &lightPdf
   );
@@ -36,10 +37,23 @@ inline Vec AreaLight::directIlluminateByLightPDF(
       &bsdfPdf
     );
 
-    float lightWeight = math::powerHeuristic(1, lightPdf, 1, bsdfPdf);
-    return bsdf.cwiseProduct(lightColor)
-      * fabsf(isect.normal.dot(outgoingWorld))
-      * lightWeight / lightPdf;
+    if (bsdfPdf > 0.0f && !math::isVectorExactlyZero(bsdf)) {
+      // There's a risk that something's blocking between the object and light.
+      bool occluded = kdt.intersectShadow(
+        Ray(isect.position + math::VERY_SMALL * outgoingWorld, outgoingWorld),
+        // Why do we subtract 2 * VERY_SMALL?
+        // 1. To balance out the added VERY_SMALL in the ray pointToLight, and
+        // 2. Because we don't want to actually hit the light itself!
+        outgoingDist - 2.0f * math::VERY_SMALL
+      );
+
+      if (!occluded) {
+        float lightWeight = math::powerHeuristic(1, lightPdf, 1, bsdfPdf);
+        return bsdf.cwiseProduct(lightColor)
+          * fabsf(isect.normal.dot(outgoingWorld))
+          * lightWeight / lightPdf;
+      }
+    }
   }
 
   return Vec(0, 0, 0);
@@ -69,22 +83,33 @@ inline Vec AreaLight::directIlluminateByMatPDF(
   if (bsdfPdf > 0.0f && !math::isVectorExactlyZero(bsdf)) {
     // Evaluate light PDF as well.
     Vec lightColor;
+    float outgoingDist;
     float lightPdf;
     evalLight(
       emissionObj,
-      kdt,
       isect.position,
       outgoingWorld,
+      &outgoingDist,
       &lightColor,
       &lightPdf
     );
 
-    // There's a risk that the light PDF is zero (e.g. occluded light).
     if (lightPdf > 0.0f && !math::isVectorExactlyZero(lightColor)) {
-      float bsdfWeight = math::powerHeuristic(1, bsdfPdf, 1, lightPdf);
-      return bsdf.cwiseProduct(lightColor)
-        * fabsf(isect.normal.dot(outgoingWorld))
-        * bsdfWeight / bsdfPdf;
+      // There's a risk that something's blocking between the object and light.
+      bool occluded = kdt.intersectShadow(
+        Ray(isect.position + math::VERY_SMALL * outgoingWorld, outgoingWorld),
+        // Why do we subtract 2 * VERY_SMALL?
+        // 1. To balance out the added VERY_SMALL in the ray pointToLight, and
+        // 2. Because we don't want to actually hit the light itself!
+        outgoingDist - 2.0f * math::VERY_SMALL
+      );
+
+      if (!occluded) {
+        float bsdfWeight = math::powerHeuristic(1, bsdfPdf, 1, lightPdf);
+        return bsdf.cwiseProduct(lightColor)
+          * fabsf(isect.normal.dot(outgoingWorld))
+          * bsdfWeight / bsdfPdf;
+      }
     }
   }
 
@@ -107,35 +132,39 @@ inline Vec AreaLight::emit(
 
 void AreaLight::evalLight(
   const Geom* emissionObj,
-  const KDTree& kdt,
   const Vec& point,
   const Vec& dirToLight,
+  float* distToLightOut,
   Vec* colorOut,
   float* pdfOut
 ) const {
   Ray pointToLight(point + math::VERY_SMALL * dirToLight, dirToLight);
   Intersection lightIsect;
 
-  if (kdt.intersect(pointToLight, &lightIsect) != emissionObj) {
-    // Something's blocking the light.
+  if (!emissionObj->intersect(pointToLight, &lightIsect)) {
+    // The ray doesn't hit the light.
+    // So the light wouldn't have ever chosen this direction at all when
+    // sampling random directions.
+
+    *distToLightOut = 0.0f;
     *colorOut = Vec(0, 0, 0);
     *pdfOut = 0.0f;
-    return;
   } else {
     const float dirToLightDist2 = (lightIsect.position - point).squaredNorm();
     const float absCosTheta = fabsf(lightIsect.normal.dot(-dirToLight));
+
+    *distToLightOut = sqrtf(dirToLightDist2);
     *colorOut = emit(dirToLight, lightIsect.normal);
     *pdfOut = dirToLightDist2 / (absCosTheta * emissionObj->area());
-    return;
   }
 }
 
 void AreaLight::sampleLight(
   Randomness& rng,
   const Geom* emissionObj,
-  const KDTree& kdt,
   const Vec& point,
   Vec* dirToLightOut,
+  float* distToLightOut,
   Vec* colorOut,
   float* pdfOut
 ) const {
@@ -143,26 +172,17 @@ void AreaLight::sampleLight(
   Vec normalOnLight;
   emissionObj->samplePoint(rng, &pointOnLight, &normalOnLight);
 
+  // Of course there's an intersection!
+  // Thus we don't have to expend an intersection check here compared to
+  // AreaLight::eval.
   const Vec dirToLight = (pointOnLight - point).normalized();
   const float dirToLightDist2 = (pointOnLight - point).squaredNorm();
+  const float absCosTheta = fabsf(normalOnLight.dot(-dirToLight));
 
-  // Why do we subtract 2 * VERY_SMALL?
-  // 1. To balance out the added VERY_SMALL in the ray pointToLight, and
-  // 2. Because we don't want to actually hit the light itself!
-  float shadowDist = sqrtf(dirToLightDist2) - 2.0f * math::VERY_SMALL;
-  Ray pointToLight(point + math::VERY_SMALL * dirToLight, dirToLight);
-
-  if (kdt.intersectShadow(pointToLight, shadowDist)) {
-    // Something's blocking the light.
-    *dirToLightOut = dirToLight;
-    *colorOut = Vec(0, 0, 0);
-    *pdfOut = 0.0f;
-  } else {
-    const float absCosTheta = fabsf(normalOnLight.dot(-dirToLight));
-    *dirToLightOut = dirToLight;
-    *colorOut = emit(dirToLight, normalOnLight);
-    *pdfOut = dirToLightDist2 / (absCosTheta * emissionObj->area());
-  }
+  *dirToLightOut = dirToLight;
+  *distToLightOut = sqrtf(dirToLightDist2);
+  *colorOut = emit(dirToLight, normalOnLight);
+  *pdfOut = dirToLightDist2 / (absCosTheta * emissionObj->area());
 }
 
 Vec AreaLight::directIlluminate(

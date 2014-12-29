@@ -11,10 +11,12 @@ namespace materials {
     /** The refractive index for a vacuum (approx. air), nVac. */
     static constexpr float IOR_VACUUM = 1.0f;
 
-    float r0; /** The cached R(0) value for Schlick's approximation. */
+    const float r0; /** The cached R(0) value for Schlick's approximation. */
     const float etaEntering; /** The refraction ratio nVac / nMaterial. */
     const float etaExiting; /** Inverse of etaEntering (nMaterial / nVac). */
-  
+
+    static float schickR0(float ior);
+
   public:
     static constexpr float IOR_GLASS = 1.5f; /**< The IOR for glass. */
     static constexpr float IOR_DIAMOND = 2.4f; /**< The IOR for diamond. */

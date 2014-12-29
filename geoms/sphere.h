@@ -22,8 +22,8 @@ namespace geoms {
     Sphere(
       Vec o = Vec(0, 0, 0),
       float r = 1.0f,
-      Material* m = nullptr,
-      AreaLight* l = nullptr
+      const Material* m = nullptr,
+      const AreaLight* l = nullptr
     );
 
     /**

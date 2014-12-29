@@ -56,9 +56,8 @@ class KDTree {
      * @param count the number of objects in the leaf
      */
     inline void makeLeaf(const std::vector<mem::ID>::iterator ids, long count) {
-      for (long i = 0; i < count; ++i) {
-        objIds.push_back(ids[i]);
-      }
+      objIds.reserve(size_t(count));
+      objIds.insert(objIds.end(), ids, ids + count);
     }
 
     /**
@@ -170,7 +169,7 @@ protected:
   void print(mem::ID nodeId, std::ostream& os, std::string header = "") const;
 
 public:
-  std::vector<Geom*>* objs; /**< The geometric objects in the k-d tree. */
+  const std::vector<Geom*>* objs; /**< The geometric objects in the k-d tree. */
 
   /**
    * Constructs an empty kdtree associated with the given objects,
@@ -193,7 +192,7 @@ public:
    *                       be null
    * @returns              the geom that was hit, or nullptr if none was hit
    */
-  Geom* intersect(const Ray& r, Intersection* isectOut) const;
+  const Geom* intersect(const Ray& r, Intersection* isectOut) const;
 
   /**
    * Determines if any object in the k-d tree intersects the given shadow ray

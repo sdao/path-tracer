@@ -32,8 +32,8 @@ namespace geoms {
       Vec n = Vec(0, 1, 0),
       float rOuter = 10.0f,
       float rInner = 0.0f,
-      Material* m = nullptr,
-      AreaLight* l = nullptr
+      const Material* m = nullptr,
+      const AreaLight* l = nullptr
     );
 
     /**

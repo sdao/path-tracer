@@ -38,8 +38,8 @@ namespace geoms {
       mem::ID b,
       mem::ID c,
       std::vector<geoms::Poly::Point>* lookup,
-      Material* m = nullptr,
-      AreaLight* l = nullptr
+      const Material* m = nullptr,
+      const AreaLight* l = nullptr
     );
     /**
      * Constructs a poly from another poly.

@@ -93,15 +93,6 @@ struct LightRay : public Ray {
   inline bool isZeroLength() const {
     return math::isNearlyZero(direction);
   }
-
-  /**
-   * Makes the ray black, and sets its origin and direction to (0, 0, 0).
-   */
-  inline void kill() {
-    origin = Vec(0, 0, 0);
-    direction = Vec(0, 0, 0);
-    color = Vec(0, 0, 0);
-  }
 };
 
 /**

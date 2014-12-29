@@ -90,7 +90,7 @@ void KDTree::buildTree(
 retrySplit:
   // Initialize edges for axis (p. 236).
   for (long i = 0; i < nodeObjCount; ++i) {
-    mem::ID j = nodeObjIds[i];
+    const mem::ID j = nodeObjIds[i];
     const BBox& jBounds = mem::refConst(allObjBounds, j);
     workEdges[ax][2 * i]     = BBoxEdge(j, jBounds.lower[ax], true);
     workEdges[ax][2 * i + 1] = BBoxEdge(j, jBounds.upper[ax], false);
@@ -161,12 +161,12 @@ retrySplit:
   long n1 = 0;
   for (long i = 0; i < bestOffset; ++i) {
     if (workEdges[bestAxis][i].starting) {
-      workObjs0[n0++] = mem::ID(workEdges[bestAxis][i].objId);
+      workObjs0[n0++] = workEdges[bestAxis][i].objId;
     }
   }
   for (long i = bestOffset + 1; i < 2 * nodeObjCount; ++i) {
     if (!workEdges[bestAxis][i].starting) {
-      workObjs1[n1++] = mem::ID(workEdges[bestAxis][i].objId);
+      workObjs1[n1++] = workEdges[bestAxis][i].objId;
     }
   }
 
@@ -206,7 +206,7 @@ retrySplit:
   );
 }
 
-Geom* KDTree::intersect(
+const Geom* KDTree::intersect(
   const Ray& r,
   Intersection* isectOut
 ) const {
@@ -229,7 +229,7 @@ Geom* KDTree::intersect(
   mem::ID nodeId = rootId;
 
   Intersection winnerIsect; // By default, distance is set to max float value.
-  Geom* winnerObj = nullptr;
+  const Geom* winnerObj = nullptr;
   while (nodeId.isValid()) {
     const KDNode& node = mem::refConst(allNodes, nodeId);
 
@@ -276,7 +276,7 @@ Geom* KDTree::intersect(
     } else  {
       // Check for intersections inside leaf node (p. 244).
       for (mem::ID objId : node.objIds) {
-        Geom* obj = mem::ref(*objs, objId);
+        const Geom* obj = mem::refConst(*objs, objId);
 
         // Check one primitive inside leaf node (p. 244).
         Intersection isect;
@@ -333,7 +333,7 @@ bool KDTree::intersectShadow(const Ray& r, float maxDist) const {
     if (node.isLeaf()) {
       // Check for shadow ray intersections inside leaf node.
       for (mem::ID objId : node.objIds) {
-        Geom* obj = mem::ref(*objs, objId);
+        const Geom* obj = mem::refConst(*objs, objId);
 
         if (obj->intersectShadow(r, maxDist)) {
           return true;

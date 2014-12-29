@@ -15,11 +15,11 @@ protected:
    * @param m the material used to render the geometry
    * @param l the area light causing emission from the geometry
    */
-  Geom(Material* m = nullptr, AreaLight* l = nullptr);
+  Geom(const Material* m = nullptr, const AreaLight* l = nullptr);
 
 public:
-  Material* mat; /**< The material used to render the geometry. */
-  AreaLight* light; /**< The area light causing emission from the geometry. */
+  const Material* mat; /**< The material used to render the geom. */
+  const AreaLight* light; /**< The area light causing emission from the geom. */
 
   virtual ~Geom();
 

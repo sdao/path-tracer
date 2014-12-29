@@ -5,8 +5,8 @@ geoms::Poly::Poly(
   mem::ID b,
   mem::ID c,
   std::vector<geoms::Poly::Point>* lookup,
-  Material* m,
-  AreaLight* l
+  const Material* m,
+  const AreaLight* l
 ) : Geom(m, l), pt0(a), pt1(b), pt2(c), pointLookup(lookup) {}
 
 geoms::Poly::Poly(const geoms::Poly& other)

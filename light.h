@@ -57,9 +57,9 @@ public:
 
   void evalLight(
     const Geom* emissionObj,
-    const KDTree& kdt,
     const Vec& point,
     const Vec& dirToLight,
+    float* distToLightOut,
     Vec* colorOut,
     float* pdfOut
   ) const;
@@ -67,9 +67,9 @@ public:
   void sampleLight(
     Randomness& rng,
     const Geom* emissionObj,
-    const KDTree& kdt,
     const Vec& point,
     Vec* dirToLightOut,
+    float* distToLightOut,
     Vec* colorOut,
     float* pdfOut
   ) const;

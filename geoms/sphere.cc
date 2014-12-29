@@ -1,6 +1,6 @@
 #include "sphere.h"
 
-geoms::Sphere::Sphere(Vec o, float r, Material* m, AreaLight* l)
+geoms::Sphere::Sphere(Vec o, float r, const Material* m, const AreaLight* l)
   : Geom(m, l), origin(o), radius(r) {}
 
 geoms::Sphere::Sphere(const geoms::Sphere& other)

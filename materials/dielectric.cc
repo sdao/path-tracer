@@ -1,11 +1,15 @@
 #include "dielectric.h"
 
 materials::Dielectric::Dielectric(float ior, Vec c)
-  : etaEntering(IOR_VACUUM / ior), etaExiting(ior / IOR_VACUUM), color(c) {
-  // Pre-compute values for Fresnel calculations.
+  : r0(schickR0(ior)),
+    etaEntering(IOR_VACUUM / ior), etaExiting(ior / IOR_VACUUM),
+    color(c) {}
 
+float materials::Dielectric::schickR0(float ior) {
+  // Pre-compute values for Fresnel calculations.
+  
   float r0_temp = (IOR_VACUUM - ior) / (IOR_VACUUM + ior);
-  r0 = r0_temp * r0_temp;
+  return r0_temp * r0_temp;
 }
 
 Vec materials::Dielectric::evalBSDFLocal(

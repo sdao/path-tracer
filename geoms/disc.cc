@@ -5,8 +5,8 @@ geoms::Disc::Disc(
   Vec n,
   float rOuter,
   float rInner,
-  Material* m,
-  AreaLight* l
+  const Material* m,
+  const AreaLight* l
 ) : Geom(m, l),
     radiusOuterSquared(rOuter * rOuter), radiusInnerSquared(rInner * rInner),
     radiusOuter(rOuter), radiusInner(rInner),

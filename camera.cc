@@ -79,7 +79,7 @@ void Camera::renderOnce(
             float probLive;
             if (depth >= RUSSIAN_ROULETTE_DEPTH_2) {
               // More aggressive ray killing when ray is very old.
-              probLive = math::clampedLerp(0.0f, 0.75f, r.energy());
+              probLive = math::clampedLerp(0.00f, 0.75f, r.energy());
             } else {
               // Less aggressive ray killing.
               probLive = math::clampedLerp(0.25f, 1.00f, r.energy());
@@ -97,7 +97,7 @@ void Camera::renderOnce(
 
           // Bounce ray and kill if nothing hit.
           Intersection isect;
-          Geom* g = kdt.intersect(r, &isect);
+          const Geom* g = kdt.intersect(r, &isect);
           if (!g) {
             // End path in empty space.
             break;
@@ -132,7 +132,7 @@ void Camera::renderOnce(
         } // End path tracing loop.
 
         // Filter value.
-        double smpWeight = math::mitchellFilter(offsetX, offsetY);
+        double smpWeight = math::triangleFilter(offsetX, offsetY);
 
         // Black if ray died; fill in color otherwise.
         pxColor += smpWeight * L.cast<double>();
@@ -190,8 +190,8 @@ Vec Camera::uniformSampleOneLight(
   }
 
   size_t lightIdx = size_t(floorf(rng.nextUnitFloat() * numLights));
-  Geom* emissionObj = lights[min(lightIdx, numLights - 1)];
-  AreaLight* areaLight = emissionObj->light;
+  const Geom* emissionObj = lights[min(lightIdx, numLights - 1)];
+  const AreaLight* areaLight = emissionObj->light;
 
   // P[this light] = 1 / numLights, so 1 / P[this light] = numLights.
   return float(numLights)

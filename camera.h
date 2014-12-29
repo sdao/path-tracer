@@ -20,7 +20,7 @@ class Camera {
    * The number of bounces at which a ray is subject to Russian Roulette
    * termination, stage 2 (more aggressive).
    */
-  static constexpr int RUSSIAN_ROULETTE_DEPTH_2 = 25;
+  static constexpr int RUSSIAN_ROULETTE_DEPTH_2 = 50;
   /**
    * The number of samples to take per pixel in each iteration (supersampling).
    */
@@ -39,8 +39,8 @@ class Camera {
   std::vector< std::vector<double> > weights; /**< The raw filter weights. */
   Imf::Array2D<Imf::Rgba> exrData; /**< The filtered image for OpenEXR. */
 
-  size_t w; /**< The width of the output image to generate. */
-  size_t h; /**< The height of the output image to generate. */
+  const size_t w; /**< The width of the output image to generate. */
+  const size_t h; /**< The height of the output image to generate. */
   int iters; /** The current number of path-tracing iterations done. */
 
   /**

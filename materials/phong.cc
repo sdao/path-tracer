@@ -103,5 +103,5 @@ void materials::Phong::sampleLocal(
 }
 
 bool materials::Phong::shouldDirectIlluminate() const {
-  return false;
+  return true;
 }
