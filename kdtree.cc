@@ -1,4 +1,4 @@
-#include "KDTree.h"
+#include "kdtree.h"
 
 KDTree::KDTree(std::vector<Geom*>* o) : allNodes(), rootId(), objs(o) {}
 
