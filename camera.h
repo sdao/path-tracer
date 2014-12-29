@@ -25,6 +25,10 @@ class Camera {
    * The number of samples to take per pixel in each iteration (supersampling).
    */
   static constexpr int SAMPLES_PER_PIXEL = 4;
+  /**
+   * Maximum positive or negative pixel offset of samples.
+   */
+  static constexpr float FILTER_WIDTH = 2.0f;
 
   Ray eye; /**< The ray representing the eye's position and orientation. */
 

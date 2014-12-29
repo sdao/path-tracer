@@ -117,13 +117,13 @@ inline Vec AreaLight::directIlluminateByMatPDF(
 }
 
 inline Vec AreaLight::emit(
-  const Vec& dirToLight,
-  const Vec& normalOnLight
+  const Intersection& isect,
+  const Vec& direction
 ) const {
   // Only emit on the normal-facing side of objects, e.g. on the outside of a
   // sphere or on the normal side of a disc.
-  if (dirToLight.dot(normalOnLight) < 0.0f) {
-    // Direction to light faces the normal side.
+  if (direction.dot(isect.normal) < 0.0f) {
+    // Incoming direction towards light is opposite (facing) the normal.
     return color;
   } else {
     return Vec(0, 0, 0);
@@ -142,7 +142,7 @@ void AreaLight::evalLight(
   Intersection lightIsect;
 
   if (!emissionObj->intersect(pointToLight, &lightIsect)) {
-    // The ray doesn't hit the light.
+    // The ray doesn't even hit the light (ignoring other scene objects).
     // So the light wouldn't have ever chosen this direction at all when
     // sampling random directions.
 
@@ -154,7 +154,7 @@ void AreaLight::evalLight(
     const float absCosTheta = fabsf(lightIsect.normal.dot(-dirToLight));
 
     *distToLightOut = sqrtf(dirToLightDist2);
-    *colorOut = emit(dirToLight, lightIsect.normal);
+    *colorOut = emit(lightIsect, dirToLight);
     *pdfOut = dirToLightDist2 / (absCosTheta * emissionObj->area());
   }
 }
@@ -168,21 +168,16 @@ void AreaLight::sampleLight(
   Vec* colorOut,
   float* pdfOut
 ) const {
-  Vec pointOnLight;
-  Vec normalOnLight;
-  emissionObj->samplePoint(rng, &pointOnLight, &normalOnLight);
-
-  // Of course there's an intersection!
-  // Thus we don't have to expend an intersection check here compared to
-  // AreaLight::eval.
-  const Vec dirToLight = (pointOnLight - point).normalized();
-  const float dirToLightDist2 = (pointOnLight - point).squaredNorm();
-  const float absCosTheta = fabsf(normalOnLight.dot(-dirToLight));
+  // Note: this is not the final point; we have really only sampled the
+  // direction. (Consider a sphere where we sample a point on the opposite side
+  // of the observer being illuminated. The direction sampled will actually
+  // cause an intersection with some other point on the side facing the
+  // observer.)
+  const Vec sample = emissionObj->samplePoint(rng);
+  const Vec dirToLight = (sample - point).normalized();
 
   *dirToLightOut = dirToLight;
-  *distToLightOut = sqrtf(dirToLightDist2);
-  *colorOut = emit(dirToLight, normalOnLight);
-  *pdfOut = dirToLightDist2 / (absCosTheta * emissionObj->area());
+  evalLight(emissionObj, point, dirToLight, distToLightOut, colorOut, pdfOut);
 }
 
 Vec AreaLight::directIlluminate(

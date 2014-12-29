@@ -5,6 +5,30 @@
  * A material that specifies how light scatters on geometry using a BSDF.
  */
 class Material {
+protected:
+  /**
+   * Evaluates the BSDF for an incoming and an outgoing direction in the local
+   * (normal) coordinate system. If you have not changed the default behavior of
+   * Material::sampleBSDF, you can assume that the incoming and outgoing
+   * directions are in the same hemisphere.
+   * 
+   * If the BSDF is a delta distribution (i.e. it is only non-zero for one
+   * point), you should return 0 from this function and override
+   * Material::sampleBSDFLocal only.
+   */
+  virtual Vec evalBSDFLocal(const Vec& incoming, const Vec& outgoing) const = 0;
+  
+  /**
+   * Returns the probability that the given outgoing vector will be sampled
+   * for the given incoming vector by the function Material::sampleBSDFLocal,
+   * with both vectors in local space. The default implementation returns
+   * the probability based on a cosine-weighted hemisphere.
+   *
+   * If you override this function, you should also override
+   * Material::sampleBSDFLocal.
+   */
+  virtual float evalPDFLocal(const Vec& incoming, const Vec& outgoing) const;
+
 public:
   virtual ~Material();
 
@@ -65,37 +89,24 @@ public:
   ) const;
 
   /**
-   * Returns the probability that the given outgoing vector will be sampled
-   * for the given incoming vector by the function Material::sampleBSDFLocal,
-   * with both vectors in local space. The default implementation returns
-   * the probability based on a cosine-weighted hemisphere.
+   * Evaluates the BSDF and PDF for an incoming and an outgoing direction in the
+   * local (normal) coordinate system.
    *
-   * If you override this function, you should also override
-   * Material::sampleBSDFLocal.
-   */
-  virtual float evalPDFLocal(const Vec& incoming, const Vec& outgoing) const;
-
-  /**
-   * Evaluates the BSDF for an incoming and an outgoing direction in the local
-   * (normal) coordinate system. If you have not changed the default behavior of
-   * Material::sampleBSDF, you can assume that the incoming and outgoing
-   * directions are in the same hemisphere.
-   * 
-   * If the BSDF is a delta distribution (i.e. it is only non-zero for one
-   * point), you should return 0 from this function and override
-   * Material::sampleBSDFLocal only.
-   */
-  virtual Vec evalBSDFLocal(const Vec& incoming, const Vec& outgoing) const = 0;
-
-  /**
-   * Evaluates the BSDF and PDF for an incoming and an outgoing direction, given
-   * an intersection frame.
-   *
-   * @param isect           the intersection that defines the local space
-   * @param incoming        the incoming direction in world space
-   * @param outgoing        the outgoing direction in world space
+   * @param incoming        the incoming direction in local space
+   * @param outgoing        the outgoing direction in local space
    * @param bsdfOut  [out]  the value of the BSDF at the incoming/outgoing pair
    * @param pdfOut   [out]  the value of the PDF at the incoming/outgoing pair
+   */
+  void evalLocal(
+    const Vec& incoming,
+    const Vec& outgoing,
+    Vec* bsdfOut,
+    float* pdfOut
+  ) const;
+
+  /**
+   * Same as Material::evalLocal, but requires the incoming and outcoming
+   * vectors to be specified in world space using the given intersection frame.
    */
   void evalWorld(
     const Intersection& isect,

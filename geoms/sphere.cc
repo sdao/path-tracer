@@ -79,27 +79,17 @@ BBox geoms::Sphere::bounds() const {
   return BBox(origin - boundsDiag, origin + boundsDiag);
 }
 
-void geoms::Sphere::samplePoint(
-  Randomness& rng,
-  Vec* positionOut,
-  Vec* normalOut
-) const {
+Vec geoms::Sphere::samplePoint(Randomness& rng) const {
   // See MathWorld <http://mathworld.wolfram.com/SpherePointPicking.html>.
   float x = rng.nextNormalFloat();
   float y = rng.nextNormalFloat();
   float z = rng.nextNormalFloat();
-  float a = 1.0f / sqrtf(x * x + y * y + z * z);
+  float a = radius / sqrtf(x * x + y * y + z * z);
 
-  *positionOut = Vec(
-    origin.x() + radius * a * x,
-    origin.y() + radius * a * y,
-    origin.z() + radius * a * z
-  );
-
-  *normalOut = Vec(
-    a * x,
-    a * y,
-    a * z
+  return Vec(
+    origin.x() + a * x,
+    origin.y() + a * y,
+    origin.z() + a * z
   );
 }
 

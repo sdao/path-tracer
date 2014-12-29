@@ -149,30 +149,31 @@ namespace math {
    * Out = 0.0625
    * @endcode
    *
-   * @param x the x-offset from the pixel center, -0.5 <= x <= 0.5
-   * @param y the y-offset from the pixel center, -0.5 <= y <= 0.5
-   * @returns the value of the filter, where 0 <= value <= 0.25
+   * @param x     the x-offset from the pixel center, -width <= x <= width
+   * @param y     the y-offset from the pixel center, -width <= x <= width
+   * @param width the maximum x- or y- offset sampled from the pixel center
+   * @returns the value of the filter
    */
-  inline double triangleFilter(double x, double y) {
-    return max(0.0, 0.5 - fabs(x)) * max(0.0, 0.5 - fabs(y));
+  inline double triangleFilter(double x, double y, double width = 2.0) {
+    return max(0.0, width - fabs(x)) * max(0.0, width - fabs(y));
   }
 
   /**
    * Computes the 1-dimensional Mitchell filter with B = 1/3 and C = 1/3 for a
-   * specified offset from the pixel center. The values are not normalized.
+   * scaled offset from the pixel center. The values are not normalized.
    *
    * Pharr and Humphreys suggest on p. 398 of PBR that values of B and C should
    * be chosen such that B + 2C = 1.
    * GPU Gems <http://http.developer.nvidia.com/GPUGems/gpugems_ch24.html>
    * suggests the above values of B = 1/3 and C = 1/3.
    *
-   * @param x the x-offset from the pixel center, -0.5 <= x <= 0.5
+   * @param x the scaled x-offset from the pixel center, -1 <= x <= 1
    */
   inline double mitchellFilter(double x) {
     const double B = 1.0 / 3.0;
     const double C = 1.0 / 3.0;
 
-    x = fabs(4.0 * x); // Convert to the range [0, 2].
+    x = fabs(2.0 * x); // Convert to the range [0, 2].
 
     if (x > 1.0) {
       return ((-B - 6 * C) * (x * x * x)
@@ -191,12 +192,13 @@ namespace math {
    * pixel center by separating and computing the 1-dimensional Mitchell
    * filter for the x- and y- offsets.
    *
-   * @param x the x-offset from the pixel center, -0.5 <= x <= 0.5
-   * @param y the y-offset from the pixel center, -0.5 <= y <= 0.5
+   * @param x     the x-offset from the pixel center, -width <= x <= width
+   * @param y     the y-offset from the pixel center, -width <= x <= width
+   * @param width the maximum x- or y- offset sampled from the pixel center
    * @returns the value of the filter
    */
-  inline double mitchellFilter(double x, double y) {
-    return mitchellFilter(x) * mitchellFilter(y);
+  inline double mitchellFilter(double x, double y, double width = 2.0) {
+    return mitchellFilter(x / width) * mitchellFilter(y / width);
   }
 
   /**

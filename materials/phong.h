@@ -8,7 +8,6 @@ namespace materials {
    * Note that Phong reflectance is not physically plausible.
    */
   class Phong : public Material {
-  private:
     /** Cached scaling term in the Phong BRDF. */
     const Vec scaleBRDF;
 
@@ -27,6 +26,17 @@ namespace materials {
       const Vec& perfectReflect,
       const Vec& outgoing
     ) const;
+
+  protected:
+    virtual Vec evalBSDFLocal(
+      const Vec& incoming,
+      const Vec& outgoing
+    ) const override;
+
+    virtual float evalPDFLocal(
+      const Vec& incoming,
+      const Vec& outgoing
+    ) const override;
 
   public:
     /** The Phong exponent of the material. */
@@ -50,16 +60,6 @@ namespace materials {
       Vec* outgoingOut,
       Vec* bsdfOut,
       float* pdfOut
-    ) const override;
-
-    virtual float evalPDFLocal(
-      const Vec& incoming,
-      const Vec& outgoing
-    ) const override;
-
-    virtual Vec evalBSDFLocal(
-      const Vec& incoming,
-      const Vec& outgoing
     ) const override;
 
     virtual bool shouldDirectIlluminate() const override;

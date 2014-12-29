@@ -85,11 +85,7 @@ BBox geoms::Disc::bounds() const {
   return b;
 }
 
-void geoms::Disc::samplePoint(
-  Randomness& rng,
-  Vec* positionOut,
-  Vec* normalOut
-) const {
+Vec geoms::Disc::samplePoint(Randomness& rng) const {
   // See Bostock <http://bl.ocks.org/mbostock/d8b1e0a25467e6034bb9>.
   Vec tangent;
   Vec binormal;
@@ -101,8 +97,7 @@ void geoms::Disc::samplePoint(
   float x = r * cosf(a);
   float y = r * sinf(a);
 
-  *positionOut = origin + (x * tangent) + (y * binormal);
-  *normalOut = normal;
+  return origin + (x * tangent) + (y * binormal);
 }
 
 float geoms::Disc::area() const {

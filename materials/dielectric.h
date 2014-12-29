@@ -17,6 +17,17 @@ namespace materials {
 
     static float schickR0(float ior);
 
+  protected:
+    virtual Vec evalBSDFLocal(
+      const Vec& incoming,
+      const Vec& outgoing
+    ) const override;
+
+    virtual float evalPDFLocal(
+      const Vec& incoming,
+      const Vec& outgoing
+    ) const override;
+
   public:
     static constexpr float IOR_GLASS = 1.5f; /**< The IOR for glass. */
     static constexpr float IOR_DIAMOND = 2.4f; /**< The IOR for diamond. */
@@ -38,16 +49,6 @@ namespace materials {
       Vec* outgoingOut,
       Vec* bsdfOut,
       float* pdfOut
-    ) const override;
-
-    virtual float evalPDFLocal(
-      const Vec& incoming,
-      const Vec& outgoing
-    ) const override;
-
-    virtual Vec evalBSDFLocal(
-      const Vec& incoming,
-      const Vec& outgoing
     ) const override;
 
     virtual bool shouldDirectIlluminate() const override;

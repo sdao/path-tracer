@@ -92,6 +92,8 @@ void materials::Phong::sampleLocal(
   float phi = math::TWO_PI * rng.nextUnitFloat();
   Vec local(cosf(phi) * sinTheta, sinf(phi) * sinTheta, cosTheta);
 
+  // Here, "local" being the space of the perfect reflection vector and
+  // "world" being the space of the normal.
   *outgoingOut = math::localToWorld(
     local,
     reflectTangent,

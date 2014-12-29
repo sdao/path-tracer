@@ -58,8 +58,8 @@ void Camera::renderOnce(
 
       // Begin pixel sampling loop.
       for (int samps = 0; samps < SAMPLES_PER_PIXEL; ++samps) {
-        float offsetY = rng.nextFloat(-0.5f, 0.5f);
-        float offsetX = rng.nextFloat(-0.5f, 0.5f);
+        float offsetY = rng.nextFloat(-FILTER_WIDTH, FILTER_WIDTH);
+        float offsetX = rng.nextFloat(-FILTER_WIDTH, FILTER_WIDTH);
         float fracY = (float(y) + offsetY) / (float(h) - 1.0f);
         float fracX = (float(x) + offsetX) / (float(w) - 1.0f);
 
@@ -79,7 +79,7 @@ void Camera::renderOnce(
             float probLive;
             if (depth >= RUSSIAN_ROULETTE_DEPTH_2) {
               // More aggressive ray killing when ray is very old.
-              probLive = math::clampedLerp(0.00f, 0.75f, r.energy());
+              probLive = math::clampedLerp(0.05f, 0.75f, r.energy());
             } else {
               // Less aggressive ray killing.
               probLive = math::clampedLerp(0.25f, 1.00f, r.energy());
@@ -131,8 +131,8 @@ void Camera::renderOnce(
 
         } // End path tracing loop.
 
-        // Filter value.
-        double smpWeight = math::triangleFilter(offsetX, offsetY);
+        // Filter the sampled value.
+        double smpWeight = math::mitchellFilter(offsetX, offsetY, FILTER_WIDTH);
 
         // Black if ray died; fill in color otherwise.
         pxColor += smpWeight * L.cast<double>();

@@ -11,7 +11,13 @@ LightRay Material::scatter(
   Vec bsdf;
   float pdf;
   sampleWorld(isect, rng, -incoming.direction, &outgoingWorld, &bsdf, &pdf);
-  Vec scale = bsdf * fabsf(isect.normal.dot(outgoingWorld)) / pdf;
+
+  Vec scale;
+  if (pdf > 0.0f) {
+    scale = bsdf * fabsf(isect.normal.dot(outgoingWorld)) / pdf;
+  } else {
+    scale = Vec(0, 0, 0);
+  }
 
   return LightRay(
     isect.position + outgoingWorld * math::VERY_SMALL,
@@ -26,6 +32,16 @@ float Material::evalPDFLocal(const Vec& incoming, const Vec& outgoing) const {
   }
 
   return math::cosineSampleHemispherePDF(outgoing);
+}
+
+void Material::evalLocal(
+  const Vec& incoming,
+  const Vec& outgoing,
+  Vec* bsdfOut,
+  float* pdfOut
+) const {
+  *bsdfOut = evalBSDFLocal(incoming, outgoing);
+  *pdfOut = evalPDFLocal(incoming, outgoing);
 }
 
 void Material::evalWorld(
@@ -54,8 +70,7 @@ void Material::evalWorld(
     isect.normal
   );
 
-  *bsdfOut = evalBSDFLocal(incomingLocal, outgoingLocal);
-  *pdfOut = evalPDFLocal(incomingLocal, outgoingLocal);
+  evalLocal(incomingLocal, outgoingLocal, bsdfOut, pdfOut);
 }
 
 void Material::sampleLocal(
