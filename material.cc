@@ -7,32 +7,11 @@ LightRay Material::scatter(
   const LightRay& incoming,
   const Intersection& isect
 ) const {
-  Vec tangent;
-  Vec binormal;
-  math::coordSystem(isect.normal, &tangent, &binormal);
-
-  // BSDF computation expects incoming ray to be in local-space.
-  Vec incomingLocal = math::worldToLocal(
-    -incoming.direction,
-    tangent,
-    binormal,
-    isect.normal
-  );
-
-  // Sample BSDF for direction, color, and probability.
-  Vec outgoingLocal;
+  Vec outgoingWorld;
   Vec bsdf;
   float pdf;
-  sampleLocal(rng, incomingLocal, &outgoingLocal, &bsdf, &pdf);
-  Vec scale = bsdf * math::absCosTheta(outgoingLocal) / pdf;
-
-  // Rendering expects outgoing ray to be in world-space.
-  Vec outgoingWorld = math::localToWorld(
-    outgoingLocal,
-    tangent,
-    binormal,
-    isect.normal
-  );
+  sampleWorld(isect, rng, -incoming.direction, &outgoingWorld, &bsdf, &pdf);
+  Vec scale = bsdf * fabsf(isect.normal.dot(outgoingWorld)) / pdf;
 
   return LightRay(
     isect.position + outgoingWorld * math::VERY_SMALL,
@@ -47,20 +26,6 @@ float Material::evalPDFLocal(const Vec& incoming, const Vec& outgoing) const {
   }
 
   return math::cosineSampleHemispherePDF(outgoing);
-}
-
-void Material::sampleLocal(
-  Randomness& rng,
-  const Vec& incoming,
-  Vec* outgoingOut,
-  Vec* bsdfOut,
-  float* pdfOut
-) const {
-  Vec outgoing = math::cosineSampleHemisphere(rng, incoming.z() < 0.0f);
-
-  *outgoingOut = outgoing;
-  *bsdfOut = evalBSDFLocal(incoming, outgoing);
-  *pdfOut = math::cosineSampleHemispherePDF(outgoing);
 }
 
 void Material::evalWorld(
@@ -91,4 +56,57 @@ void Material::evalWorld(
 
   *bsdfOut = evalBSDFLocal(incomingLocal, outgoingLocal);
   *pdfOut = evalPDFLocal(incomingLocal, outgoingLocal);
+}
+
+void Material::sampleLocal(
+  Randomness& rng,
+  const Vec& incoming,
+  Vec* outgoingOut,
+  Vec* bsdfOut,
+  float* pdfOut
+) const {
+  Vec outgoing = math::cosineSampleHemisphere(rng, incoming.z() < 0.0f);
+
+  *outgoingOut = outgoing;
+  *bsdfOut = evalBSDFLocal(incoming, outgoing);
+  *pdfOut = math::cosineSampleHemispherePDF(outgoing);
+}
+
+void Material::sampleWorld(
+  const Intersection& isect,
+  Randomness& rng,
+  const Vec& incoming,
+  Vec* outgoingOut,
+  Vec* bsdfOut,
+  float* pdfOut
+) const {
+  Vec tangent;
+  Vec binormal;
+  math::coordSystem(isect.normal, &tangent, &binormal);
+
+  // BSDF computation expects incoming ray to be in local-space.
+  Vec incomingLocal = math::worldToLocal(
+    incoming,
+    tangent,
+    binormal,
+    isect.normal
+  );
+
+  // Sample BSDF for direction, color, and probability.
+  Vec outgoingLocal;
+  Vec tempBsdf;
+  float tempPdf;
+  sampleLocal(rng, incomingLocal, &outgoingLocal, &tempBsdf, &tempPdf);
+
+  // Rendering expects outgoing ray to be in world-space.
+  Vec outgoingWorld = math::localToWorld(
+    outgoingLocal,
+    tangent,
+    binormal,
+    isect.normal
+  );
+
+  *outgoingOut = outgoingWorld;
+  *bsdfOut = tempBsdf;
+  *pdfOut = tempPdf;
 }

@@ -40,10 +40,23 @@ public:
    *                          the pointer must not be null
    * @param bsdfOut     [out] the BSDF at the sample point;
    *                          the pointer must not be null
-   * @param pdfOut      [out] the probability of the sample, between 0 and 1;
+   * @param pdfOut      [out] the probability of the sample;
    *                          the pointer must not be null
    */
   virtual void sampleLocal(
+    Randomness& rng,
+    const Vec& incoming,
+    Vec* outgoingOut,
+    Vec* bsdfOut,
+    float* pdfOut
+  ) const;
+
+  /**
+   * Same as Material::sampleLocal, but returns the outgoing vector in world
+   * space using the given intersection frame.
+   */
+  void sampleWorld(
+    const Intersection& isect,
     Randomness& rng,
     const Vec& incoming,
     Vec* outgoingOut,

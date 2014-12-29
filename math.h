@@ -221,6 +221,14 @@ namespace math {
   }
 
   /**
+   * Convenience function for determining whether all of a vec's components are
+   * zero.
+   */
+  inline bool isVectorExactlyZero(const Vec& v) {
+    return v.x() == 0.0f && v.y() == 0.0f && v.z() == 0.0f;
+  }
+
+  /**
    * Calculates the base-2 logarithm of a number.
    */
   inline float log2(float x) {
@@ -440,6 +448,25 @@ namespace math {
    */
   inline float clampedLerp(float x, float y, float a) {
     return lerp(x, y, clamp(a));
+  }
+
+  /**
+   * Calculates the power heuristic for multiple importance sampling of
+   * two separate functions.
+   *
+   * See Pharr & Humphreys p. 693 for more information.
+   *
+   * @param nf   number of samples taken with a Pf distribution
+   * @param fPdf probability according to the Pf distribution
+   * @param ng   number of samples taken with a Pg distribution
+   * @param gPdf probability according to the Pg distribution
+   * @returns    the weight according to the power heuristic
+   */
+  inline float powerHeuristic(int nf, float fPdf, int ng, float gPdf) {
+    float f = nf * fPdf;
+    float g = ng * gPdf;
+
+    return (f * f) / (f * f + g * g);
   }
 
 }
