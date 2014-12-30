@@ -2,9 +2,6 @@ SOURCES = *.cc materials/*.cc geoms/*.cc
 LDLIBS = -lIlmImf -lHalf -ltbb -lassimp
 INCLUDES = -isystem /usr/local/include/eigen3
 
-# icpc or c++ or g++ or clang++
-CXX = icpc
-
 ifeq ($(strip $(CXX)),icpc)
 	WARN = -Werror -Wall -Wcheck
 	CXXFLAGS = $(WARN) -std=c++11 -DNDEBUG -fast -parallel
