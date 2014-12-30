@@ -1,6 +1,7 @@
 SOURCES = *.cc materials/*.cc geoms/*.cc
 LDLIBS = -lIlmImf -lHalf -ltbb -lassimp
-INCLUDES = -isystem /usr/local/include/eigen3
+INCLUDES = -isystem /usr/local/include/eigen3 -isystem /usr/include/eigen3 \
+           -isystem /usr/include/OpenEXR/
 
 ifeq ($(strip $(CXX)),icpc)
 	WARN = -Werror -Wall -Wcheck
