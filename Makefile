@@ -1,7 +1,6 @@
 SOURCES = *.cc materials/*.cc geoms/*.cc
 LDLIBS = -lIlmImf -lHalf -ltbb -lassimp
-INCLUDES = -isystem /usr/local/include/eigen3 -isystem /usr/include/eigen3 \
-           -isystem /usr/include/OpenEXR/
+INCLUDES = -isystem /usr/local/include/eigen3 -isystem /usr/include/eigen3g
 
 ifeq ($(strip $(CXX)),icpc)
 	# Intel C++ compiler: enable profile-guided optimization.
@@ -32,7 +31,7 @@ else
 	CXXFLAGS_DEBUG = $(WARN) -std=c++11 -DDEBUG -O0 -g
 	CXXFLAGS_GENPROF = $(CXXFLAGS)
 	CXXFLAGS_USEPROF = $(CXXFLAGS)
-	
+
 endif
 
 all: path-tracer
