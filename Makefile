@@ -1,9 +1,10 @@
 SOURCES = *.cc materials/*.cc geoms/*.cc
 LDLIBS = -lIlmImf -lHalf -ltbb -lassimp
-INCLUDES = -isystem /usr/local/include/eigen3 -isystem /usr/include/eigen3
+INCLUDES = -isystem /usr/local/include/eigen3 -isystem /usr/include/eigen3 \
+           -isystem /usr/include/OpenEXR
 
 ifeq ($(strip $(CXX)),icpc)
-	# Intel C++ compiler: enable profile-guided optimization.
+	# Intel C++ compiler: enable profile-guided optimization
 
 	WARN = -Werror -Wall -Wcheck
 
@@ -13,7 +14,7 @@ ifeq ($(strip $(CXX)),icpc)
 	CXXFLAGS_USEPROF = $(CXXFLAGS) -prof-use -prof-dir=prof
 
 else ifeq ($(strip $(CXX)),clang++)
-	# Clang compiler: enable extra warnings.
+	# Clang compiler: enable extra warnings
 
 	WARN = -Werror -Weverything -Wno-c++98-compat -Wno-padded -Wno-float-equal
 

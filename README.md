@@ -3,6 +3,8 @@ path-tracer
 
 Little global illumination Monte Carlo path tracer
 
+[![Build Status](https://semaphoreapp.com/api/v1/projects/f17e953b-83a4-4364-a2e3-04e1f126be21/317820/badge.png)](https://semaphoreapp.com/stevedao/path-tracer)
+
 Dependencies
 ------------
 If you're on OS X, I suggest using [Homebrew](http://brew.sh/) to get the right
