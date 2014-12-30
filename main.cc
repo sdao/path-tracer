@@ -8,9 +8,9 @@
 #include "kdtree.h"
 #include "mesh.h"
 
-void render(size_t w, size_t h, int iterations);
+void render(long w, long h, int iterations);
 
-void render(size_t w, size_t h, int iterations) {
+void render(long w, long h, int iterations) {
   materials::Lambert    green(Vec(0.5f, 1.0f, 0.5f));
   materials::Lambert    white(Vec(1, 1, 1));
   materials::Lambert    red(Vec(1.0f, 0.5f, 0.5f));

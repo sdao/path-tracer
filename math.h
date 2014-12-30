@@ -5,8 +5,6 @@
 #include <cmath>
 #include <limits>
 #include <vector>
-#include <OpenEXR/ImfRgbaFile.h>
-#include <OpenEXR/ImfArray.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include "randomness.h"
@@ -15,7 +13,8 @@ using std::min;
 using std::max;
 
 typedef Eigen::Vector3f Vec; /**< A 3D single-precision vector. */
-typedef Eigen::Vector3d DoubleVec; /**< A 3D double-precision vector. */
+typedef Eigen::Vector2f Vec2; /**< A 2D single-precision vector. */
+typedef Eigen::Vector4f Vec4; /**< A 4D single-precision vector. */
 
 /** An enumeration of standard axes in 3D space. */
 enum axis { X_AXIS = 0, Y_AXIS = 1, Z_AXIS = 2, INVALID_AXIS = -1 };
@@ -42,6 +41,12 @@ namespace math {
 
   /** Clamps a value x between a and b. */
   inline float clamp(float x, float a = 0.0f, float b = 1.0f) {
+    return x < a ? a : (x > b ? b : x);
+  }
+
+  /** Clamps a value x between a and b. */
+  template< class T >
+  inline T clampAny(T x, T a, T b) {
     return x < a ? a : (x > b ? b : x);
   }
 
@@ -106,38 +111,6 @@ namespace math {
   }
 
   /**
-   * Reconstructs an image from an accumulated color vector and a weight vector,
-   * placing the results in a 2D OpenEXR array.
-   *
-   * @param w       the width of the vector (number of elements per row)
-   * @param h       the height of the vector (number of row elements)
-   * @param colors  the accumulated color vector; its elements are rows, whose
-   *                elements in turn contain the actual color data
-   * @param weights the filter weight vector; its elements are rows, whose
-   *                elements in turn contain the actual filter weights
-   * @param exrData the 2D OpenEXR array to which the data will be copied
-   */
-  inline void reconstructImage(
-    size_t w,
-    size_t h,
-    const std::vector< std::vector<DoubleVec> >& colors,
-    const std::vector< std::vector<double> >& weights,
-    Imf::Array2D<Imf::Rgba>& exrData
-  ) {
-    for (size_t y = 0; y < h; ++y) {
-      for (size_t x = 0; x < w; ++x) {
-        Imf::Rgba& rgba = exrData[long(y)][long(x)];
-        const DoubleVec& pxColor = colors[y][x];
-        const double& pxWeight = weights[y][x];
-        rgba.r = float(pxColor.x() / pxWeight);
-        rgba.g = float(pxColor.y() / pxWeight);
-        rgba.b = float(pxColor.z() / pxWeight);
-        rgba.a = 1.0f;
-      }
-    }
-  }
-
-  /**
    * Evaluates a triangle filter with width = 0.5 (support = 1.0) for a
    * specified offset from the pixel center. The values are not normalized,
    * i.e., the integral of the filter over the 1x1 square around the point.
@@ -154,8 +127,8 @@ namespace math {
    * @param width the maximum x- or y- offset sampled from the pixel center
    * @returns the value of the filter
    */
-  inline double triangleFilter(double x, double y, double width = 2.0) {
-    return max(0.0, width - fabs(x)) * max(0.0, width - fabs(y));
+  inline float triangleFilter(float x, float y, float width = 2.0f) {
+    return max(0.0f, width - fabsf(x)) * max(0.0f, width - fabsf(y));
   }
 
   /**
@@ -169,21 +142,21 @@ namespace math {
    *
    * @param x the scaled x-offset from the pixel center, -1 <= x <= 1
    */
-  inline double mitchellFilter(double x) {
-    const double B = 1.0 / 3.0;
-    const double C = 1.0 / 3.0;
+  inline float mitchellFilter(float x) {
+    const float B = 1.0f / 3.0f;
+    const float C = 1.0f / 3.0f;
 
-    x = fabs(2.0 * x); // Convert to the range [0, 2].
+    x = fabsf(2.0f * x); // Convert to the range [0, 2].
 
-    if (x > 1.0) {
-      return ((-B - 6 * C) * (x * x * x)
-        + (6 * B + 30 * C) * (x * x)
-        + (-12 * B - 48 * C) * x
-        + (8 * B + 24 * C)) * (1.0 / 6.0);
+    if (x > 1.0f) {
+      return ((-B - 6.0f * C) * (x * x * x)
+        + (6.0f * B + 30.0f * C) * (x * x)
+        + (-12.0f * B - 48.0f * C) * x
+        + (8.0f * B + 24.0f * C)) * (1.0f / 6.0f);
     } else {
-      return ((12 - 9 * B - 6 * C) * (x * x * x)
-        + (-18 + 12 * B + 6 * C) * (x * x)
-        + (6 - 2 * B)) * (1.0 / 6.0);
+      return ((12.0f - 9.0f * B - 6.0f * C) * (x * x * x)
+        + (-18.0f + 12.0f * B + 6.0f * C) * (x * x)
+        + (6.0f - 2.0f * B)) * (1.0f / 6.0f);
     }
   }
 
@@ -197,7 +170,7 @@ namespace math {
    * @param width the maximum x- or y- offset sampled from the pixel center
    * @returns the value of the filter
    */
-  inline double mitchellFilter(double x, double y, double width = 2.0) {
+  inline float mitchellFilter(float x, float y, float width = 2.0f) {
     return mitchellFilter(x / width) * mitchellFilter(y / width);
   }
 

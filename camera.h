@@ -1,11 +1,10 @@
 #pragma once
-#include <OpenEXR/ImfRgbaFile.h>
-#include <OpenEXR/ImfArray.h>
 #include <tbb/tbb.h>
 #include <vector>
 #include "core.h"
 #include "geom.h"
 #include "kdtree.h"
+#include "image.h"
 
 /**
  * Manages rendering by simulating the action of a physical pinhole camera.
@@ -21,14 +20,6 @@ class Camera {
    * termination, stage 2 (more aggressive).
    */
   static constexpr int RUSSIAN_ROULETTE_DEPTH_2 = 50;
-  /**
-   * The number of samples to take per pixel in each iteration (supersampling).
-   */
-  static constexpr int SAMPLES_PER_PIXEL = 4;
-  /**
-   * Maximum positive or negative pixel offset of samples.
-   */
-  static constexpr float FILTER_WIDTH = 2.0f;
 
   Ray eye; /**< The ray representing the eye's position and orientation. */
 
@@ -39,13 +30,24 @@ class Camera {
   Randomness masterRng; /**< The RNG used to seed the per-row RNGs. */
   std::vector<unsigned> rowSeeds; /**< The per-row RNG seeds. */
 
-  std::vector< std::vector<DoubleVec> > colors; /**< The raw sampled colors. */
-  std::vector< std::vector<double> > weights; /**< The raw filter weights. */
-  Imf::Array2D<Imf::Rgba> exrData; /**< The filtered image for OpenEXR. */
+  Image img; /**< The rendered and filtered image. */
 
-  const size_t w; /**< The width of the output image to generate. */
-  const size_t h; /**< The height of the output image to generate. */
   int iters; /** The current number of path-tracing iterations done. */
+
+  /**
+   * Traces a path starting with the given ray, and returns the sampled
+   * radiance.
+   *
+   * @param r          the ray that starts the path
+   * @param kdt        a k-d tree containing the scene's geometry
+   * @param lights     a vector containing all area lights in the scene
+   */
+  Vec trace(
+    LightRay r,
+    Randomness& rng,
+    const KDTree& kdt,
+    const std::vector<Geom*>& lights
+  ) const;
 
   /**
    * Randomly picks a light and samples it for direct illumination. The
@@ -58,16 +60,16 @@ class Camera {
    * @param isect       the intersection on the target geometry that should be
    *                    illuminated
    * @param mat         the material of the target geometry being illuminated
-   * @param lights      a list of light-emitting objects to randomly pick from
-   * @param kdt         the k-d tree containing all geometry in the scene
+   * @param kdt         a k-d tree containing the scene's geometry
+   * @param lights      a vector containing all area lights in the scene
    */
   Vec uniformSampleOneLight(
     Randomness& rng,
     const LightRay& incoming,
     const Intersection& isect,
     const Material* mat,
-    const std::vector<Geom*>& lights,
-    const KDTree& kdt
+    const KDTree& kdt,
+    const std::vector<Geom*>& lights
   ) const;
 
 public:
@@ -79,7 +81,7 @@ public:
    * @param hh the height of the output image, in pixels
    * @param ff the total horizontal field of view, in radians
    */
-  Camera(Ray e, size_t ww, size_t hh, float ff = math::PI_4);
+  Camera(Ray e, long ww, long hh, float ff = math::PI_4);
 
   /**
    * Renders an additional iteration of the image by path-tracing.
