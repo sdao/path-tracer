@@ -7,9 +7,9 @@ compiler:
 install:
   - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
   - sudo apt-get -qq update
-  - sudo apt-get -qq install libstdc++-4.8-dev
+  - sudo apt-get -qq install libstdc++6
   - sudo apt-get install -y libboost-dev
-  - sudo apt-get install -y libassimp3-dev
+  - sudo apt-get install -y libassimp3
   - sudo apt-get install -y libopenexr-dev
   - sudo apt-get install -y libeigen3-dev
   - sudo apt-get install -y libtbb-dev
