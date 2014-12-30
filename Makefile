@@ -1,7 +1,7 @@
 SOURCES = *.cc materials/*.cc geoms/*.cc
 LDLIBS = -lIlmImf -lHalf -ltbb -lassimp
 INCLUDES = -isystem /usr/local/include/eigen3 -isystem /usr/include/eigen3 \
-           -isystem /usr/include/OpenEXR
+           -isystem /usr/local/include/OpenEXR -isystem /usr/include/OpenEXR
 
 ifeq ($(strip $(CXX)),icpc)
 	# Intel C++ compiler: enable profile-guided optimization
