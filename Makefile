@@ -4,7 +4,7 @@ INCLUDES = -isystem /usr/local/include/eigen3
 
 ifeq ($(strip $(CXX)),icpc)
 	WARN = -Werror -Wall -Wcheck
-	CXXFLAGS = $(WARN) -std=c++11 -stdlib=libc++ -DNDEBUG -fast -parallel
+	CXXFLAGS = $(WARN) -std=c++11 -DNDEBUG -fast -parallel
 	CXXFLAGS_DEBUG = $(WARN) -std=c++11 -DDEBUG -O0 -g
 
 	# Enable profile guided optimization for Intel compiler
@@ -12,7 +12,7 @@ ifeq ($(strip $(CXX)),icpc)
 	CXXFLAGS_USEPROF = $(CXXFLAGS) -prof-use -prof-dir=prof
 else
 	WARN = -Werror -Weverything -Wno-c++98-compat -Wno-padded -Wno-float-equal
-	CXXFLAGS = $(WARN) -std=c++11 -stdlib=libc++ -DNDEBUG -O3 -flto
+	CXXFLAGS = $(WARN) -std=c++11 -DNDEBUG -O3 -flto
 	CXXFLAGS_DEBUG = $(WARN) -std=c++11 -DDEBUG -O0 -g
 
 	# For the moment, skip profile guided optimization on Clang/GCC/etc
