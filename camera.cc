@@ -7,21 +7,26 @@ using std::max;
 using std::min;
 namespace chrono = std::chrono;
 
-Camera::Camera(Ray e, Vec orient, long ww, long hh, float ff)
-  : eye(e.origin, e.direction.normalized()), masterRng(),
-    rowSeeds(size_t(hh)), img(ww, hh), iters(0)
+Camera::Camera(Transform xform, long ww, long hh, float fov)
+  : camToWorldXform(xform), eyeWorldSpace(xform * Vec(0, 0, 0)),
+    masterRng(), rowSeeds(size_t(hh)), img(ww, hh), iters(0)
 {
-  // Size of the image plane projected into world space
-  // using the given fovx and cam focal length.
-  float scaleRight = 2.0f * eye.direction.norm() * tanf(0.5f * ff);
-  float scaleUp = scaleRight * (float(img.h) / float(img.w));
+  const float focalLength = 100.0f;
 
-  // Corresponding vectors.
-  up = -orient.normalized() * scaleUp; // Flip the y-axis for image output!
-  right = -eye.direction.cross(up).normalized() * scaleRight;
+  float halfFarPlaneUp;
+  float halfFarPlaneRight;
 
-  // Image corner ray in world space.
-  cornerRay = eye.direction - (0.5f * up) - (0.5f * right);
+  if (img.w > img.h) {
+    halfFarPlaneUp = focalLength * tanf(0.5f * fov);
+    halfFarPlaneRight = halfFarPlaneUp * float(img.w) / float(img.h);
+  } else {
+    halfFarPlaneRight = focalLength * tanf(0.5f * fov);
+    halfFarPlaneUp = halfFarPlaneRight * float(img.h) / float(img.w);
+  }
+
+  farPlaneUp = -2.0f * halfFarPlaneUp;
+  farPlaneRight = 2.0f * halfFarPlaneRight;
+  farPlaneOrigin = Vec(-halfFarPlaneRight, halfFarPlaneUp, -focalLength);
 }
 
 void Camera::renderOnce(
@@ -52,9 +57,11 @@ void Camera::renderOnce(
 
         float fracY = posY / (float(img.h) - 1.0f);
         float fracX = posX / (float(img.w) - 1.0f);
-        Vec dir = (cornerRay + (up * fracY) + (right * fracX)).normalized();
+
+        Vec offset = Vec(farPlaneRight * fracX, farPlaneUp * fracY, 0.0f);
+        Vec dir = (camToWorldXform * (farPlaneOrigin + offset)).normalized();
       
-        Vec L = trace(LightRay(eye.origin, dir), rng, kdt, lights);
+        Vec L = trace(LightRay(eyeWorldSpace, dir), rng, kdt, lights);
         img.setSample(x, y, posX, posY, samp, L);
       }
     }

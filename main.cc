@@ -26,8 +26,8 @@ void renderCornellBox(long w, long h, int iterations) {
   geoms::Disc   bottom(Vec(0, -18, -25), Vec(0, 1, 0), 100.0f, 0.0f, &white);
   geoms::Disc   top(Vec(0, 18, -25), Vec(0, -1, 0), 100.0f, 10.0f, &white);
   geoms::Disc   back(Vec(0, 0, -50), Vec(0, 0, 1), 100.0f, 0.0f, &white);
-  geoms::Disc   left(Vec(-20, 0, -25), Vec(1, 0, 0), 100.0f, 0.0f, &red);
-  geoms::Disc   right(Vec(20, 0, -25), Vec(-1, 0, 0), 100.0f, 0.0f, &green);
+  geoms::Disc   left(Vec(-18, 0, -25), Vec(1, 0, 0), 100.0f, 0.0f, &red);
+  geoms::Disc   right(Vec(18, 0, -25), Vec(-1, 0, 0), 100.0f, 0.0f, &green);
   geoms::Disc   lightSource(
     Vec(0.0f, 18.5f, -25.0f),
     Vec(0, -1, 0),
@@ -57,14 +57,14 @@ void renderCornellBox(long w, long h, int iterations) {
   KDTree tree(&objs);
   tree.build();
 
-  Camera cam(Ray(Vec(0, 0, 50), Vec(0, 0, -1)), Vec(0, 1, 0), w, h, math::PI_4);
+  Camera cam(math::translation(0, 0, 22), w, h, math::PI_4);
   cam.renderMultiple(tree, lights, "output.exr", iterations);
 }
 
 void renderDaylightScene(long w, long h, int iterations) {
   AreaLight areaLight(Vec(1, 1, 1));
 
-  materials::Lambert    green(Vec(0.4f, 0.6f, 0.2f));
+  materials::Phong      glossy(5.0f, Vec(1.0f, 0.9f, 0.8f));
   materials::Lambert    white(Vec(1, 1, 1));
   materials::Dielectric blueDielectric(
     materials::Dielectric::IOR_GLASS,
@@ -79,17 +79,18 @@ void renderDaylightScene(long w, long h, int iterations) {
     Vec(0.6f, 1.0f, 0.8f)
   );
 
-  geoms::Sphere   smallSphere1(Vec(-6, -14, -16), 4.0f, &redDielectric);
-  geoms::Sphere   smallSphere2(Vec(14, -12, -30), 4.0f, &redDielectric);
-  geoms::Sphere   smallSphere3(Vec(6, -12, -18), 4.0f, &greenDielectric);
-  geoms::Sphere   bigSphere(Vec(10, -12, -24), 6.0f, &blueDielectric);
-  geoms::Disc     bottom(Vec(0, -18, -25), Vec(0, 1, 0), 500.0f, 0.0f, &white);
-  geoms::Sphere   giant(Vec(0, 0, -25), 10000.0f, nullptr, &areaLight);
+  geoms::Sphere   smallSphere1(Vec(-6, -14, -26), 4.0f, &redDielectric);
+  geoms::Sphere   smallSphere2(Vec(14, -14, -30), 4.0f, &redDielectric);
+  geoms::Sphere   smallSphere3(Vec(4, -14, -26), 4.0f, &greenDielectric);
+  geoms::Sphere   smallSphere4(Vec(0, -15, -22), 3.0f, &redDielectric);
+  geoms::Sphere   bigSphere(Vec(8, -12, -20), 6.0f, &blueDielectric);
+  geoms::Disc     bottom(Vec(0, -18, -25), Vec(0, 1, 0), 10000.0f, 0.0f, &white);
+  geoms::Sphere   giant(Vec(0, -18, -25), 10000.0f, nullptr, &areaLight);
   geoms::Inverted lightSource(&giant);
 
   std::vector<Geom*> objs {
-    &smallSphere1, &smallSphere2, &smallSphere3,  &bigSphere, &bottom,
-    &lightSource
+    &smallSphere1, &smallSphere2, &smallSphere3, &smallSphere4, &bigSphere,
+    &bottom, &lightSource
   };
 
   std::vector<Geom*> lights {
@@ -99,8 +100,8 @@ void renderDaylightScene(long w, long h, int iterations) {
   Mesh externalModel;
   externalModel.readPolyModel(
     "assets/dragon.obj",
-    Vec(-6, -18, -35),
-    &green,
+    Vec(-10, -18, -35),
+    &glossy,
     nullptr,
     &objs
   );
@@ -110,9 +111,10 @@ void renderDaylightScene(long w, long h, int iterations) {
   tree.build();
 
   Camera cam(
-    Ray(Vec(0, 30, 50), Vec(0, -1, -2)),
-    Vec(0, 0, -1),
-    w, h, math::PI_4
+    math::angleAxisRotation(-math::PI_4, Vec(1, 0, 0))
+      * math::translation(0, 8, -10),
+    w, h,
+    math::PI_2
   );
   cam.renderMultiple(tree, lights, "output.exr", iterations);
 }
@@ -151,7 +153,7 @@ void renderInversionTest(long w, long h, int iterations) {
   KDTree tree(&objs);
   tree.build();
 
-  Camera cam(Ray(Vec(0, 0, 50), Vec(0, 0, -1)), Vec(0, 1, 0), w, h, math::PI_4);
+  Camera cam(math::translation(0, 0, 22), w, h, math::PI_4);
   cam.renderMultiple(tree, lights, "output.exr", iterations);
 }
 
@@ -163,5 +165,5 @@ int main(int argc, char* argv[]) {
     itersArg >> iterations;
   }
 
-  renderDaylightScene(512, 384, iterations);
+  renderCornellBox(512, 384, iterations);
 }

@@ -15,6 +15,7 @@ using std::max;
 typedef Eigen::Vector3f Vec; /**< A 3D single-precision vector. */
 typedef Eigen::Vector2f Vec2; /**< A 2D single-precision vector. */
 typedef Eigen::Vector4f Vec4; /**< A 4D single-precision vector. */
+typedef Eigen::Affine3f Transform; /**< An affine transformation in 3D space. */
 
 /** An enumeration of standard axes in 3D space. */
 enum axis { X_AXIS = 0, Y_AXIS = 1, Z_AXIS = 2, INVALID_AXIS = -1 };
@@ -33,8 +34,14 @@ namespace math {
   /** Pi / 2 as a single-precision float. */
   static constexpr float PI_2 = float(M_PI_2);
 
+  /** Pi / 3 as a single-precision float. */
+  static constexpr float PI_3 = float(M_PI / 3.0);
+
   /** Pi / 4 as a single-precision float. */
   static constexpr float PI_4 = float(M_PI_4);
+
+  /** Pi / 6 as a single-precision float. */
+  static constexpr float PI_6 = float(M_PI / 6.0);
 
   /** 1 / Pi as a single-precision float. */
   static constexpr float INV_PI = float(M_1_PI);
@@ -442,6 +449,14 @@ namespace math {
     float g = ng * gPdf;
 
     return (f * f) / (f * f + g * g);
+  }
+
+  inline Transform translation(float x, float y, float z) {
+    return Transform(Eigen::Translation<float, 3>(x, y, z));
+  }
+
+  inline Transform angleAxisRotation(float angle, Vec axis) {
+    return Transform(Eigen::AngleAxis<float>(angle, axis));
   }
 
 }

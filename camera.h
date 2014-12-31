@@ -21,12 +21,12 @@ class Camera {
    */
   static constexpr int RUSSIAN_ROULETTE_DEPTH_2 = 50;
 
-  Ray eye; /**< The ray representing the eye's position and orientation. */
-
-  Vec up; /**< The ray increment moving up in the y-direction. */
-  Vec right; /**< The ray increment moving right in the x-direction. */
-  Vec cornerRay; /**< The first ray in the lower-left corner. */
-
+  const Transform camToWorldXform;
+  const Vec eyeWorldSpace;
+  float farPlaneUp;
+  float farPlaneRight;
+  Vec farPlaneOrigin;
+  
   Randomness masterRng; /**< The RNG used to seed the per-row RNGs. */
   std::vector<unsigned> rowSeeds; /**< The per-row RNG seeds. */
 
@@ -76,13 +76,13 @@ public:
   /**
    * Constructs a camera.
    *
-   * @param e      a ray specifying the eye's position and orientation
-   * @param orient a vector specifying the "upwards" orientation of the camera
+   * @param xform  the transformation from camera space to world space
    * @param ww     the width of the output image, in pixels
    * @param hh     the height of the output image, in pixels
-   * @param ff     the total horizontal field of view, in radians
+   * @param fov    the field of view (horizontal or vertical, whichever is
+   *               smaller), in radians
    */
-  Camera(Ray e, Vec orient, long ww, long hh, float ff = math::PI_4);
+  Camera(Transform xform, long ww, long hh, float fov = math::PI_4);
 
   /**
    * Renders an additional iteration of the image by path-tracing.
