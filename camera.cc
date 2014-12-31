@@ -7,7 +7,7 @@ using std::max;
 using std::min;
 namespace chrono = std::chrono;
 
-Camera::Camera(Ray e, long ww, long hh, float ff)
+Camera::Camera(Ray e, Vec orient, long ww, long hh, float ff)
   : eye(e.origin, e.direction.normalized()), masterRng(),
     rowSeeds(size_t(hh)), img(ww, hh), iters(0)
 {
@@ -17,7 +17,7 @@ Camera::Camera(Ray e, long ww, long hh, float ff)
   float scaleUp = scaleRight * (float(img.h) / float(img.w));
 
   // Corresponding vectors.
-  up = -Vec(0, 1, 0) * scaleUp; // Flip the y-axis for image output!
+  up = -orient.normalized() * scaleUp; // Flip the y-axis for image output!
   right = -eye.direction.cross(up).normalized() * scaleRight;
 
   // Image corner ray in world space.
@@ -138,7 +138,7 @@ Vec Camera::trace(
     // Check for lighting.
     if (g->light && !didDirectIlluminate) {
       // Accumulate emission normally.
-      L += r.color.cwiseProduct(g->light->color);
+      L += r.color.cwiseProduct(g->light->emit(isect, r.direction));
     } else if (g->light && didDirectIlluminate) {
       // Skip emission accumulation because it was accumulated already
       // in a direct lighting calculation. We don't want to double-count.

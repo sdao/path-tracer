@@ -42,20 +42,6 @@ private:
     const KDTree& kdt
   ) const;
 
-  /**
-   * Calculates the emittance of the area light via a given intersection on
-   * the light, in a given direction towards the light.
-   *
-   * @param isect     the intersection on the light
-   * @param direction the incoming direction from the ray-caster towards the
-   *                  light
-   * @returns         the emittance from the light
-   */
-  inline Vec emit(
-    const Intersection& isect,
-    const Vec& direction
-  ) const;
-
 public:
   const Vec color; /**< The color of the light emitted. */
 
@@ -117,6 +103,20 @@ public:
     float* distToLightOut,
     Vec* colorOut,
     float* pdfOut
+  ) const;
+
+  /**
+   * Calculates the emittance of the area light via a given intersection on
+   * the light, in a given direction towards the light.
+   *
+   * @param isect     the intersection on the light
+   * @param direction the incoming direction from the ray-caster towards the
+   *                  light
+   * @returns         the emittance from the light
+   */
+  Vec emit(
+    const Intersection& isect,
+    const Vec& direction
   ) const;
 
   /**

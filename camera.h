@@ -76,12 +76,13 @@ public:
   /**
    * Constructs a camera.
    *
-   * @param e  a ray specifying the eye's position and orientation
-   * @param ww the width of the output image, in pixels
-   * @param hh the height of the output image, in pixels
-   * @param ff the total horizontal field of view, in radians
+   * @param e      a ray specifying the eye's position and orientation
+   * @param orient a vector specifying the "upwards" orientation of the camera
+   * @param ww     the width of the output image, in pixels
+   * @param hh     the height of the output image, in pixels
+   * @param ff     the total horizontal field of view, in radians
    */
-  Camera(Ray e, long ww, long hh, float ff = math::PI_4);
+  Camera(Ray e, Vec orient, long ww, long hh, float ff = math::PI_4);
 
   /**
    * Renders an additional iteration of the image by path-tracing.

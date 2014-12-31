@@ -9,6 +9,7 @@ bool Mesh::readPolyModel(
   std::string name,
   Vec offset,
   Material* m,
+  AreaLight* l,
   std::vector<Geom*>* geomList
 ) {
   // Create an instance of the Importer class
@@ -74,7 +75,8 @@ bool Mesh::readPolyModel(
           mem::ID(face.mIndices[1]),
           mem::ID(face.mIndices[2]),
           &points,
-          m
+          m,
+          l
         );
 
         faces.push_back(thisPoly);

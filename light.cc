@@ -116,7 +116,7 @@ inline Vec AreaLight::directIlluminateByMatPDF(
   return Vec(0, 0, 0);
 }
 
-inline Vec AreaLight::emit(
+Vec AreaLight::emit(
   const Intersection& isect,
   const Vec& direction
 ) const {

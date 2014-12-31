@@ -18,10 +18,11 @@ public:
      * Note: any previous data will be destroyed. All existing pointers to this
      * data will be invalidated.
      *
-     * @param m        the material used to render the poly faces of the mesh
      * @param name     the name of the file to read; can be any file format that
                        the Open Asset Import Library recognizes (e.g. obj)
      * @param offset   a vector offset to add to every point in the mesh
+     * @param m        the material used to render the poly faces of the mesh
+     * @param l        the area light causing emission from the poly faces
      * @param geomList as a convenience, if a geometry vector is specified,
      *                 pointers to all the poly faces in the mesh will be
      *                 appended to the end of geomList; alternatively, leave
@@ -32,7 +33,8 @@ public:
     bool readPolyModel(
       std::string name,
       Vec offset,
-      Material* m,
+      Material* m = nullptr,
+      AreaLight* l = nullptr,
       std::vector<Geom*>* geomList = nullptr
     );
 
