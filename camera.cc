@@ -7,26 +7,31 @@ using std::max;
 using std::min;
 namespace chrono = std::chrono;
 
-Camera::Camera(Transform xform, long ww, long hh, float fov)
-  : camToWorldXform(xform), eyeWorldSpace(xform * Vec(0, 0, 0)),
+Camera::Camera(
+  Transform xform,
+  long ww,
+  long hh,
+  float fov,
+  float len,
+  float stop
+) : focalLength(len), lensRadius((len / stop) * 0.5f), // Diameter = len / stop.
+    camToWorldXform(xform),
     masterRng(), rowSeeds(size_t(hh)), img(ww, hh), iters(0)
 {
-  const float focalLength = 100.0f;
-
-  float halfFarPlaneUp;
-  float halfFarPlaneRight;
+  float halfFocalPlaneUp;
+  float halfFocalPlaneRight;
 
   if (img.w > img.h) {
-    halfFarPlaneUp = focalLength * tanf(0.5f * fov);
-    halfFarPlaneRight = halfFarPlaneUp * float(img.w) / float(img.h);
+    halfFocalPlaneUp = focalLength * tanf(0.5f * fov);
+    halfFocalPlaneRight = halfFocalPlaneUp * float(img.w) / float(img.h);
   } else {
-    halfFarPlaneRight = focalLength * tanf(0.5f * fov);
-    halfFarPlaneUp = halfFarPlaneRight * float(img.h) / float(img.w);
+    halfFocalPlaneRight = focalLength * tanf(0.5f * fov);
+    halfFocalPlaneUp = halfFocalPlaneRight * float(img.h) / float(img.w);
   }
 
-  farPlaneUp = -2.0f * halfFarPlaneUp;
-  farPlaneRight = 2.0f * halfFarPlaneRight;
-  farPlaneOrigin = Vec(-halfFarPlaneRight, halfFarPlaneUp, -focalLength);
+  focalPlaneUp = -2.0f * halfFocalPlaneUp;
+  focalPlaneRight = 2.0f * halfFocalPlaneRight;
+  focalPlaneOrigin = Vec(-halfFocalPlaneRight, halfFocalPlaneUp, -focalLength);
 }
 
 void Camera::renderOnce(
@@ -58,10 +63,19 @@ void Camera::renderOnce(
         float fracY = posY / (float(img.h) - 1.0f);
         float fracX = posX / (float(img.w) - 1.0f);
 
-        Vec offset = Vec(farPlaneRight * fracX, farPlaneUp * fracY, 0.0f);
-        Vec dir = (camToWorldXform * (farPlaneOrigin + offset)).normalized();
+        // Implement depth of field by jittering the eye.
+        Vec offset(focalPlaneRight * fracX, focalPlaneUp * fracY, 0);
+        Vec lookAt = focalPlaneOrigin + offset;
+
+        Vec eye(0, 0, 0);
+        math::areaSampleDisk(rng, &eye[0], &eye[1]);
+        eye = eye * lensRadius;
+
+        Vec eyeWorld = camToWorldXform * eye;
+        Vec lookAtWorld = camToWorldXform * lookAt;
+        Vec dir = (lookAtWorld - eyeWorld).normalized();
       
-        Vec L = trace(LightRay(eyeWorldSpace, dir), rng, kdt, lights);
+        Vec L = trace(LightRay(eyeWorld, dir), rng, kdt, lights);
         img.setSample(x, y, posX, posY, samp, L);
       }
     }

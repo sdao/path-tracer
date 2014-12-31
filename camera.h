@@ -21,11 +21,13 @@ class Camera {
    */
   static constexpr int RUSSIAN_ROULETTE_DEPTH_2 = 50;
 
+  const float focalLength;
+  const float lensRadius;
   const Transform camToWorldXform;
-  const Vec eyeWorldSpace;
-  float farPlaneUp;
-  float farPlaneRight;
-  Vec farPlaneOrigin;
+  
+  float focalPlaneUp;
+  float focalPlaneRight;
+  Vec focalPlaneOrigin;
   
   Randomness masterRng; /**< The RNG used to seed the per-row RNGs. */
   std::vector<unsigned> rowSeeds; /**< The per-row RNG seeds. */
@@ -81,8 +83,17 @@ public:
    * @param hh     the height of the output image, in pixels
    * @param fov    the field of view (horizontal or vertical, whichever is
    *               smaller), in radians
+   * @param len    the focal length of the lens
+   * @param stop   the f-stop (aperture) of the lens
    */
-  Camera(Transform xform, long ww, long hh, float fov = math::PI_4);
+  Camera(
+    Transform xform,
+    long ww,
+    long hh,
+    float fov = math::PI_4,
+    float len = 50.0f,
+    float stop = 16.0f
+  );
 
   /**
    * Renders an additional iteration of the image by path-tracing.

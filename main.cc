@@ -57,7 +57,12 @@ void renderCornellBox(long w, long h, int iterations) {
   KDTree tree(&objs);
   tree.build();
 
-  Camera cam(math::translation(0, 0, 22), w, h, math::PI_4);
+  Camera cam(
+    math::translation(0, 0, 32),
+    w, h,
+    math::PI_4,
+    45.0f // Focus on small sphere (its origin is ~48 away).
+  );
   cam.renderMultiple(tree, lights, "output.exr", iterations);
 }
 
@@ -112,9 +117,11 @@ void renderDaylightScene(long w, long h, int iterations) {
 
   Camera cam(
     math::angleAxisRotation(-math::PI_4, Vec(1, 0, 0))
-      * math::translation(0, 8, -10),
+      * math::translation(0, 10, -10),
     w, h,
-    math::PI_2
+    math::PI_2,
+    15.0f, // Aim at the red sphere on the left.
+    8.0f
   );
   cam.renderMultiple(tree, lights, "output.exr", iterations);
 }
@@ -153,7 +160,7 @@ void renderInversionTest(long w, long h, int iterations) {
   KDTree tree(&objs);
   tree.build();
 
-  Camera cam(math::translation(0, 0, 22), w, h, math::PI_4);
+  Camera cam(math::translation(0, 0, 32), w, h, math::PI_4, 50.0f, 1024.0f);
   cam.renderMultiple(tree, lights, "output.exr", iterations);
 }
 
