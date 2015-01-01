@@ -130,6 +130,8 @@ class KDTree {
   std::vector<KDNode> allNodes; /**< The node lookup table. */
   mem::ID rootId; /**< The index of the root node (usually 0). */
   BBox bounds; /**< The bounds encapsulating all the objects in the tree. */
+  std::vector<const Geom*> objs; /**< The geometric objects in the k-d tree. */
+  std::vector<const Geom*> lights; /**< The geometric objects with a light. */
 
   /**
    * Recursively constructs the k-d tree.
@@ -169,14 +171,12 @@ protected:
   void print(mem::ID nodeId, std::ostream& os, std::string header = "") const;
 
 public:
-  const std::vector<Geom*>* objs; /**< The geometric objects in the k-d tree. */
-
   /**
    * Constructs an empty kdtree associated with the given objects,
    * but does not actually build out the k-d tree structure.
    * Use the kdtree::build() method to complete building.
    */
-  KDTree(std::vector<Geom*>* o);
+  KDTree(const std::vector<const Geom*>& o);
 
   /**
    * Actually builds out the k-d tree structure.
@@ -203,6 +203,17 @@ public:
    * @returns       true if any geom hit within maxDist, otherwise false
    */
   bool intersectShadow(const Ray& r, float maxDist) const;
+
+  /**
+   * Returns a reference to the list of all (refined) geometry in the k-d tree.
+   */
+  const std::vector<const Geom*>& allObjecs() const;
+
+  /**
+   * Returns a reference to the list of all light-source geometry in the k-d
+   * tree.
+   */
+  const std::vector<const Geom*>& allLights() const;
 
   friend std::ostream& operator<<(std::ostream& os, const KDTree& tree) {
     tree.print(tree.rootId, os);

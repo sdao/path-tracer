@@ -62,4 +62,6 @@ public:
    * Gets the total surface area of the geometry.
    */
   virtual float area() const = 0;
+
+  virtual void refine(std::vector<const Geom*>& refined) const;
 };

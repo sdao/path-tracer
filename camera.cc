@@ -36,7 +36,6 @@ Camera::Camera(
 
 void Camera::renderOnce(
   const KDTree& kdt,
-  const std::vector<Geom*>& lights,
   std::string name
 ) {
   // Increment iteration count and begin timer.
@@ -75,7 +74,7 @@ void Camera::renderOnce(
         Vec lookAtWorld = camToWorldXform * lookAt;
         Vec dir = (lookAtWorld - eyeWorld).normalized();
       
-        Vec L = trace(LightRay(eyeWorld, dir), rng, kdt, lights);
+        Vec L = trace(LightRay(eyeWorld, dir), rng, kdt);
         img.setSample(x, y, posX, posY, samp, L);
       }
     }
@@ -94,7 +93,6 @@ void Camera::renderOnce(
 
 void Camera::renderMultiple(
   const KDTree& kdt,
-  const std::vector<Geom*>& lights,
   std::string name,
   int iterations
 ) {
@@ -103,14 +101,14 @@ void Camera::renderMultiple(
     std::cout << "Rendering infinitely, press Ctrl-c to terminate program\n";
 
     while (true) {
-      renderOnce(kdt, lights, name);
+      renderOnce(kdt, name);
     }
   } else {
     // Run finite iterations.
     std::cout << "Rendering " << iterations << " iterations\n";
 
     for (int i = 0; i < iterations; ++i) {
-      renderOnce(kdt, lights, name);
+      renderOnce(kdt, name);
     }
   }
 }
@@ -118,8 +116,7 @@ void Camera::renderMultiple(
 Vec Camera::trace(
   LightRay r,
   Randomness& rng,
-  const KDTree& kdt,
-  const std::vector<Geom*>& lights
+  const KDTree& kdt
 ) const {
   Vec L(0, 0, 0);
   bool didDirectIlluminate = false;
@@ -176,7 +173,7 @@ Vec Camera::trace(
     } else if (g->mat && g->mat->shouldDirectIlluminate()) {
       // Sample direct lighting and then continue path.
       L += r.color.cwiseProduct(
-        uniformSampleOneLight(rng, r, isect, g->mat, kdt, lights)
+        uniformSampleOneLight(rng, r, isect, g->mat, kdt)
       );
       r = g->mat->scatter(rng, r, isect);
       didDirectIlluminate = true;
@@ -191,16 +188,15 @@ Vec Camera::uniformSampleOneLight(
   const LightRay& incoming,
   const Intersection& isect,
   const Material* mat,
-  const KDTree& kdt,
-  const std::vector<Geom*>& lights
+  const KDTree& kdt
 ) const {
-  size_t numLights = lights.size();
+  size_t numLights = kdt.allLights().size();
   if (numLights == 0) {
     return Vec(0, 0, 0);
   }
 
   size_t lightIdx = size_t(floorf(rng.nextUnitFloat() * numLights));
-  const Geom* emissionObj = lights[min(lightIdx, numLights - 1)];
+  const Geom* emissionObj = kdt.allLights()[min(lightIdx, numLights - 1)];
   const AreaLight* areaLight = emissionObj->light;
 
   // P[this light] = 1 / numLights, so 1 / P[this light] = numLights.
