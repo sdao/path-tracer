@@ -20,6 +20,13 @@ class Camera {
    * termination, stage 2 (more aggressive).
    */
   static constexpr int RUSSIAN_ROULETTE_DEPTH_2 = 50;
+  /**
+   * Limits any given sample to the given amount of radiance. This helps to
+   * reduce "fireflies" in the output. The lower this value, the more bias will
+   * be introduced into the image. For unbiased rendering, set this to
+   * std::numeric_limits<float>::max().
+   */
+  static constexpr float BIASED_RADIANCE_CLAMPING = 50.0f;
 
   const float focalLength;
   const float lensRadius;

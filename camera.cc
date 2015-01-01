@@ -180,6 +180,10 @@ Vec Camera::trace(
     }
   }
 
+  L[0] = math::clamp(L[0], 0.0f, BIASED_RADIANCE_CLAMPING);
+  L[1] = math::clamp(L[1], 0.0f, BIASED_RADIANCE_CLAMPING);
+  L[2] = math::clamp(L[2], 0.0f, BIASED_RADIANCE_CLAMPING);
+
   return L;
 }
 
