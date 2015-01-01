@@ -1,20 +1,34 @@
 #include "kdtree.h"
 
-KDTree::KDTree(std::vector<Geom*>* o) : allNodes(), rootId(), objs(o) {}
+KDTree::KDTree(const std::vector<const Geom*>& o)
+  : allNodes(), rootId(), objs(), lights()
+{
+  // Refine all geometry into primitives.
+  for (const Geom* g : o) {
+    g->refine(objs);
+  }
+
+  // Add all lights to the light list.
+  for (const Geom* g : objs) {
+    if (g->light) {
+      lights.push_back(g);
+    }
+  }
+}
 
 void KDTree::build() {
   rootId = 0;
   allNodes.push_back(KDNode());
 
   // Build kd-tree for accelerator (p. 232).
-  float logOfSize = math::log2(float(objs->size()));
+  float logOfSize = math::log2(float(objs.size()));
   int maxDepth = int(roundf(8.0f + 1.3f * floorf(logOfSize)));
 
   // Compute bounds for kd-tree construction (Pharr & Humphreys p. 232).
   bounds = BBox();
-  std::vector<BBox> allObjBounds(objs->size());
-  for (size_t i = 0; i < objs->size(); ++i) {
-    allObjBounds[i] = (*objs)[i]->bounds();
+  std::vector<BBox> allObjBounds(objs.size());
+  for (size_t i = 0; i < objs.size(); ++i) {
+    allObjBounds[i] = objs[i]->bounds();
     allObjBounds[i].expand(math::VERY_SMALL); // Avoid pathological flat bboxes.
     bounds.expand(allObjBounds[i]);
   }
@@ -23,15 +37,15 @@ void KDTree::build() {
   std::vector<BBoxEdge> workEdgesRaw[3];
   std::vector<BBoxEdge>::iterator workEdgesIters[3];
   for (size_t i = 0; i < 3; ++i) {
-    workEdgesRaw[i] = std::vector<BBoxEdge>(2 * objs->size());
+    workEdgesRaw[i] = std::vector<BBoxEdge>(2 * objs.size());
     workEdgesIters[i] = workEdgesRaw[i].begin();
   }
-  std::vector<mem::ID> workObjs0(objs->size());
-  std::vector<mem::ID> workObjs1(size_t(maxDepth + 1) * objs->size());
+  std::vector<mem::ID> workObjs0(objs.size());
+  std::vector<mem::ID> workObjs1(size_t(maxDepth + 1) * objs.size());
 
   // Initialize `objIds` for kd-tree construction (p. 232).
-  std::vector<mem::ID> objIds(objs->size());
-  for (size_t i = 0; i < objs->size(); ++i) {
+  std::vector<mem::ID> objIds(objs.size());
+  for (size_t i = 0; i < objs.size(); ++i) {
     objIds[i] = i;
   }
 
@@ -41,7 +55,7 @@ void KDTree::build() {
     bounds,
     allObjBounds,
     objIds.begin(),
-    long(objs->size()),
+    long(objs.size()),
     maxDepth,
     workEdgesIters,
     workObjs0.begin(),
@@ -276,7 +290,7 @@ const Geom* KDTree::intersect(
     } else  {
       // Check for intersections inside leaf node (p. 244).
       for (mem::ID objId : node.objIds) {
-        const Geom* obj = mem::refConst(*objs, objId);
+        const Geom* obj = mem::refConst(objs, objId);
 
         // Check one primitive inside leaf node (p. 244).
         Intersection isect;
@@ -333,7 +347,7 @@ bool KDTree::intersectShadow(const Ray& r, float maxDist) const {
     if (node.isLeaf()) {
       // Check for shadow ray intersections inside leaf node.
       for (mem::ID objId : node.objIds) {
-        const Geom* obj = mem::refConst(*objs, objId);
+        const Geom* obj = mem::refConst(objs, objId);
 
         if (obj->intersectShadow(r, maxDist)) {
           return true;
@@ -435,4 +449,12 @@ void KDTree::print(mem::ID nodeId, std::ostream& os, std::string header) const {
   }
 
   os << "\n" << header << "}";
+}
+
+const std::vector<const Geom*>& KDTree::allObjecs() const {
+  return objs;
+}
+
+const std::vector<const Geom*>& KDTree::allLights() const {
+  return lights;
 }

@@ -3,3 +3,4 @@
 #include "sphere.h"
 #include "poly.h"
 #include "inverted.h"
+#include "mesh.h"

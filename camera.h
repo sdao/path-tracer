@@ -42,13 +42,11 @@ class Camera {
    *
    * @param r          the ray that starts the path
    * @param kdt        a k-d tree containing the scene's geometry
-   * @param lights     a vector containing all area lights in the scene
    */
   Vec trace(
     LightRay r,
     Randomness& rng,
-    const KDTree& kdt,
-    const std::vector<Geom*>& lights
+    const KDTree& kdt
   ) const;
 
   /**
@@ -63,15 +61,13 @@ class Camera {
    *                    illuminated
    * @param mat         the material of the target geometry being illuminated
    * @param kdt         a k-d tree containing the scene's geometry
-   * @param lights      a vector containing all area lights in the scene
    */
   Vec uniformSampleOneLight(
     Randomness& rng,
     const LightRay& incoming,
     const Intersection& isect,
     const Material* mat,
-    const KDTree& kdt,
-    const std::vector<Geom*>& lights
+    const KDTree& kdt
   ) const;
 
 public:
@@ -101,12 +97,10 @@ public:
    * combined in a weighted manner.
    *
    * @param kdt     a k-d tree containing the scene's geometry
-   * @param lights  a vector containing all area lights in the scene
    * @param name    the name of the output EXR file
    */
   void renderOnce(
     const KDTree& kdt,
-    const std::vector<Geom*>& lights,
     std::string name
   );
 
@@ -115,14 +109,12 @@ public:
    * To render infinite iterations, specify iterations = -1.
    *
    * @param kdt        a k-d tree containing the scene's geometry
-   * @param lights     a vector containing all area lights in the scene
    * @param name       the name of the output EXR file
    * @param iterations the number of iterations to render; if < 0, then this
    *                   function will run forever
    */
   void renderMultiple(
     const KDTree& kdt,
-    const std::vector<Geom*>& lights,
     std::string name,
     int iterations
   );

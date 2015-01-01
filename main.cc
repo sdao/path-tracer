@@ -6,7 +6,6 @@
 #include "light.h"
 #include "camera.h"
 #include "kdtree.h"
-#include "mesh.h"
 
 void renderCornellBox(long w, long h, int iterations);
 void renderDaylightScene(long w, long h, int iterations);
@@ -22,7 +21,7 @@ void renderCornellBox(long w, long h, int iterations) {
   materials::Phong      glossy(100.0f);
 
   geoms::Sphere smallSphere(Vec(-6, -14, -16), 4.0f, &dielectric);
-  geoms::Sphere bigSphere(Vec(10, -12, -24), 6.0f, &dielectric);
+  geoms::Sphere bigSphere(Vec(10, -12, -22), 6.0f, &dielectric);
   geoms::Disc   bottom(Vec(0, -18, -25), Vec(0, 1, 0), 100.0f, 0.0f, &white);
   geoms::Disc   top(Vec(0, 18, -25), Vec(0, -1, 0), 100.0f, 10.0f, &white);
   geoms::Disc   back(Vec(0, 0, -50), Vec(0, 0, 1), 100.0f, 0.0f, &white);
@@ -35,26 +34,16 @@ void renderCornellBox(long w, long h, int iterations) {
     nullptr,
     &areaLight
   );
+  geoms::Mesh   dragon(Vec(-6, -18, -28), &glossy);
+  dragon.readPolyModel("assets/dragon100k.obj");
 
-  std::vector<Geom*> objs {
-    &smallSphere, &bigSphere, &bottom, &top, &back, &left, &right, &lightSource
+  std::vector<const Geom*> objs {
+    &smallSphere, &bigSphere, &bottom, &top, &back, &left, &right, &lightSource,
+    &dragon
   };
-
-  std::vector<Geom*> lights {
-    &lightSource
-  };
-
-  Mesh externalModel;
-  externalModel.readPolyModel(
-    "assets/dragon.obj",
-    Vec(-6, -18, -28),
-    &glossy,
-    nullptr,
-    &objs
-  );
 
   // Construct k-d tree acceleration structure.
-  KDTree tree(&objs);
+  KDTree tree(objs);
   tree.build();
 
   Camera cam(
@@ -63,7 +52,7 @@ void renderCornellBox(long w, long h, int iterations) {
     math::PI_4,
     45.0f // Focus on small sphere (its origin is ~48 away).
   );
-  cam.renderMultiple(tree, lights, "output.exr", iterations);
+  cam.renderMultiple(tree, "output.exr", iterations);
 }
 
 void renderDaylightScene(long w, long h, int iterations) {
@@ -92,27 +81,16 @@ void renderDaylightScene(long w, long h, int iterations) {
   geoms::Disc     bottom(Vec(0, -18, -25), Vec(0, 1, 0), 10000.0f, 0.0f, &white);
   geoms::Sphere   giant(Vec(0, -18, -25), 10000.0f, nullptr, &areaLight);
   geoms::Inverted lightSource(&giant);
+  geoms::Mesh     dragon(Vec(-10, -18, -35), &glossy);
+  dragon.readPolyModel("assets/dragon100k.obj");
 
-  std::vector<Geom*> objs {
+  std::vector<const Geom*> objs {
     &smallSphere1, &smallSphere2, &smallSphere3, &smallSphere4, &bigSphere,
-    &bottom, &lightSource
+    &bottom, &lightSource, &dragon
   };
-
-  std::vector<Geom*> lights {
-    &lightSource
-  };
-
-  Mesh externalModel;
-  externalModel.readPolyModel(
-    "assets/dragon.obj",
-    Vec(-10, -18, -35),
-    &glossy,
-    nullptr,
-    &objs
-  );
 
   // Construct k-d tree acceleration structure.
-  KDTree tree(&objs);
+  KDTree tree(objs);
   tree.build();
 
   Camera cam(
@@ -123,7 +101,7 @@ void renderDaylightScene(long w, long h, int iterations) {
     15.0f, // Aim at the red sphere on the left.
     8.0f
   );
-  cam.renderMultiple(tree, lights, "output.exr", iterations);
+  cam.renderMultiple(tree, "output.exr", iterations);
 }
 
 void renderInversionTest(long w, long h, int iterations) {
@@ -148,20 +126,16 @@ void renderInversionTest(long w, long h, int iterations) {
     &areaLight
   );
 
-  std::vector<Geom*> objs {
+  std::vector<const Geom*> objs {
     &smallSphereInv, &bigSphereInv2, &bottom, &lightSource
   };
 
-  std::vector<Geom*> lights {
-    &smallSphereInv, &bigSphereInv2, &lightSource
-  };
-
   // Construct k-d tree acceleration structure.
-  KDTree tree(&objs);
+  KDTree tree(objs);
   tree.build();
 
   Camera cam(math::translation(0, 0, 32), w, h, math::PI_4, 50.0f, 1024.0f);
-  cam.renderMultiple(tree, lights, "output.exr", iterations);
+  cam.renderMultiple(tree, "output.exr", iterations);
 }
 
 int main(int argc, char* argv[]) {
