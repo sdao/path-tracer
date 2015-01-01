@@ -30,3 +30,8 @@ programming style.
 
 My renderer is also influenced by Kevin Beason's
 [smallpt](http://www.kevinbeason.com/smallpt/) path tracer.
+
+Renderings
+----------
+![Cornell box](https://raw.githubusercontent.com/wiki/sdao/path-tracer/pathtracer_dragon_400iters_30min.png)
+![Spheres with depth of field](https://raw.githubusercontent.com/wiki/sdao/path-tracer/pathtracer_spheres_400iters_15min.png)
