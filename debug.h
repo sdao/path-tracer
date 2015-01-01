@@ -9,7 +9,7 @@ namespace debug {
     return isnan(v.x()) || isnan(v.y()) || isnan(v.z());
   }
 
-  template< class T >
+  template<typename T>
   inline T shouldNotReach(T x) {
     assert(false && "not reachable in normal circumstances");
     return x;
