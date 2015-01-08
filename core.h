@@ -81,10 +81,10 @@ struct LightRay : public Ray {
   }
 
   /**
-   * Returns the largest component of the ray's light color.
+   * Returns the perceived luminance of the light's color, assuming it is RGB.
    */
-  inline float energy() const {
-    return max(max(color.x(), color.y()), color.z());
+  inline float luminance() const {
+    return 0.21f * color.x() + 0.71f * color.y() + 0.08f * color.z();
   }
 
   /**

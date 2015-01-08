@@ -129,10 +129,10 @@ Vec Camera::trace(
       float probLive;
       if (depth >= RUSSIAN_ROULETTE_DEPTH_2) {
         // More aggressive ray killing when ray is very old.
-        probLive = math::clampedLerp(0.25f, 0.75f, r.energy());
+        probLive = math::clampedLerp(0.25f, 0.75f, r.luminance());
       } else {
         // Less aggressive ray killing.
-        probLive = math::clampedLerp(0.25f, 1.00f, r.energy());
+        probLive = math::clampedLerp(0.25f, 1.00f, r.luminance());
       }
 
       if (rv < probLive) {
