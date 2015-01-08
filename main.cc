@@ -56,7 +56,7 @@ void renderCornellBox(long w, long h, int iterations) {
 }
 
 void renderSpheresScene(long w, long h, int iterations) {
-  AreaLight areaLight(Vec(4, 4, 4));
+  AreaLight areaLight(Vec(10, 10, 10));
   AreaLight skyLight(Vec(0.3f, 0.4f, 0.5f));
 
   materials::Lambert    green(Vec(0.5f, 1.0f, 0.5f));

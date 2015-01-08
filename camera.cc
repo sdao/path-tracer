@@ -156,7 +156,7 @@ Vec Camera::trace(
     // Check for lighting.
     if (g->light && !didDirectIlluminate) {
       // Accumulate emission normally.
-      L += r.color.cwiseProduct(g->light->emit(isect, r.direction));
+      L += r.color.cwiseProduct(g->light->emit(r, isect));
     } else if (g->light && didDirectIlluminate) {
       // Skip emission accumulation because it was accumulated already
       // in a direct lighting calculation. We don't want to double-count.
@@ -171,12 +171,18 @@ Vec Camera::trace(
       r = g->mat->scatter(rng, r, isect);
       didDirectIlluminate = false;
     } else if (g->mat && g->mat->shouldDirectIlluminate()) {
+#ifndef NO_DIRECT_ILLUM
       // Sample direct lighting and then continue path.
       L += r.color.cwiseProduct(
         uniformSampleOneLight(rng, r, isect, g->mat, kdt)
       );
       r = g->mat->scatter(rng, r, isect);
       didDirectIlluminate = true;
+#else
+      // Continue path normally.
+      r = g->mat->scatter(rng, r, isect);
+      didDirectIlluminate = false;
+#endif
     }
   }
 
@@ -200,10 +206,10 @@ Vec Camera::uniformSampleOneLight(
   }
 
   size_t lightIdx = size_t(floorf(rng.nextUnitFloat() * numLights));
-  const Geom* emissionObj = kdt.allLights()[min(lightIdx, numLights - 1)];
-  const AreaLight* areaLight = emissionObj->light;
+  const Geom* emitter = kdt.allLights()[min(lightIdx, numLights - 1)];
+  const AreaLight* areaLight = emitter->light;
 
   // P[this light] = 1 / numLights, so 1 / P[this light] = numLights.
   return float(numLights)
-    * areaLight->directIlluminate(rng, incoming, isect, mat, emissionObj, kdt);
+    * areaLight->directIlluminate(rng, incoming, isect, mat, emitter, kdt);
 }

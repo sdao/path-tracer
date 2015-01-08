@@ -424,6 +424,21 @@ namespace math {
     return ret;
   }
 
+  /**
+   * Returns the probability that any solid angle was sampled uniformly
+   * from a unit sphere.
+   */
+  inline float uniformSampleSpherePDF() {
+    return 1.0f / STERADIANS_PER_SPHERE;
+  }
+
+  /**
+   * Uniformly samples from a unit sphere, with respect to the sphere's
+   * surface area.
+   *
+   * @param rng the per-thread RNG in use
+   * @returns   the uniformly-distributed random vector in the sphere
+   */
   inline Vec uniformSampleSphere(Randomness& rng) {
     // See MathWorld <http://mathworld.wolfram.com/SpherePointPicking.html>.
     float x = rng.nextNormalFloat();
@@ -434,8 +449,44 @@ namespace math {
     return Vec(a * x, a * y, a * z);
   }
 
-   /**
-   * Generates a random ray in a cone around the normal.
+  /**
+   * Returns the probability that any solid angle already inside the given
+   * cone was sampled uniformly from the cone. The cone is defined by the
+   * half-angle of the subtended (apex) angle.
+   *
+   * @param halfAngle the half-angle of the cone
+   * @returns         the probability that the angle was sampled
+   */
+  inline float uniformSampleConePDF(float halfAngle) {
+    const float solidAngle = math::TWO_PI * (1.0f - cosf(halfAngle));
+    return 1.0f / solidAngle;
+  }
+
+  /**
+   * Returns the proabability that the given solid angle was sampled
+   * uniformly from the given cone. The cone is defined by the half-angle of
+   * the subtended (apex) angle. The probability is uniform if the direction
+   * is actually in the cone, and zero if it is outside the cone.
+   *
+   * @param halfAngle the half-angle of the cone
+   * @param direction the direction of the sampled vector
+   * @returns         the probability that the angle was sampled
+   */
+  inline float uniformSampleConePDF(float halfAngle, const Vec& direction) {
+    const float cosHalfAngle = cosf(halfAngle);
+    const float solidAngle = math::TWO_PI * (1.0f - cosHalfAngle);
+    if (cosTheta(direction) > cosHalfAngle) {
+      // Within the sampling cone.
+      return 1.0f / solidAngle;
+    } else {
+      // Outside the sampling cone.
+      return 0.0f;
+    }
+  }
+
+  /**
+   * Generates a random ray in a cone around the positive z-axis, uniformly
+   * with respect to solid angle.
    *
    * Handy Mathematica code for checking that this works:
    * \code
@@ -451,17 +502,12 @@ namespace math {
    * \endcode
    *
    * @param rng       the per-thread RNG in use
-   * @param normal    the normal around which the cone lies
    * @param halfAngle the half-angle of the cone's opening; must be between 0
    *                  and Pi/2 and in radians
    * @returns         a uniformally-random vector within halfAngle radians of
-   *                  the normal
+   *                  the positive z-axis
    */
-  inline Vec uniformSampleCone(Randomness& rng, Vec normal, float halfAngle) {
-    Vec tangent;
-    Vec binormal;
-    math::coordSystem(normal, &tangent, &binormal);
-
+  inline Vec uniformSampleCone(Randomness& rng, float halfAngle) {
     float h = cosf(halfAngle);
     float z = rng.nextFloat(h, 1.0f);
     float t = rng.nextFloat(float(PI * 2.0));
@@ -469,7 +515,7 @@ namespace math {
     float x = r * cosf(t);
     float y = r * sinf(t);
 
-    return (z * normal) + (x * tangent) + (y * binormal);
+    return Vec(x, y, z);
   }
 
   /**

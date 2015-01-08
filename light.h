@@ -22,7 +22,7 @@ private:
     const Ray& incoming,
     const Intersection& isect,
     const Material* mat,
-    const Geom* emissionObj,
+    const Geom* emitter,
     const KDTree& kdt
   ) const;
 
@@ -38,7 +38,7 @@ private:
     const Ray& incoming,
     const Intersection& isect,
     const Material* mat,
-    const Geom* emissionObj,
+    const Geom* emitter,
     const KDTree& kdt
   ) const;
 
@@ -55,14 +55,14 @@ public:
    * a specified direction. (Note that a diffuse area light can illuminate a
    * point from multiple different directions.)
    *
-   * @param emissionObj          the geometry from which light is emitted
+   * @param kdt                  the k-d tree containing all geometry in the
+   *                             scene
+   * @param emitter              the geometry from which light is emitted
    * @param point                the world-space point being illuminated by the
-   *                             emissionObj
+   *                             emitter
    * @param dirToLight           the direction from the world-space point
    *                             towards the light for which illumination
    *                             should be calculated
-   * @param distToLightOut [out] the distance from the world-space point towards
-   *                             the emissionObj via the direction dirToLight
    * @param colorOut       [out] the color the light emits
    * @param pdfOut         [out] the probability that the light-sampling routine
    *                             Material::sampleLight would have chosen the
@@ -70,10 +70,10 @@ public:
    *                             world-space point
    */
   void evalLight(
-    const Geom* emissionObj,
+    const KDTree& kdt,
+    const Geom* emitter,
     const Vec& point,
     const Vec& dirToLight,
-    float* distToLightOut,
     Vec* colorOut,
     float* pdfOut
   ) const;
@@ -84,39 +84,53 @@ public:
    * point from multiple different directions.)
    *
    * @param rng                  the per-thread RNG in use
-   * @param emissionObj          the geometry from which light is emitted
+   * @param kdt                  the k-d tree containing all geometry in the
+   *                             scene
+   * @param emitter              the geometry from which light is emitted
    * @param point                the world-space point being illuminated by the
-   *                             emissionObj
+   *                             emitter
    * @param dirToLightOut  [out] the randomly-sampled direction from the point
    *                             towards the emission object
-   * @param distToLightOut [out] the distance from the world-space point towards
-   *                             the emissionObj via the direction dirToLight
    * @param colorOut       [out] the color the light emits
    * @param pdfOut         [out] the probability of choosing the direction
    *                             dirToLight
    */
   void sampleLight(
     Randomness& rng,
-    const Geom* emissionObj,
+    const KDTree& kdt,
+    const Geom* emitter,
     const Vec& point,
     Vec* dirToLightOut,
-    float* distToLightOut,
     Vec* colorOut,
     float* pdfOut
   ) const;
 
   /**
-   * Calculates the emittance of the area light via a given intersection on
-   * the light, in a given direction towards the light.
+   * Calculates the emittance of the area light via a given ray intersection on
+   * the light, assuming there is no occlusion.
    *
-   * @param isect     the intersection on the light
-   * @param direction the incoming direction from the ray-caster towards the
-   *                  light
-   * @returns         the emittance from the light
+   * @param incoming     the incoming ray that struck the surface
+   * @param isect        the intersection information for the incoming ray
+   * @returns            the emittance from the light
    */
   Vec emit(
+    const Ray& incoming,
+    const Intersection& isect
+  ) const;
+
+  /**
+   * Calculates the emittance of the area light via a given ray intersection on
+   * the light, taking into account occlusion by other objects.
+   *
+   * @param incoming     the incoming ray that struck the surface
+   * @param isect        the intersection information for the incoming ray
+   * @param kdt          the k-d tree containing all geometry in the scene
+   * @returns            the emittance from the light
+   */
+  Vec emit(
+    const Ray& incoming,
     const Intersection& isect,
-    const Vec& direction
+    const KDTree& kdt
   ) const;
 
   /**
@@ -131,7 +145,7 @@ public:
    *                        be illuminated
    * @param mat             the material of the target geometry being
    *                        illuminated
-   * @param emissionObj     the object doing the illuminating (the emitter)
+   * @param emitter         the object doing the illuminating (the emitter)
    * @param kdt             the k-d tree containing all geometry in the scene
    */
   Vec directIlluminate(
@@ -139,7 +153,7 @@ public:
     const Ray& incoming,
     const Intersection& isect,
     const Material* mat,
-    const Geom* emissionObj,
+    const Geom* emitter,
     const KDTree& kdt
   ) const;
 };

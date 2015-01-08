@@ -12,15 +12,14 @@ inline Vec AreaLight::directIlluminateByLightPDF(
 ) const {
   // Sample random from light PDF.
   Vec outgoingWorld;
-  float outgoingDist;
   Vec lightColor;
   float lightPdf;
   sampleLight(
     rng,
+    kdt,
     emissionObj,
     isect.position,
     &outgoingWorld,
-    &outgoingDist,
     &lightColor,
     &lightPdf
   );
@@ -38,21 +37,10 @@ inline Vec AreaLight::directIlluminateByLightPDF(
     );
 
     if (bsdfPdf > 0.0f && !math::isVectorExactlyZero(bsdf)) {
-      // There's a risk that something's blocking between the object and light.
-      bool occluded = kdt.intersectShadow(
-        Ray(isect.position + math::VERY_SMALL * outgoingWorld, outgoingWorld),
-        // Why do we subtract 2 * VERY_SMALL?
-        // 1. To balance out the added VERY_SMALL in the ray pointToLight, and
-        // 2. Because we don't want to actually hit the light itself!
-        outgoingDist - 2.0f * math::VERY_SMALL
-      );
-
-      if (!occluded) {
-        float lightWeight = math::powerHeuristic(1, lightPdf, 1, bsdfPdf);
-        return bsdf.cwiseProduct(lightColor)
-          * fabsf(isect.normal.dot(outgoingWorld))
-          * lightWeight / lightPdf;
-      }
+      float lightWeight = math::powerHeuristic(1, lightPdf, 1, bsdfPdf);
+      return bsdf.cwiseProduct(lightColor)
+        * fabsf(isect.normal.dot(outgoingWorld))
+        * lightWeight / lightPdf;
     }
   }
 
@@ -83,33 +71,21 @@ inline Vec AreaLight::directIlluminateByMatPDF(
   if (bsdfPdf > 0.0f && !math::isVectorExactlyZero(bsdf)) {
     // Evaluate light PDF as well.
     Vec lightColor;
-    float outgoingDist;
     float lightPdf;
     evalLight(
+      kdt,
       emissionObj,
       isect.position,
       outgoingWorld,
-      &outgoingDist,
       &lightColor,
       &lightPdf
     );
 
     if (lightPdf > 0.0f && !math::isVectorExactlyZero(lightColor)) {
-      // There's a risk that something's blocking between the object and light.
-      bool occluded = kdt.intersectShadow(
-        Ray(isect.position + math::VERY_SMALL * outgoingWorld, outgoingWorld),
-        // Why do we subtract 2 * VERY_SMALL?
-        // 1. To balance out the added VERY_SMALL in the ray pointToLight, and
-        // 2. Because we don't want to actually hit the light itself!
-        outgoingDist - 2.0f * math::VERY_SMALL
-      );
-
-      if (!occluded) {
-        float bsdfWeight = math::powerHeuristic(1, bsdfPdf, 1, lightPdf);
-        return bsdf.cwiseProduct(lightColor)
-          * fabsf(isect.normal.dot(outgoingWorld))
-          * bsdfWeight / bsdfPdf;
-      }
+      float bsdfWeight = math::powerHeuristic(1, bsdfPdf, 1, lightPdf);
+      return bsdf.cwiseProduct(lightColor)
+        * fabsf(isect.normal.dot(outgoingWorld))
+        * bsdfWeight / bsdfPdf;
     }
   }
 
@@ -117,67 +93,132 @@ inline Vec AreaLight::directIlluminateByMatPDF(
 }
 
 Vec AreaLight::emit(
-  const Intersection& isect,
-  const Vec& direction
+  const Ray& incoming,
+  const Intersection& isect
 ) const {
   // Only emit on the normal-facing side of objects, e.g. on the outside of a
   // sphere or on the normal side of a disc.
-  if (direction.dot(isect.normal) < 0.0f) {
-    // Incoming direction towards light is opposite (facing) the normal.
-    return color;
-  } else {
+  if (incoming.direction.dot(isect.normal) > 0.0f) {
     return Vec(0, 0, 0);
   }
+
+  return color;
+}
+
+Vec AreaLight::emit(
+  const Ray& incoming,
+  const Intersection& isect,
+  const KDTree& kdt
+) const {
+  // Only emit on the normal-facing side of objects, e.g. on the outside of a
+  // sphere or on the normal side of a disc.
+  if (incoming.direction.dot(isect.normal) > 0.0f) {
+    return Vec(0, 0, 0);
+  }
+
+  // Object might be occluded behind another object.
+  float dist = isect.distance - 2.0f * math::VERY_SMALL;
+  if (kdt.intersectShadow(incoming, dist)) {
+    return Vec(0, 0, 0);
+  }
+
+  return color;
 }
 
 void AreaLight::evalLight(
+  const KDTree& kdt,
   const Geom* emissionObj,
   const Vec& point,
   const Vec& dirToLight,
-  float* distToLightOut,
   Vec* colorOut,
   float* pdfOut
 ) const {
+  float pdf;
+  Vec color;
+
+  BSphere emitterBounds = emissionObj->boundSphere();
+  if (emitterBounds.contains(point)) {
+    pdf = math::uniformSampleSpherePDF();
+  } else {
+    Vec dirToLightOrigin = emitterBounds.origin - point;
+    float theta = asinf(emitterBounds.radius / dirToLightOrigin.norm());
+
+    Vec normal = dirToLightOrigin.normalized();
+    Vec tangent;
+    Vec binormal;
+    math::coordSystem(normal, &tangent, &binormal);
+
+    Vec dirToLightLocal =
+      math::worldToLocal(dirToLight, tangent, binormal, normal);
+    pdf = math::uniformSampleConePDF(theta, dirToLightLocal);
+  }
+
   Ray pointToLight(point + math::VERY_SMALL * dirToLight, dirToLight);
   Intersection lightIsect;
-
   if (!emissionObj->intersect(pointToLight, &lightIsect)) {
-    // The ray doesn't even hit the light (ignoring other scene objects).
-    // So the light wouldn't have ever chosen this direction at all when
-    // sampling random directions.
-
-    *distToLightOut = 0.0f;
-    *colorOut = Vec(0, 0, 0);
-    *pdfOut = 0.0f;
+    // No emission if the ray doesn't hit the light
+    // (e.g. sampling doesn't exactly correspond with light).
+    color = Vec(0, 0, 0);
   } else {
-    const float dirToLightDist2 = (lightIsect.position - point).squaredNorm();
-    const float absCosTheta = fabsf(lightIsect.normal.dot(-dirToLight));
-
-    *distToLightOut = sqrtf(dirToLightDist2);
-    *colorOut = emit(lightIsect, dirToLight);
-    *pdfOut = dirToLightDist2 / (absCosTheta * emissionObj->area());
+    // Emits color if the ray does hit the light.
+    color = emit(pointToLight, lightIsect, kdt);
   }
+
+  *colorOut = color;
+  *pdfOut = pdf;
 }
 
 void AreaLight::sampleLight(
   Randomness& rng,
+  const KDTree& kdt,
   const Geom* emissionObj,
   const Vec& point,
   Vec* dirToLightOut,
-  float* distToLightOut,
   Vec* colorOut,
   float* pdfOut
 ) const {
-  // Note: this is not the final point; we have really only sampled the
-  // direction. (Consider a sphere where we sample a point on the opposite side
-  // of the observer being illuminated. The direction sampled will actually
-  // cause an intersection with some other point on the side facing the
-  // observer.)
-  const Vec sample = emissionObj->samplePoint(rng);
-  const Vec dirToLight = (sample - point).normalized();
+  Vec dirToLight;
+  float pdf;
+  Vec color;
+
+  BSphere emitterBounds = emissionObj->boundSphere();
+  if (emitterBounds.contains(point)) {
+    // We're inside the bounding sphere, so sample uniformly.
+    dirToLight = math::uniformSampleSphere(rng);
+    pdf = math::uniformSampleSpherePDF();
+  } else {
+    // We're outside the bounding sphere.
+    Vec dirToLightOrigin = emitterBounds.origin - point;
+    float theta = asinf(emitterBounds.radius / dirToLightOrigin.norm());
+
+    Vec normal = dirToLightOrigin.normalized();
+    Vec tangent;
+    Vec binormal;
+    math::coordSystem(normal, &tangent, &binormal);
+
+    dirToLight = math::localToWorld(
+      math::uniformSampleCone(rng, theta),
+      tangent,
+      binormal,
+      normal
+    );
+    pdf = math::uniformSampleConePDF(theta);
+  }
+
+  Ray pointToLight(point + math::VERY_SMALL * dirToLight, dirToLight);
+  Intersection lightIsect;
+  if (!emissionObj->intersect(pointToLight, &lightIsect)) {
+    // No emission if the ray doesn't hit the light
+    // (e.g. sampling doesn't exactly correspond with light).
+    color = Vec(0, 0, 0);
+  } else {
+    // Emits color if the ray does hit the light.
+    color = emit(pointToLight, lightIsect, kdt);
+  }
 
   *dirToLightOut = dirToLight;
-  evalLight(emissionObj, point, dirToLight, distToLightOut, colorOut, pdfOut);
+  *colorOut = color;
+  *pdfOut = pdf;
 }
 
 Vec AreaLight::directIlluminate(
@@ -189,6 +230,7 @@ Vec AreaLight::directIlluminate(
   const KDTree& kdt
 ) const {
   Vec Ld(0, 0, 0);
+  
   Ld += directIlluminateByLightPDF(rng, incoming, isect, mat, emissionObj, kdt);
   Ld += directIlluminateByMatPDF(rng, incoming, isect, mat, emissionObj, kdt);
 
