@@ -99,7 +99,7 @@ void renderSpheresScene(long w, long h, int iterations) {
     w, h,
     math::PI_4,
     88.0f,
-    8.0f
+    16.0f
   );
   cam.renderMultiple(tree, "output.exr", iterations);
 }

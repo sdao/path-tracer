@@ -134,7 +134,7 @@ void AreaLight::evalLight(
   float* pdfOut
 ) const {
   float pdf;
-  Vec color;
+  Vec emittedColor;
 
   BSphere emitterBounds = emissionObj->boundSphere();
   if (emitterBounds.contains(point)) {
@@ -158,13 +158,13 @@ void AreaLight::evalLight(
   if (!emissionObj->intersect(pointToLight, &lightIsect)) {
     // No emission if the ray doesn't hit the light
     // (e.g. sampling doesn't exactly correspond with light).
-    color = Vec(0, 0, 0);
+    emittedColor = Vec(0, 0, 0);
   } else {
     // Emits color if the ray does hit the light.
-    color = emit(pointToLight, lightIsect, kdt);
+    emittedColor = emit(pointToLight, lightIsect, kdt);
   }
 
-  *colorOut = color;
+  *colorOut = emittedColor;
   *pdfOut = pdf;
 }
 
@@ -179,7 +179,7 @@ void AreaLight::sampleLight(
 ) const {
   Vec dirToLight;
   float pdf;
-  Vec color;
+  Vec emittedColor;
 
   BSphere emitterBounds = emissionObj->boundSphere();
   if (emitterBounds.contains(point)) {
@@ -210,14 +210,14 @@ void AreaLight::sampleLight(
   if (!emissionObj->intersect(pointToLight, &lightIsect)) {
     // No emission if the ray doesn't hit the light
     // (e.g. sampling doesn't exactly correspond with light).
-    color = Vec(0, 0, 0);
+    emittedColor = Vec(0, 0, 0);
   } else {
     // Emits color if the ray does hit the light.
-    color = emit(pointToLight, lightIsect, kdt);
+    emittedColor = emit(pointToLight, lightIsect, kdt);
   }
 
   *dirToLightOut = dirToLight;
-  *colorOut = color;
+  *colorOut = emittedColor;
   *pdfOut = pdf;
 }
 
