@@ -1,6 +1,7 @@
 #pragma once
 #include "../geom.h"
 #include <vector>
+#include <exception>
 #include "poly.h"
 
 namespace geoms {
@@ -12,34 +13,37 @@ namespace geoms {
     std::vector<Poly::Point> points; /**< The point lookup table. */
     std::vector<Poly> faces; /**< The faces of the mesh. */
 
+  private:
+    /**
+     * Reads a polygon model from a file and populates a mesh.
+     *
+     * @param name the name of the file to read; can be any file format that the
+     *             Open Asset Import Library recognizes (e.g. obj)
+     *
+     * @throws geoms::Mesh::MeshFileImportError if the file couldn't be read
+     */
+    void readPolyModel(std::string name);
+
   public:
     const Vec origin;
 
     /**
-     * Constructs an empty mesh. Use mesh::readPolyModel() to populate.
+     * Constructs a mesh from a polygon model file on disk.
      *
-     * @param o the origin of the mesh in world space
-     * @param m the material used to render the mesh
-     * @param l the area light causing emission from the mesh
-     */
-    Mesh(Vec o, Material* m = nullptr, AreaLight* l = nullptr);
-
-    /**
-     * Reads a polygon model from a file and populates a mesh.
-     * Note: any previous data will be destroyed. All existing pointers to this
-     * data will be invalidated.
-     *
+     * @param o    the origin of the mesh in world space
      * @param name the name of the file to read; can be any file format that the
      *             Open Asset Import Library recognizes (e.g. obj)
-     * @returns    true if the mesh could be read, false otherwise
+     * @param m    the material used to render the mesh
+     * @param l    the area light causing emission from the mesh
+     *
+     * @throws geoms::Mesh::MeshFileImportError if the file couldn't be read
      */
-    bool readPolyModel(std::string name);
-
-    /**
-     * Destroys the existing poly faces and points in the mesh.
-     * All existing pointers to this data will be invalidated.
-     */
-    void clear();
+    Mesh(
+      Vec o,
+      std::string name,
+      Material* m = nullptr,
+      AreaLight* l = nullptr
+    );
 
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
     virtual bool intersectShadow(const Ray& r, float maxDist) const override;

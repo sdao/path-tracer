@@ -2,12 +2,16 @@
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
+#include <exception>
 #include "../debug.h"
 
-geoms::Mesh::Mesh(Vec o, Material* m, AreaLight* l)
-  : Geom(m, l), points(), faces(), origin(o) {}
+geoms::Mesh::Mesh(Vec o, std::string name, Material* m, AreaLight* l)
+  : Geom(m, l), points(), faces(), origin(o)
+{
+  readPolyModel(name);
+}
 
-bool geoms::Mesh::readPolyModel(std::string name) {
+void geoms::Mesh::readPolyModel(std::string name) {
   // Create an instance of the Importer class
   Assimp::Importer importer;
 
@@ -24,8 +28,7 @@ bool geoms::Mesh::readPolyModel(std::string name) {
 
   // If the import failed, report it
   if (!scene) {
-    std::cerr << "Importer error: " << importer.GetErrorString() << "\n";
-    return false;
+    throw std::runtime_error(importer.GetErrorString());
   }
 
   // Now we can access the file's contents.
@@ -35,17 +38,12 @@ bool geoms::Mesh::readPolyModel(std::string name) {
     aiMesh* mesh = scene->mMeshes[0];
 
     if (!mesh->HasPositions()) {
-      std::cerr << "Error: no vertex positions on the mesh.\n";
-      return false;
+      throw std::runtime_error("no vertex positions on the mesh");
     }
 
     if (!mesh->HasNormals()) {
-      std::cerr << "Error: no vertex normals on the mesh.\n";
-      return false;
+      throw std::runtime_error("no vertex normals on the mesh");
     }
-
-    // We have something to work with! Clear the existing data.
-    clear();
 
     // Add points.
     for (size_t i = 0; i < mesh->mNumVertices; ++i) {
@@ -79,14 +77,6 @@ bool geoms::Mesh::readPolyModel(std::string name) {
       }
     }
   }
-
-  // We're done. Everything will be cleaned up by the importer destructor.
-  return true;
-}
-
-void geoms::Mesh::clear() {
-  points.clear();
-  faces.clear();
 }
 
 bool geoms::Mesh::intersect(

@@ -26,6 +26,7 @@ void renderCornellBox(long w, long h, int iterations) {
   geoms::Disc   back(Vec(0, 0, -50), Vec(0, 0, 1), 100.0f, 0.0f, &white);
   geoms::Disc   left(Vec(-22, 0, -25), Vec(1, 0, 0), 100.0f, 0.0f, &red);
   geoms::Disc   right(Vec(22, 0, -25), Vec(-1, 0, 0), 100.0f, 0.0f, &green);
+  geoms::Mesh   dragon(Vec(-8, -18, -28), "assets/dragon100k.obj", &glossy);
   geoms::Disc   lightSource(
     Vec(0.0f, 18.5f, -25.0f),
     Vec(0, -1, 0),
@@ -33,8 +34,6 @@ void renderCornellBox(long w, long h, int iterations) {
     nullptr,
     &areaLight
   );
-  geoms::Mesh   dragon(Vec(-8, -18, -28), &glossy);
-  dragon.readPolyModel("assets/dragon100k.obj");
 
   std::vector<const Geom*> objs {
     &smallSphere, &bigSphere, &bottom, &top, &back, &left, &right, &lightSource,
