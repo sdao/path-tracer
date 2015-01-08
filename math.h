@@ -31,6 +31,9 @@ namespace math {
   /** 2 * Pi as a single-precision float. */
   static constexpr float TWO_PI = float(2.0 * M_PI);
 
+  /** 4 * Pi as a single-precision float. */
+  static constexpr float FOUR_PI = float(4.0 * M_PI);
+
   /** Pi / 2 as a single-precision float. */
   static constexpr float PI_2 = float(M_PI_2);
 
@@ -45,6 +48,12 @@ namespace math {
 
   /** 1 / Pi as a single-precision float. */
   static constexpr float INV_PI = float(M_1_PI);
+
+  /** Sqrt[3] as a single-precision float. */
+  static constexpr float SQRT_3 = 1.7320508075688772935274463415f;
+
+  /** The number of steradians in a sphere (4 * Pi). */
+  static constexpr float STERADIANS_PER_SPHERE = FOUR_PI;
 
   /** Clamps a value x between a and b. */
   inline float clamp(float x, float a = 0.0f, float b = 1.0f) {
@@ -413,6 +422,54 @@ namespace math {
       ret[2] *= -1.0f;
     }
     return ret;
+  }
+
+  inline Vec uniformSampleSphere(Randomness& rng) {
+    // See MathWorld <http://mathworld.wolfram.com/SpherePointPicking.html>.
+    float x = rng.nextNormalFloat();
+    float y = rng.nextNormalFloat();
+    float z = rng.nextNormalFloat();
+    float a = 1.0f / sqrtf(x * x + y * y + z * z);
+
+    return Vec(a * x, a * y, a * z);
+  }
+
+   /**
+   * Generates a random ray in a cone around the normal.
+   *
+   * Handy Mathematica code for checking that this works:
+   * \code
+   * R[a_] := (h = Cos[Pi/2];
+   *   z = RandomReal[{h, 1}];
+   *   t = RandomReal[{0, 2*Pi}];
+   *   r = Sqrt[1 - z^2];
+   *   x = r*Cos[t];
+   *   y = r*Sin[t];
+   *   {x, y, z})
+   *
+   * ListPointPlot3D[Map[R, Range[1000]], BoxRatios -> Automatic]
+   * \endcode
+   *
+   * @param rng       the per-thread RNG in use
+   * @param normal    the normal around which the cone lies
+   * @param halfAngle the half-angle of the cone's opening; must be between 0
+   *                  and Pi/2 and in radians
+   * @returns         a uniformally-random vector within halfAngle radians of
+   *                  the normal
+   */
+  inline Vec uniformSampleCone(Randomness& rng, Vec normal, float halfAngle) {
+    Vec tangent;
+    Vec binormal;
+    math::coordSystem(normal, &tangent, &binormal);
+
+    float h = cosf(halfAngle);
+    float z = rng.nextFloat(h, 1.0f);
+    float t = rng.nextFloat(float(PI * 2.0));
+    float r = sqrtf(1.0f - (z * z));
+    float x = r * cosf(t);
+    float y = r * sinf(t);
+
+    return (z * normal) + (x * tangent) + (y * binormal);
   }
 
   /**

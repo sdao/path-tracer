@@ -85,6 +85,10 @@ BBox geoms::Disc::bounds() const {
   return b;
 }
 
+BSphere geoms::Disc::boundSphere() const {
+  return BSphere(origin, radiusOuter);
+}
+
 Vec geoms::Disc::samplePoint(Randomness& rng) const {
   // See Bostock <http://bl.ocks.org/mbostock/d8b1e0a25467e6034bb9>.
   Vec tangent;

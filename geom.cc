@@ -7,3 +7,7 @@ Geom::~Geom() {}
 void Geom::refine(std::vector<const Geom*>& refined) const {
   refined.push_back(this);
 }
+
+BSphere Geom::boundSphere() const {
+  return BSphere(bounds());
+}

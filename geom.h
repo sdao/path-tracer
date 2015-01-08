@@ -50,6 +50,13 @@ public:
   virtual BBox bounds() const = 0;
 
   /**
+   * A bounding sphere encapsulating the entire geometry.
+   * If this method is not overriden, then the bounding sphere is
+   * automatically calculated from the bounding box.
+   */
+  virtual BSphere boundSphere() const;
+
+  /**
    * Randomly samples a point on the geometry, uniform with respect to the area
    * of the geometry.
    *

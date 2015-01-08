@@ -216,6 +216,25 @@ struct BBox {
 };
 
 /**
+ * A bounding sphere.
+ */
+struct BSphere {
+  Vec origin;
+  float radius;
+
+  BSphere(Vec o, float r = 0.0f) : origin(o), radius(r) {}
+
+  BSphere(BBox b) {
+    origin = (b.lower + b.upper) * 0.5f;
+    radius = fabsf((b.upper - origin).norm());
+  }
+
+  inline bool contains(const Vec& v) const {
+    return (v - origin).squaredNorm() <= (radius * radius);
+  }
+};
+
+/**
  * Contains the information for a ray-object intersection.
  */
 struct Intersection {
