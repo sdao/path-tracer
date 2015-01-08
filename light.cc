@@ -138,8 +138,10 @@ void AreaLight::evalLight(
 
   BSphere emitterBounds = emissionObj->boundSphere();
   if (emitterBounds.contains(point)) {
+    // We're inside the bounding sphere, so sample sphere uniformly.
     pdf = math::uniformSampleSpherePDF();
   } else {
+    // We're outside the bounding sphere, so sample by solid angle.
     Vec dirToLightOrigin = emitterBounds.origin - point;
     float theta = asinf(emitterBounds.radius / dirToLightOrigin.norm());
 
@@ -183,11 +185,11 @@ void AreaLight::sampleLight(
 
   BSphere emitterBounds = emissionObj->boundSphere();
   if (emitterBounds.contains(point)) {
-    // We're inside the bounding sphere, so sample uniformly.
+    // We're inside the bounding sphere, so sample sphere uniformly.
     dirToLight = math::uniformSampleSphere(rng);
     pdf = math::uniformSampleSpherePDF();
   } else {
-    // We're outside the bounding sphere.
+    // We're outside the bounding sphere, so sample by solid angle.
     Vec dirToLightOrigin = emitterBounds.origin - point;
     float theta = asinf(emitterBounds.radius / dirToLightOrigin.norm());
 
