@@ -1,5 +1,6 @@
 #pragma once
 #include "core.h"
+#include "parser.h"
 
 /**
  * A material that specifies how light scatters on geometry using a BSDF.

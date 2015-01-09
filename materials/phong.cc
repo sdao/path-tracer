@@ -7,7 +7,10 @@ materials::Phong::Phong(float e, Vec c)
   : scaleBRDF(c * (e + 2.0f) / math::TWO_PI),
     scaleProb((e + 1.0f) / math::TWO_PI),
     invExponent(1.0f / (e + 1.0f)),
-    exponent(e), color(c) {}
+    color(c), exponent(e) {}
+
+materials::Phong::Phong(const Parser& p)
+  : Phong(p.getFloat("exponent"), p.getVec("color")) {}
 
 inline Vec materials::Phong::evalBSDFInternal(
   const Vec& perfectReflect,

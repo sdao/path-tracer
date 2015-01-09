@@ -11,10 +11,11 @@ namespace materials {
     /** The refractive index for a vacuum (approx. air), nVac. */
     static constexpr float IOR_VACUUM = 1.0f;
 
-    const float r0; /** The cached R(0) value for Schlick's approximation. */
-    const float etaEntering; /** The refraction ratio nVac / nMaterial. */
-    const float etaExiting; /** Inverse of etaEntering (nMaterial / nVac). */
+    const float r0; /**< The cached R(0) value for Schlick's approximation. */
+    const float etaEntering; /**< The refraction ratio nVac / nMaterial. */
+    const float etaExiting; /**< Inverse of etaEntering (nMaterial / nVac). */
 
+    /** Helper function to compute R0 for the Schick approximation. */
     static float schickR0(float ior);
 
   protected:
@@ -42,6 +43,11 @@ namespace materials {
      * @param c   the color of the material
      */
     Dielectric(float ior = IOR_GLASS, Vec c = Vec(1, 1, 1));
+
+    /**
+     * Creates a dielectric material from the given parser.
+     */
+    Dielectric(const Parser& p);
 
     virtual void sampleLocal(
       Randomness& rng,

@@ -6,6 +6,10 @@ geoms::Sphere::Sphere(Vec o, float r, const Material* m, const AreaLight* l)
 geoms::Sphere::Sphere(const geoms::Sphere& other)
   : Geom(other.mat, other.light), origin(other.origin), radius(other.radius) {}
 
+geoms::Sphere::Sphere(const Parser& p)
+  : Sphere(p.getVec("origin"), p.getFloat("radius"),
+           p.getMaterial("mat"), p.getLight("light")) {}
+
 bool geoms::Sphere::intersect(const Ray& r, Intersection* isectOut) const {
   Vec diff = r.origin - origin;
   Vec l = r.direction;

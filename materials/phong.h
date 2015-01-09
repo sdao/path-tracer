@@ -8,14 +8,9 @@ namespace materials {
    * Note that Phong reflectance is not physically plausible.
    */
   class Phong : public Material {
-    /** Cached scaling term in the Phong BRDF. */
-    const Vec scaleBRDF;
-
-    /** Cached scaling term in the PDF. */
-    const float scaleProb;
-
-    /** Cached inverse exponent term. */
-    const float invExponent;
+    const Vec scaleBRDF; /**< Cached scaling term in the Phong BRDF. */
+    const float scaleProb; /**< Cached scaling term in the PDF. */
+    const float invExponent; /**< Cached inverse exponent term. */
 
     inline Vec evalBSDFInternal(
       const Vec& perfectReflect,
@@ -39,11 +34,11 @@ namespace materials {
     ) const override;
 
   public:
-    /** The Phong exponent of the material. */
-    const float exponent;
-
     /** The color of the material. */
     const Vec color;
+
+    /** The Phong exponent of the material. */
+    const float exponent;
 
     /**
      * Constructs a Phong material.
@@ -53,6 +48,11 @@ namespace materials {
      * @param c the color of the material
      */
     Phong(float e, Vec c = Vec(1, 1, 1));
+    
+    /**
+     * Constructs a Phong material from the given parser.
+     */
+    Phong(const Parser& p);
 
     virtual void sampleLocal(
       Randomness& rng,

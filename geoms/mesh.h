@@ -45,6 +45,11 @@ namespace geoms {
       const AreaLight* l = nullptr
     );
 
+    /**
+     * Constructs a mesh from the given parser.
+     */
+    Mesh(const Parser& p);
+
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
     virtual bool intersectShadow(const Ray& r, float maxDist) const override;
     virtual BBox bounds() const override;

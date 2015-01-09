@@ -19,6 +19,9 @@ namespace materials {
     /** Constructs a diffuse material with the given albedo (diffuse color). */
     Lambert(Vec a);
 
+    /** Constructs a diffuse material from the given parser. */
+    Lambert(const Parser& p);
+
     virtual bool shouldDirectIlluminate() const override;
   };
 

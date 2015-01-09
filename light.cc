@@ -2,6 +2,8 @@
 
 AreaLight::AreaLight(Vec c) : color(c) {}
 
+AreaLight::AreaLight(const Parser& p) : AreaLight(p.getVec("color")) {}
+
 inline Vec AreaLight::directIlluminateByLightPDF(
   Randomness& rng,
   const Ray& incoming,

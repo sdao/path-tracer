@@ -5,6 +5,7 @@
 #include "geom.h"
 #include "kdtree.h"
 #include "image.h"
+#include "parser.h"
 
 /**
  * Manages rendering by simulating the action of a physical pinhole camera.
@@ -87,7 +88,7 @@ public:
    * @param fov    the field of view (horizontal or vertical, whichever is
    *               smaller), in radians
    * @param len    the focal length of the lens
-   * @param stop   the f-stop (aperture) of the lens
+   * @param fStop the f-stop (aperture) of the lens
    */
   Camera(
     Transform xform,
@@ -95,8 +96,13 @@ public:
     long hh,
     float fov = math::PI_4,
     float len = 50.0f,
-    float stop = 16.0f
+    float fStop = 16.0f
   );
+
+  /**
+   * Constructs a camera from the given parser.
+   */
+   Camera(const Parser& p);
 
   /**
    * Renders an additional iteration of the image by path-tracing.

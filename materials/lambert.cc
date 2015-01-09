@@ -2,6 +2,8 @@
 
 materials::Lambert::Lambert(Vec a) : albedo(a) {}
 
+materials::Lambert::Lambert(const Parser& p) : Lambert(p.getVec("albedo")) {}
+
 Vec materials::Lambert::evalBSDFLocal(
   const Vec& incoming,
   const Vec& outgoing

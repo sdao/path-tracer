@@ -13,8 +13,8 @@ Camera::Camera(
   long hh,
   float fov,
   float len,
-  float stop
-) : focalLength(len), lensRadius((len / stop) * 0.5f), // Diameter = len / stop.
+  float fStop
+) : focalLength(len), lensRadius((len / fStop) * 0.5f), // Diam = len / fStop.
     camToWorldXform(xform),
     masterRng(), rowSeeds(size_t(hh)), img(ww, hh), iters(0)
 {
@@ -33,6 +33,11 @@ Camera::Camera(
   focalPlaneRight = 2.0f * halfFocalPlaneRight;
   focalPlaneOrigin = Vec(-halfFocalPlaneRight, halfFocalPlaneUp, -focalLength);
 }
+
+Camera::Camera(const Parser& p)
+  : Camera(p.getTransform("xform"), p.getInt("width"), p.getInt("height"),
+           p.getFloat("fov"), p.getFloat("focalLength"),
+           p.getFloat("fStop")) {}
 
 void Camera::renderOnce(
   const KDTree& kdt,

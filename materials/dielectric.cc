@@ -5,6 +5,9 @@ materials::Dielectric::Dielectric(float ior, Vec c)
     etaEntering(IOR_VACUUM / ior), etaExiting(ior / IOR_VACUUM),
     color(c) {}
 
+materials::Dielectric::Dielectric(const Parser& p)
+  : Dielectric(p.getFloat("ior"), p.getVec("color")) {}
+
 float materials::Dielectric::schickR0(float ior) {
   // Pre-compute values for Fresnel calculations.
   

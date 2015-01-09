@@ -1,5 +1,6 @@
 #pragma once
 #include "core.h"
+#include "parser.h"
 
 class Material;
 class AreaLight;
@@ -16,6 +17,11 @@ protected:
    * @param l the area light causing emission from the geometry
    */
   Geom(const Material* m = nullptr, const AreaLight* l = nullptr);
+
+  /**
+   * Constructs a geom from the given parser.
+   */
+  Geom(const Parser& p);
 
 public:
   const Material* mat; /**< The material used to render the geom. */

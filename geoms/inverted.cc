@@ -3,6 +3,9 @@
 geoms::Inverted::Inverted(const Geom* g)
   : Geom(g->mat, g->light), original(g) {}
 
+geoms::Inverted::Inverted(const Parser& p)
+  : Inverted(p.getGeom("original")) {}
+
 bool geoms::Inverted::intersect(const Ray& r, Intersection* isectOut) const {
   bool status = original->intersect(r, isectOut);
   isectOut->normal = isectOut->normal * -1.0f;

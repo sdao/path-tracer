@@ -4,11 +4,12 @@
 #include <functional>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-#include "camera.h"
+#include "parser.h"
 
 class AreaLight;
 class Material;
 class Geom;
+class Camera;
 
 class Scene {
   std::map<std::string, const AreaLight*> sceneLights;
@@ -23,35 +24,13 @@ class Scene {
     const boost::property_tree::ptree& root,
     const std::string& prefix,
     std::map<std::string, T>& storage,
-    std::function<T(const boost::property_tree::ptree&)> readSingleFunc
+    std::function<T(const Parser&)> readSingleFunc
   );
   void readLights(const boost::property_tree::ptree& root);
   void readMats(const boost::property_tree::ptree& root);
   void readGeoms(const boost::property_tree::ptree& root);
   void readCamera(const boost::property_tree::ptree& root);
-
-  template<typename T>
-  static T parseRefAny(
-    const boost::property_tree::ptree& attr,
-    std::map<std::string, T>& storage,
-    std::string key,
-    bool allowNull
-  );
-  static std::string parseString(
-    const boost::property_tree::ptree& attr,
-    std::string key,
-    bool allowEmpty
-  );
-  static float parseFloat(
-    const boost::property_tree::ptree& attr,
-    std::string key
-  );
-  static int parseInt(
-    const boost::property_tree::ptree& attr,
-    std::string key
-  );
-  static Vec parseVec(const boost::property_tree::ptree& attr, std::string key);
-
+  
 public:
   /**
    * Constructs a scene by reading it from a JSON scene description.

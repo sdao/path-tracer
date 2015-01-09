@@ -32,21 +32,21 @@
   "geometry" : {
     "small_sphere" : {
       "type" : "sphere",
-      "material" : "dielectric",
+      "mat" : "dielectric",
       "light" : "",
       "origin" : [-2, -14, -16],
       "radius" : 4.0
     },
     "big_sphere" : {
       "type" : "sphere",
-      "material" : "dielectric",
+      "mat" : "dielectric",
       "light" : "",
       "origin" : [10, -12, -22],
       "radius" : 6.0
     },
     "bottom" : {
       "type" : "disc",
-      "material" : "white",
+      "mat" : "white",
       "light" : "",
       "origin" : [0, -18, -25],
       "normal" : [0, 1, 0],
@@ -55,7 +55,7 @@
     },
     "top" : {
       "type" : "disc",
-      "material" : "white",
+      "mat" : "white",
       "light" : "",
       "origin" : [0, 18, -25],
       "normal" : [0, -1, 0],
@@ -64,7 +64,7 @@
     },
     "back" : {
       "type" : "disc",
-      "material" : "white",
+      "mat" : "white",
       "light" : "",
       "origin" : [0, 0, -50],
       "normal" : [0, 0, 1],
@@ -73,7 +73,7 @@
     },
     "left" : {
       "type" : "disc",
-      "material" : "red",
+      "mat" : "red",
       "light" : "",
       "origin" : [-22, 0, -25],
       "normal" : [1, 0, 0],
@@ -82,7 +82,7 @@
     },
     "right" : {
       "type" : "disc",
-      "material" : "green",
+      "mat" : "green",
       "light" : "",
       "origin" : [22, -0, -25],
       "normal" : [-1, 0, 0],
@@ -91,7 +91,7 @@
     },
     "light_source" : {
       "type" : "disc",
-      "material" : "",
+      "mat" : "",
       "light" : "ceiling",
       "origin" : [0, 18.5, -25],
       "normal" : [0, -1, 0],
@@ -100,17 +100,19 @@
     },
     "dragon" : {
       "type" : "mesh",
-      "material" : "glossy",
+      "mat" : "glossy",
       "light" : "",
       "origin" : [-8, -18, -28],
       "file" : "assets/dragon100k.obj"
     }
   },
   "camera" : {
-    "translate" : [0, 0, 32],
-    "rotate" : {
-      "angle" : 0,
-      "axis" : [1, 0, 0]
+    "xform" : {
+      "translate" : [0, 0, 32],
+      "rotate" : {
+        "angle" : 0,
+        "axis" : [1, 0, 0]
+      }
     },
     "width" : 512,
     "height" : 384,
