@@ -1,5 +1,7 @@
 #pragma once
 #include <iostream>
+#include <vector>
+#include <map>
 #include "core.h"
 #include "geom.h"
 #include "mem.h"
@@ -177,6 +179,13 @@ public:
    * Use the kdtree::build() method to complete building.
    */
   KDTree(const std::vector<const Geom*>& o);
+
+  /**
+   * Constructs an empty kdtree associated with the given objects,
+   * but does not actually build out the k-d tree structure.
+   * Use the kdtree::build() method to complete building.
+   */
+  KDTree(const std::map<std::string, const Geom*>& o);
 
   /**
    * Actually builds out the k-d tree structure.

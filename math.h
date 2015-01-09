@@ -558,6 +558,10 @@ namespace math {
     return Transform(Eigen::Translation<float, 3>(x, y, z));
   }
 
+  inline Transform translation(Vec v) {
+    return Transform(Eigen::Translation<float, 3>(v.x(), v.y(), v.z()));
+  }
+
   inline Transform angleAxisRotation(float angle, Vec axis) {
     return Transform(Eigen::AngleAxis<float>(angle, axis));
   }

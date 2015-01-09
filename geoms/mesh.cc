@@ -5,9 +5,12 @@
 #include <exception>
 #include "../debug.h"
 
-geoms::Mesh::Mesh(Vec o, std::string name, Material* m, AreaLight* l)
-  : Geom(m, l), points(), faces(), origin(o)
-{
+geoms::Mesh::Mesh(
+  Vec o,
+  std::string name,
+  const Material* m,
+  const AreaLight* l
+) : Geom(m, l), points(), faces(), origin(o) {
   readPolyModel(name);
 }
 
@@ -38,11 +41,11 @@ void geoms::Mesh::readPolyModel(std::string name) {
     aiMesh* mesh = scene->mMeshes[0];
 
     if (!mesh->HasPositions()) {
-      throw std::runtime_error("no vertex positions on the mesh");
+      throw std::runtime_error("No vertex positions on the mesh");
     }
 
     if (!mesh->HasNormals()) {
-      throw std::runtime_error("no vertex normals on the mesh");
+      throw std::runtime_error("No vertex normals on the mesh");
     }
 
     // Add points.

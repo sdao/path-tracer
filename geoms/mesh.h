@@ -41,8 +41,8 @@ namespace geoms {
     Mesh(
       Vec o,
       std::string name,
-      Material* m = nullptr,
-      AreaLight* l = nullptr
+      const Material* m = nullptr,
+      const AreaLight* l = nullptr
     );
 
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;

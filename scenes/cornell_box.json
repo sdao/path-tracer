@@ -1,0 +1,121 @@
+{
+  "lights" : {
+    "ceiling" : {
+      "type" : "area",
+      "color" : [4, 4, 4]
+    }
+  },
+  "materials" : {
+    "green" : {
+      "type" : "lambert",
+      "albedo" : [0.5, 1.0, 0.5]
+    },
+    "white" : {
+      "type" : "lambert",
+      "albedo" : [1, 1, 1]
+    },
+    "red" : {
+      "type" : "lambert",
+      "albedo" : [1.0, 0.5, 0.5]
+    },
+    "dielectric" : {
+      "type" : "dielectric",
+      "ior" : 1.5,
+      "color" : [1, 1, 1]
+    },
+    "glossy" : {
+      "type" : "phong",
+      "exponent" : 100,
+      "color" : [1, 1, 1]
+    }
+  },
+  "geometry" : {
+    "small_sphere" : {
+      "type" : "sphere",
+      "material" : "dielectric",
+      "light" : "",
+      "origin" : [-2, -14, -16],
+      "radius" : 4.0
+    },
+    "big_sphere" : {
+      "type" : "sphere",
+      "material" : "dielectric",
+      "light" : "",
+      "origin" : [10, -12, -22],
+      "radius" : 6.0
+    },
+    "bottom" : {
+      "type" : "disc",
+      "material" : "white",
+      "light" : "",
+      "origin" : [0, -18, -25],
+      "normal" : [0, 1, 0],
+      "radiusOuter" : 100.0,
+      "radiusInner" : 0.0
+    },
+    "top" : {
+      "type" : "disc",
+      "material" : "white",
+      "light" : "",
+      "origin" : [0, 18, -25],
+      "normal" : [0, -1, 0],
+      "radiusOuter" : 100.0,
+      "radiusInner" : 10.0
+    },
+    "back" : {
+      "type" : "disc",
+      "material" : "white",
+      "light" : "",
+      "origin" : [0, 0, -50],
+      "normal" : [0, 0, 1],
+      "radiusOuter" : 100.0,
+      "radiusInner" : 0.0
+    },
+    "left" : {
+      "type" : "disc",
+      "material" : "red",
+      "light" : "",
+      "origin" : [-22, 0, -25],
+      "normal" : [1, 0, 0],
+      "radiusOuter" : 100.0,
+      "radiusInner" : 0.0
+    },
+    "right" : {
+      "type" : "disc",
+      "material" : "green",
+      "light" : "",
+      "origin" : [22, -0, -25],
+      "normal" : [-1, 0, 0],
+      "radiusOuter" : 100.0,
+      "radiusInner" : 0.0
+    },
+    "light_source" : {
+      "type" : "disc",
+      "material" : "",
+      "light" : "ceiling",
+      "origin" : [0, 18.5, -25],
+      "normal" : [0, -1, 0],
+      "radiusOuter" : 12.0,
+      "radiusInner" : 0.0
+    },
+    "dragon" : {
+      "type" : "mesh",
+      "material" : "glossy",
+      "light" : "",
+      "origin" : [-8, -18, -28],
+      "file" : "assets/dragon100k.obj"
+    }
+  },
+  "camera" : {
+    "translate" : [0, 0, 32],
+    "rotate" : {
+      "angle" : 0,
+      "axis" : [1, 0, 0]
+    },
+    "width" : 512,
+    "height" : 384,
+    "fov" : 0.78540,
+    "focalLength" : 48.0,
+    "fStop" : 32.0
+  }
+}

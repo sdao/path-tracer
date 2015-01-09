@@ -18,8 +18,8 @@ dependencies. If you're on Linux, you can use your package manager.
   (links with libIlmImf and libHalf)
 * [Open Asset Import Library](http://assimp.sourceforge.net/)
   (links with libassimp) 
-* [Boost.MultiArray](http://www.boost.org/)
-  (part of the Boost template libraries)
+* [Boost](http://www.boost.org/)
+  (template libraries)
 
 Reference
 ---------
