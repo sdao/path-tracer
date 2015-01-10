@@ -12,19 +12,22 @@ class Geom;
 class Camera;
 
 class Scene {
-  std::map<std::string, const AreaLight*> sceneLights;
-  std::map<std::string, const Material*> sceneMats;
-  std::map<std::string, const Geom*> sceneGeoms;
+  template <typename T>
+  using LookupMap = std::map< std::string, std::function<T(const Parser&)> >;
+
+  std::map<std::string, const AreaLight*> lights;
+  std::map<std::string, const Material*> materials;
+  std::map<std::string, const Geom*> geometry;
   Camera* camera;
 
   void cleanUp();
 
   template<typename T>
-  inline void readAny(
+  void readMultiple(
     const boost::property_tree::ptree& root,
     const std::string& prefix,
-    std::map<std::string, T>& storage,
-    std::function<T(const Parser&)> readSingleFunc
+    const LookupMap<T> lookup,
+    std::map<std::string, T>& storage
   );
   void readLights(const boost::property_tree::ptree& root);
   void readMats(const boost::property_tree::ptree& root);
@@ -50,8 +53,5 @@ public:
    * @param iterations the number of iterations to render; if < 0, then this
    *                   function will run forever
    */
-  void renderMultiple(
-    std::string name,
-    int iterations
-  );
+  void renderMultiple(std::string name, int iterations);
 };

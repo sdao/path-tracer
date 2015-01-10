@@ -422,8 +422,9 @@ bool KDTree::intersectShadow(const Ray& r, float maxDist) const {
   return false;
 }
 
-void KDTree::print(mem::ID nodeId, std::ostream& os, std::string header) const {
+void KDTree::print(mem::ID nodeId, std::ostream& os, int level) const {
   const KDNode& node = mem::refConst<KDNode>(allNodes, nodeId);
+  std::string header(level * 2, ' ');
 
   if (!node.isLeaf()) {
     os << header << "interior ";
@@ -452,14 +453,14 @@ void KDTree::print(mem::ID nodeId, std::ostream& os, std::string header) const {
 
   os << ") {\n";
   if (node.belowId().isValid()) {
-    print(node.belowId(), os, header + "  ");
+    print(node.belowId(), os, level + 1);
   } else {
     os << header << "  [none below]";
   }
 
   os << "\n";
   if (node.aboveId().isValid()) {
-    print(node.aboveId(), os, header + "  ");
+    print(node.aboveId(), os, level + 1);
   } else {
     os << header << "  [none above]";
   }

@@ -9,9 +9,11 @@
 #include "kdtree.h"
 
 using namespace boost::property_tree;
+using namespace materials;
+using namespace geoms;
 
 Scene::Scene(std::string jsonFile)
-  : sceneLights(), sceneMats(), sceneGeoms(), camera(nullptr)
+  : lights(), materials(), geometry(), camera(nullptr)
 {
   try {
     ptree pt;
@@ -21,7 +23,7 @@ Scene::Scene(std::string jsonFile)
     readMats(pt);
     readGeoms(pt);
     readCamera(pt);
-  } catch (const std::exception&) {
+  } catch (...) {
     cleanUp();
     throw;
   }
@@ -32,15 +34,15 @@ Scene::~Scene() {
 }
 
 void Scene::cleanUp() {
-  for (auto& pair : sceneLights) {
+  for (auto& pair : lights) {
     delete pair.second;
   }
 
-  for (auto& pair : sceneMats) {
+  for (auto& pair : materials) {
     delete pair.second;
   }
 
-  for (auto& pair : sceneGeoms) {
+  for (auto& pair : geometry) {
     delete pair.second;
   }
 
@@ -48,32 +50,35 @@ void Scene::cleanUp() {
 }
 
 template<typename T>
-void Scene::readAny(
+void Scene::readMultiple(
   const boost::property_tree::ptree& root,
   const std::string& prefix,
-  std::map<std::string, T>& storage,
-  std::function<T(const Parser&)> readSingleFunc
+  const LookupMap<T> lookup,
+  std::map<std::string, T>& storage
 ) {
   const auto& children = root.get_child(prefix);
 
   int count = 0;
   for (const auto& child : children) {
     const std::string name = child.first;
-    const auto& attr = child.second;
-    Parser parser(sceneLights, sceneMats, sceneGeoms, attr);
 
     try {
+      const Parser parser(lights, materials, geometry, child.second);
+      const std::string type = parser.getString("type", false);
+
       if (name.length() == 0) {
         throw std::runtime_error("No name");
       } else if (storage.count(name) > 0) {
         throw std::runtime_error("Name was reused");
+      } else if (lookup.count(type) == 0) {
+        throw std::runtime_error(type + " is an unrecognized type");
       }
 
-      storage[name] = readSingleFunc(parser);
-    } catch (std::exception& e) {
+      storage[name] = lookup.at(type)(parser);
+    } catch (...) {
       std::stringstream msg;
-      msg << prefix << ".[" << count << "]" << name << ": " << e.what();
-      throw std::runtime_error(msg.str());
+      msg << "Error parsing " << prefix << ".[" << count << "]" << name;
+      std::throw_with_nested(std::runtime_error(msg.str()));
     }
 
     count++;
@@ -81,63 +86,47 @@ void Scene::readAny(
 }
 
 void Scene::readLights(const ptree& root) {
-  readAny<const AreaLight*>(root, "lights", sceneLights, [](const Parser& p) -> const AreaLight* {
-    const std::string type = p.getString("type", false);
+  static const LookupMap<const AreaLight*> lightLookup = {
+    { "area", [](const Parser& p) { return new AreaLight(p); } }
+  };
 
-    if (type == "area") {
-      return new AreaLight(p);
-    } else {
-      throw std::runtime_error(type + " is not a recognized light type");
-    }
-  });
+  readMultiple<const AreaLight*>(root, "lights", lightLookup, lights);
 }
 
 void Scene::readMats(const ptree& root) {
-  readAny<const Material*>(root, "materials", sceneMats, [](const Parser& p) -> const Material* {
-    const std::string type = p.getString("type", false);
+  static const LookupMap<const Material*> materialLookup = {
+    { "dielectric", [](const Parser& p) { return new Dielectric(p); } },
+    { "lambert",    [](const Parser& p) { return new Lambert(p); } },
+    { "phong",      [](const Parser& p) { return new Phong(p); } }
+  };
 
-    if (type == "dielectric") {
-      return new materials::Dielectric(p);
-    } else if (type == "lambert") {
-      return new materials::Lambert(p);
-    } else if (type == "phong") {
-      return new materials::Phong(p);
-    } else {
-      throw std::runtime_error(type + " is not a recognized material type");
-    }
-  });
+  readMultiple<const Material*>(root, "materials", materialLookup, materials);
 }
 
 void Scene::readGeoms(const ptree& root) {
-  readAny<const Geom*>(root, "geometry", sceneGeoms, [&](const Parser& p) -> const Geom* {
-    const std::string type = p.getString("type", false);
+  static const LookupMap<const Geom*> geometryLookup = {
+    { "disc",     [](const Parser& p) { return new Disc(p); } },
+    { "inverted", [](const Parser& p) { return new Inverted(p); } },
+    { "sphere",   [](const Parser& p) { return new Sphere(p); } },
+    { "mesh",     [](const Parser& p) { return new Mesh(p); } }
+  };
 
-    if (type == "disc") {
-      return new geoms::Disc(p);
-    } else if (type == "sphere") {
-      return new geoms::Sphere(p);
-    } else if (type == "mesh") {
-      return new geoms::Mesh(p);
-    } else if (type == "inverted") {
-      return new geoms::Inverted(p);
-    } else {
-      throw std::runtime_error(type + " is not a recognized geometry type");
-    }
-  });
+  readMultiple<const Geom*>(root, "geometry", geometryLookup, geometry);
 }
 
-void Scene::readCamera(const boost::property_tree::ptree& root) {
+void Scene::readCamera(const ptree& root) {
   const auto& attr = root.get_child("camera");
-  Parser parser(sceneLights, sceneMats, sceneGeoms, attr);
 
-  camera = new Camera(parser);
+  try {
+    const Parser parser(lights, materials, geometry, attr);
+    camera = new Camera(parser);
+  } catch (...) {
+    std::throw_with_nested(std::runtime_error("Error parsing camera"));
+  }
 }
 
-void Scene::renderMultiple(
-  std::string name,
-  int iterations
-) {
-  KDTree tree(sceneGeoms);
+void Scene::renderMultiple(std::string name, int iterations) {
+  KDTree tree(geometry);
   tree.build();
   camera->renderMultiple(tree, name, iterations);
 }

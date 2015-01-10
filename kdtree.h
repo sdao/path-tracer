@@ -168,9 +168,9 @@ protected:
    *
    * @param nodeId the node at the root of the subtree
    * @param os     the output stream to print to
-   * @param header whitespace used to indent the printed output
+   * @param level  the level of indentation for the output
    */
-  void print(mem::ID nodeId, std::ostream& os, std::string header = "") const;
+  void print(mem::ID nodeId, std::ostream& os, int level = 0) const;
 
 public:
   /**

@@ -7,6 +7,7 @@
 #include "camera.h"
 #include "kdtree.h"
 #include "scene.h"
+#include "debug.h"
 
 void renderCornellBox(long w, long h, int iterations);
 void renderSpheresScene(long w, long h, int iterations);
@@ -116,6 +117,6 @@ int main(int argc, char* argv[]) {
     Scene scene("scenes/cornell_box.json");
     scene.renderMultiple("output.exr", iterations);
   } catch (std::exception& e) {
-    std::cerr << e.what() << "\n";
+    debug::printNestedException(e);
   }
 }

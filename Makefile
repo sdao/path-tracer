@@ -16,7 +16,8 @@ ifeq ($(strip $(CXX)),icpc)
 else ifeq ($(strip $(CXX)),clang++)
 	# Clang compiler: enable extra warnings
 
-	WARN = -Werror -Weverything -Wno-c++98-compat -Wno-padded -Wno-float-equal
+	WARN = -Werror -Weverything -Wno-c++98-compat -Wno-padded -Wno-float-equal \
+			   -Wno-exit-time-destructors
 
 	CXXFLAGS = $(WARN) -std=c++11 -DNDEBUG -O3 -flto
 	CXXFLAGS_DEBUG = $(WARN) -std=c++11 -DDEBUG -O0 -g
