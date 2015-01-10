@@ -1,5 +1,6 @@
 #include "scene.h"
 #include <exception>
+#include <boost/format.hpp>
 #include "camera.h"
 #include "light.h"
 #include "material.h"
@@ -8,9 +9,8 @@
 #include "geoms/all.h"
 #include "kdtree.h"
 
-using namespace boost::property_tree;
-using namespace materials;
-using namespace geoms;
+using boost::property_tree::ptree;
+using boost::format;
 
 Scene::Scene(std::string jsonFile)
   : lights(), materials(), geometry(), camera(nullptr)
@@ -71,14 +71,14 @@ void Scene::readMultiple(
       } else if (storage.count(name) > 0) {
         throw std::runtime_error("Name was reused");
       } else if (lookup.count(type) == 0) {
-        throw std::runtime_error(type + " is an unrecognized type");
+        throw std::runtime_error(type + " is not a recognized type");
       }
 
       storage[name] = lookup.at(type)(parser);
     } catch (...) {
-      std::stringstream msg;
-      msg << "Error parsing " << prefix << ".[" << count << "]" << name;
-      std::throw_with_nested(std::runtime_error(msg.str()));
+      std::throw_with_nested(std::runtime_error(
+        str(format("Error parsing node (%1%.[%2%]%3%)") % prefix % count % name)
+      ));
     }
 
     count++;
@@ -94,6 +94,7 @@ void Scene::readLights(const ptree& root) {
 }
 
 void Scene::readMats(const ptree& root) {
+  using namespace materials;
   static const LookupMap<const Material*> materialLookup = {
     { "dielectric", [](const Parser& p) { return new Dielectric(p); } },
     { "lambert",    [](const Parser& p) { return new Lambert(p); } },
@@ -104,6 +105,7 @@ void Scene::readMats(const ptree& root) {
 }
 
 void Scene::readGeoms(const ptree& root) {
+  using namespace geoms;
   static const LookupMap<const Geom*> geometryLookup = {
     { "disc",     [](const Parser& p) { return new Disc(p); } },
     { "inverted", [](const Parser& p) { return new Inverted(p); } },
@@ -121,7 +123,9 @@ void Scene::readCamera(const ptree& root) {
     const Parser parser(lights, materials, geometry, attr);
     camera = new Camera(parser);
   } catch (...) {
-    std::throw_with_nested(std::runtime_error("Error parsing camera"));
+    std::throw_with_nested(std::runtime_error(
+      "Error parsing node (camera)"
+    ));
   }
 }
 

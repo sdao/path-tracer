@@ -1,19 +1,18 @@
 #include "parser.h"
+#include <boost/format.hpp>
 
-using namespace boost::property_tree;
+using boost::property_tree::ptree;
+using boost::format;
 
 Parser::Parser(
-  const std::map<std::string, const AreaLight*>& sceneLights,
-  const std::map<std::string, const Material*>& sceneMats,
-  const std::map<std::string, const Geom*>& sceneGeoms,
+  const std::map<std::string, const AreaLight*>& ll,
+  const std::map<std::string, const Material*>& mm,
+  const std::map<std::string, const Geom*>& gg,
   const ptree& attr
-) : lights(sceneLights),
-    materials(sceneMats),
-    geometry(sceneGeoms),
-    attributes(attr) {}
+) : lights(ll), materials(mm), geometry(gg), attributes(attr) {}
 
 template<typename T>
-T Parser::getRefAny(
+T Parser::getItemFromStorage(
   const std::map<std::string, T>& storage,
   std::string key,
   bool allowNull
@@ -25,7 +24,9 @@ T Parser::getRefAny(
   } else if (storage.count(name) > 0) {
     return storage.at(name);
   } else {
-    throw std::runtime_error(key + " references a non-existent object");
+    throw std::runtime_error(
+      str(format("Property '%1%' references an unknown object") % key)
+    );
   }
 }
 
@@ -34,12 +35,17 @@ std::string Parser::getString(
   bool allowEmpty
 ) const {
   const auto optionalString = attributes.get_optional<std::string>(key);
+
   if (!optionalString) {
-    throw std::runtime_error(key + " is missing");
+    throw std::runtime_error(
+      str(format("Required property '%1%' is missing") % key)
+    );
   }
 
   if (!allowEmpty && optionalString->length() == 0) {
-    throw std::runtime_error(key + " must not be empty");
+    throw std::runtime_error(
+      str(format("Property '%1%' must not be empty") % key)
+    );
   }
 
   return *optionalString;
@@ -49,8 +55,11 @@ float Parser::getFloat(
   std::string key
 ) const {
   const auto optionalFloat = attributes.get_optional<float>(key);
+
   if (!optionalFloat) {
-    throw std::runtime_error(key + " is missing or is not a float");
+    throw std::runtime_error(
+      str(format("Cannot read float property '%1%'") % key)
+    );
   }
 
   return *optionalFloat;
@@ -60,8 +69,11 @@ int Parser::getInt(
   std::string key
 ) const {
   const auto optionalInt = attributes.get_optional<int>(key);
+
   if (!optionalInt) {
-    throw std::runtime_error(key + " is missing or is not an integer");
+    throw std::runtime_error(
+      str(format("Cannot read int property '%1%'") % key)
+    );
   }
 
   return *optionalInt;
@@ -69,12 +81,14 @@ int Parser::getInt(
 
 Vec Parser::getVec(std::string key) const {
   const auto optionalArray = attributes.get_child_optional(key);
+
   if (!optionalArray) {
-    throw std::runtime_error(key + " is missing");
+    throw std::runtime_error(
+      str(format("Cannot read vector property '%1%'") % key)
+    );
   }
 
   Vec result;
-
   int count = 0;
   for (const auto& component : *optionalArray) {
     const auto optionalVal = component.second.get_value_optional<float>();
@@ -82,7 +96,7 @@ Vec Parser::getVec(std::string key) const {
     if (count < 3) {
       if (!optionalVal) {
         throw std::runtime_error(
-          key + " is invalid at component " + std::to_string(count)
+          str(format("Cannot read index %1% of vector '%2%'") % count % key)
         );
       }
 
@@ -93,7 +107,9 @@ Vec Parser::getVec(std::string key) const {
   }
 
   if (count != 3) {
-    throw std::runtime_error(key + " must have exactly 3 components");
+    throw std::runtime_error(
+      str(format("Property '%1%' must have exactly 3 components") % key)
+    );
   }
 
   return result;
@@ -110,13 +126,13 @@ Transform Parser::getTransform(std::string key) const {
 }
 
 const AreaLight* Parser::getLight(std::string key) const {
-  return getRefAny<const AreaLight*>(lights, key, true);
+  return getItemFromStorage<const AreaLight*>(lights, key, true);
 }
 
 const Material* Parser::getMaterial(std::string key) const {
-  return getRefAny<const Material*>(materials, key, true);
+  return getItemFromStorage<const Material*>(materials, key, true);
 }
 
 const Geom* Parser::getGeom(std::string key) const {
-  return getRefAny<const Geom*>(geometry, key, false);
+  return getItemFromStorage<const Geom*>(geometry, key, false);
 }

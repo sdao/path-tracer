@@ -3,7 +3,7 @@
 /**
  * Represents a typesafe array/vector index.
  */
-union ID {
+struct ID {
   /**
    * An invalid array/vector index.
    * All valid indices must be lower than this index.

@@ -10,18 +10,14 @@ namespace debug {
     return isnan(v.x()) || isnan(v.y()) || isnan(v.z());
   }
 
-  inline void printNestedException(const std::exception& e, bool root =  true)
+  inline void printNestedException(const std::exception& e)
   {
-    if (root) {
-      std::cerr << "error: " << e.what() << "\n";
-    } else {
-      std::cerr << "       " << e.what() << "\n";
-    }
+    std::cerr << e.what() << "\n";
 
     try {
       std::rethrow_if_nested(e);
     } catch(const std::exception& e) {
-      printNestedException(e, false);
+      printNestedException(e);
     } catch(...) {}
   }
 
