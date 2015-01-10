@@ -1,5 +1,6 @@
 #pragma once
 #include "../geom.h"
+#include "../id.h"
 
 namespace geoms {
 

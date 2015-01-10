@@ -4,6 +4,7 @@
 #include <map>
 #include "core.h"
 #include "geom.h"
+#include "id.h"
 
 /**
  * A k-d tree used to accelerate ray-object intersections.
