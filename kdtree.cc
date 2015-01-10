@@ -16,22 +16,6 @@ KDTree::KDTree(const std::vector<const Geom*>& o)
   }
 }
 
-KDTree::KDTree(const std::map<std::string, const Geom*>& o)
-  : allNodes(), rootId(), objs(), lights()
-{
-  // Refine all geometry into primitives.
-  for (const auto& pair : o) {
-    pair.second->refine(objs);
-  }
-
-  // Add all lights to the light list.
-  for (const Geom* g : objs) {
-    if (g->light) {
-      lights.push_back(g);
-    }
-  }
-}
-
 void KDTree::build() {
   rootId = 0;
   allNodes.push_back(KDNode());

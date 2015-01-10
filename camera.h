@@ -29,13 +29,15 @@ class Camera {
    */
   static constexpr float BIASED_RADIANCE_CLAMPING = 50.0f;
 
-  const float focalLength;
-  const float lensRadius;
-  const Transform camToWorldXform;
+  KDTree kdAccelTree; /**< The k-d tree containing the renderable geometry. */
+
+  const float focalLength; /**< The distance from the eye to the focal plane. */
+  const float lensRadius; /**< The radius of the lens opening. */
+  const Transform camToWorldXform; /**< Transform from camera to world space. */
   
-  float focalPlaneUp;
-  float focalPlaneRight;
-  Vec focalPlaneOrigin;
+  float focalPlaneUp; /**< The height of the focal plane. */
+  float focalPlaneRight; /**< The width of the focal plane. */
+  Vec focalPlaneOrigin; /**< The origin (corner) of the focal plane. */
   
   Randomness masterRng; /**< The RNG used to seed the per-row RNGs. */
   std::vector<unsigned> rowSeeds; /**< The per-row RNG seeds. */
@@ -48,13 +50,13 @@ class Camera {
    * Traces a path starting with the given ray, and returns the sampled
    * radiance.
    *
-   * @param r          the ray that starts the path
-   * @param kdt        a k-d tree containing the scene's geometry
+   * @param r   the ray that starts the path
+   * @param rng the per-thread RNG in use
+   * @returns   the sampled radiance of the path
    */
   Vec trace(
     LightRay r,
-    Randomness& rng,
-    const KDTree& kdt
+    Randomness& rng
   ) const;
 
   /**
@@ -68,14 +70,12 @@ class Camera {
    * @param isect       the intersection on the target geometry that should be
    *                    illuminated
    * @param mat         the material of the target geometry being illuminated
-   * @param kdt         a k-d tree containing the scene's geometry
    */
   Vec uniformSampleOneLight(
     Randomness& rng,
     const LightRay& incoming,
     const Intersection& isect,
-    const Material* mat,
-    const KDTree& kdt
+    const Material* mat
   ) const;
 
 public:
@@ -83,6 +83,7 @@ public:
    * Constructs a camera.
    *
    * @param xform  the transformation from camera space to world space
+   * @param objs   the objects to render
    * @param ww     the width of the output image, in pixels
    * @param hh     the height of the output image, in pixels
    * @param fov    the field of view (horizontal or vertical, whichever is
@@ -92,6 +93,7 @@ public:
    */
   Camera(
     Transform xform,
+    std::vector<const Geom*> objs,
     long ww,
     long hh,
     float fov = math::PI_4,
@@ -109,11 +111,9 @@ public:
    * If there are existing iterations, the additional iteration will be
    * combined in a weighted manner.
    *
-   * @param kdt     a k-d tree containing the scene's geometry
    * @param name    the name of the output EXR file
    */
   void renderOnce(
-    const KDTree& kdt,
     std::string name
   );
 
@@ -121,13 +121,11 @@ public:
    * Renders multiple additional path-tracing iterations.
    * To render infinite iterations, specify iterations = -1.
    *
-   * @param kdt        a k-d tree containing the scene's geometry
    * @param name       the name of the output EXR file
    * @param iterations the number of iterations to render; if < 0, then this
    *                   function will run forever
    */
   void renderMultiple(
-    const KDTree& kdt,
     std::string name,
     int iterations
   );

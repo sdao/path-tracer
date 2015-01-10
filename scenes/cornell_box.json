@@ -30,14 +30,14 @@
     }
   },
   "geometry" : {
-    "small_sphere" : {
+    "smallSphere" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
       "origin" : [-2, -14, -16],
       "radius" : 4.0
     },
-    "big_sphere" : {
+    "bigSphere" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
@@ -89,7 +89,7 @@
       "radiusOuter" : 100.0,
       "radiusInner" : 0.0
     },
-    "light_source" : {
+    "lightSource" : {
       "type" : "disc",
       "mat" : "",
       "light" : "ceiling",
@@ -106,18 +106,25 @@
       "file" : "assets/dragon100k.obj"
     }
   },
-  "camera" : {
-    "xform" : {
-      "translate" : [0, 0, 32],
-      "rotate" : {
-        "angle" : 0,
-        "axis" : [1, 0, 0]
-      }
-    },
-    "width" : 512,
-    "height" : 384,
-    "fov" : 0.78540,
-    "focalLength" : 48.0,
-    "fStop" : 32.0
+  "cameras" : {
+    "default" : {
+      "type" : "persp",
+      "xform" : {
+        "translate" : [0, 0, 32],
+        "rotate" : {
+          "angle" : 0,
+          "axis" : [1, 0, 0]
+        }
+      },
+      "objects" : [
+        "smallSphere", "bigSphere", "bottom", "top", "back", "left", "right",
+        "lightSource", "dragon"
+      ],
+      "width" : 512,
+      "height" : 384,
+      "fov" : 0.78540,
+      "focalLength" : 48.0,
+      "fStop" : 32.0
+    }
   }
 }

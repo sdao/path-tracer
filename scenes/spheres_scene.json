@@ -1,0 +1,152 @@
+{
+  "lights" : {
+    "sunLight" : {
+      "type" : "area",
+      "color" : [10, 10, 10]
+    },
+    "skyLight" : {
+      "type" : "area",
+      "color" : [0.3, 0.4, 0.5]
+    }
+  },
+  "materials" : {
+    "green" : {
+      "type" : "lambert",
+      "albedo" : [0.5, 1.0, 0.5]
+    },
+    "ground" : {
+      "type" : "lambert",
+      "albedo" : [0.4, 0.3, 0.2]
+    },
+    "sky" : {
+      "type" : "lambert",
+      "albedo" : [0.4, 0.5, 0.6]
+    },
+    "dielectric" : {
+      "type" : "dielectric",
+      "ior" : 1.5,
+      "color" : [1, 1, 1]
+    }
+  },
+  "geometry" : {
+    "worldSphere" : {
+      "type" : "sphere",
+      "mat" : "sky",
+      "light" : "skyLight",
+      "origin" : [0, 0, 0],
+      "radius" : 2000.0
+    },
+    "worldSphereInv" : {
+      "type" : "inverted",
+      "original" : "worldSphere"
+    },
+    "bottom" : {
+      "type" : "disc",
+      "mat" : "ground",
+      "light" : "",
+      "origin" : [0, -20, -0],
+      "normal" : [0, 1, 0],
+      "radiusOuter" : 2001.0,
+      "radiusInner" : 0.0
+    },
+    "lightSource" : {
+      "type" : "sphere",
+      "mat" : "",
+      "light" : "sunLight",
+      "origin" : [0, 2500, 0],
+      "radius" : 1000.0
+    },
+    "sphere1" : {
+      "type" : "sphere",
+      "mat" : "dielectric",
+      "light" : "",
+      "origin" : [16, -12, -22],
+      "radius" : 8.0
+    },
+    "sphere2" : {
+      "type" : "sphere",
+      "mat" : "dielectric",
+      "light" : "",
+      "origin" : [2, -12, -40],
+      "radius" : 8.0
+    },
+    "sphere3" : {
+      "type" : "sphere",
+      "mat" : "dielectric",
+      "light" : "",
+      "origin" : [-12, -12, -58],
+      "radius" : 8.0
+    },
+    "sphere4" : {
+      "type" : "sphere",
+      "mat" : "dielectric",
+      "light" : "",
+      "origin" : [-26, -12, -76],
+      "radius" : 8.0
+    },
+    "sphere5" : {
+      "type" : "sphere",
+      "mat" : "dielectric",
+      "light" : "",
+      "origin" : [-40, -12, -94],
+      "radius" : 8.0
+    },
+    "sphere6" : {
+      "type" : "sphere",
+      "mat" : "dielectric",
+      "light" : "",
+      "origin" : [-54, -12, -112],
+      "radius" : 8.0
+    },
+    "sphere7" : {
+      "type" : "sphere",
+      "mat" : "dielectric",
+      "light" : "",
+      "origin" : [-68, -12, -130],
+      "radius" : 8.0
+    },
+    "sphere8" : {
+      "type" : "sphere",
+      "mat" : "dielectric",
+      "light" : "",
+      "origin" : [-82, -12, -148],
+      "radius" : 8.0
+    },
+    "sphere9" : {
+      "type" : "sphere",
+      "mat" : "dielectric",
+      "light" : "",
+      "origin" : [-96, -12, -166],
+      "radius" : 8.0
+    },
+    "sphere10" : {
+      "type" : "sphere",
+      "mat" : "dielectric",
+      "light" : "",
+      "origin" : [-110, -12, -184],
+      "radius" : 8.0
+    }
+  },
+  "cameras" : {
+    "default" : {
+      "type" : "persp",
+      "xform" : {
+        "translate" : [-2, 8, 30],
+        "rotate" : {
+          "angle" : -0.26180,
+          "axis" : [1, 0, 0]
+        }
+      },
+      "objects" : [
+        "worldSphereInv", "bottom", "lightSource", "sphere1", "sphere2",
+        "sphere3", "sphere4", "sphere5", "sphere6", "sphere7", "sphere8",
+        "sphere9", "sphere10"
+      ],
+      "width" : 512,
+      "height" : 384,
+      "fov" : 0.78540,
+      "focalLength" : 88.0,
+      "fStop" : 16.0
+    }
+  }
+}

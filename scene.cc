@@ -7,13 +7,14 @@
 #include "geom.h"
 #include "materials/all.h"
 #include "geoms/all.h"
-#include "kdtree.h"
+#include "parser.h"
 
 using boost::property_tree::ptree;
 using boost::format;
 
 Scene::Scene(std::string jsonFile)
-  : lights(), materials(), geometry(), camera(nullptr)
+  : lights(), materials(), geometry(), cameras(), allLights(lights),
+    allMaterials(materials), allGeometry(geometry), allCameras(cameras)
 {
   try {
     ptree pt;
@@ -22,7 +23,7 @@ Scene::Scene(std::string jsonFile)
     readLights(pt);
     readMats(pt);
     readGeoms(pt);
-    readCamera(pt);
+    readCameras(pt);
   } catch (...) {
     cleanUp();
     throw;
@@ -46,7 +47,9 @@ void Scene::cleanUp() {
     delete pair.second;
   }
 
-  delete camera;
+  for (auto& pair : cameras) {
+    delete pair.second;
+  }
 }
 
 template<typename T>
@@ -63,12 +66,12 @@ void Scene::readMultiple(
     const std::string name = child.first;
 
     try {
-      const Parser parser(lights, materials, geometry, child.second);
+      const Parser parser(*this, child.second);
       const std::string type = parser.getString("type", false);
 
       if (name.length() == 0) {
         throw std::runtime_error("No name");
-      } else if (storage.count(name) > 0) {
+      } else if (storage.count(name) != 0) {
         throw std::runtime_error("Name was reused");
       } else if (lookup.count(type) == 0) {
         throw std::runtime_error(type + " is not a recognized type");
@@ -116,21 +119,10 @@ void Scene::readGeoms(const ptree& root) {
   readMultiple<const Geom*>(root, "geometry", geometryLookup, geometry);
 }
 
-void Scene::readCamera(const ptree& root) {
-  const auto& attr = root.get_child("camera");
+void Scene::readCameras(const ptree& root) {
+  static const LookupMap<Camera*> cameraLookup = {
+    { "persp", [](const Parser& p) { return new Camera(p); } }
+  };
 
-  try {
-    const Parser parser(lights, materials, geometry, attr);
-    camera = new Camera(parser);
-  } catch (...) {
-    std::throw_with_nested(std::runtime_error(
-      "Error parsing node (camera)"
-    ));
-  }
-}
-
-void Scene::renderMultiple(std::string name, int iterations) {
-  KDTree tree(geometry);
-  tree.build();
-  camera->renderMultiple(tree, name, iterations);
+  readMultiple<Camera*>(root, "cameras", cameraLookup, cameras);
 }

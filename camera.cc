@@ -9,12 +9,14 @@ namespace chrono = std::chrono;
 
 Camera::Camera(
   Transform xform,
+  std::vector<const Geom*> objs,
   long ww,
   long hh,
   float fov,
   float len,
   float fStop
-) : focalLength(len), lensRadius((len / fStop) * 0.5f), // Diam = len / fStop.
+) : kdAccelTree(objs), focalLength(len),
+    lensRadius((len / fStop) * 0.5f), // Diameter = focalLength / fStop.
     camToWorldXform(xform),
     masterRng(), rowSeeds(size_t(hh)), img(ww, hh), iters(0)
 {
@@ -32,15 +34,17 @@ Camera::Camera(
   focalPlaneUp = -2.0f * halfFocalPlaneUp;
   focalPlaneRight = 2.0f * halfFocalPlaneRight;
   focalPlaneOrigin = Vec(-halfFocalPlaneRight, halfFocalPlaneUp, -focalLength);
+
+  kdAccelTree.build();
 }
 
 Camera::Camera(const Parser& p)
-  : Camera(p.getTransform("xform"), p.getInt("width"), p.getInt("height"),
+  : Camera(p.getTransform("xform"), p.getGeometryList("objects"),
+           p.getInt("width"), p.getInt("height"),
            p.getFloat("fov"), p.getFloat("focalLength"),
            p.getFloat("fStop")) {}
 
 void Camera::renderOnce(
-  const KDTree& kdt,
   std::string name
 ) {
   // Increment iteration count and begin timer.
@@ -79,7 +83,7 @@ void Camera::renderOnce(
         Vec lookAtWorld = camToWorldXform * lookAt;
         Vec dir = (lookAtWorld - eyeWorld).normalized();
       
-        Vec L = trace(LightRay(eyeWorld, dir), rng, kdt);
+        Vec L = trace(LightRay(eyeWorld, dir), rng);
         img.setSample(x, y, posX, posY, samp, L);
       }
     }
@@ -97,7 +101,6 @@ void Camera::renderOnce(
 }
 
 void Camera::renderMultiple(
-  const KDTree& kdt,
   std::string name,
   int iterations
 ) {
@@ -106,22 +109,21 @@ void Camera::renderMultiple(
     std::cout << "Rendering infinitely, press Ctrl-c to terminate program\n";
 
     while (true) {
-      renderOnce(kdt, name);
+      renderOnce(name);
     }
   } else {
     // Run finite iterations.
     std::cout << "Rendering " << iterations << " iterations\n";
 
     for (int i = 0; i < iterations; ++i) {
-      renderOnce(kdt, name);
+      renderOnce(name);
     }
   }
 }
 
 Vec Camera::trace(
   LightRay r,
-  Randomness& rng,
-  const KDTree& kdt
+  Randomness& rng
 ) const {
   Vec L(0, 0, 0);
   bool didDirectIlluminate = false;
@@ -152,7 +154,7 @@ Vec Camera::trace(
 
     // Bounce ray and kill if nothing hit.
     Intersection isect;
-    const Geom* g = kdt.intersect(r, &isect);
+    const Geom* g = kdAccelTree.intersect(r, &isect);
     if (!g) {
       // End path in empty space.
       break;
@@ -179,7 +181,7 @@ Vec Camera::trace(
 #ifndef NO_DIRECT_ILLUM
       // Sample direct lighting and then continue path.
       L += r.color.cwiseProduct(
-        uniformSampleOneLight(rng, r, isect, g->mat, kdt)
+        uniformSampleOneLight(rng, r, isect, g->mat)
       );
       r = g->mat->scatter(rng, r, isect);
       didDirectIlluminate = true;
@@ -202,19 +204,19 @@ Vec Camera::uniformSampleOneLight(
   Randomness& rng,
   const LightRay& incoming,
   const Intersection& isect,
-  const Material* mat,
-  const KDTree& kdt
+  const Material* mat
 ) const {
-  size_t numLights = kdt.allLights().size();
+  size_t numLights = kdAccelTree.allLights().size();
   if (numLights == 0) {
     return Vec(0, 0, 0);
   }
 
   size_t lightIdx = size_t(floorf(rng.nextUnitFloat() * numLights));
-  const Geom* emitter = kdt.allLights()[min(lightIdx, numLights - 1)];
+  const Geom* emitter = kdAccelTree.allLights()[min(lightIdx, numLights - 1)];
   const AreaLight* areaLight = emitter->light;
 
   // P[this light] = 1 / numLights, so 1 / P[this light] = numLights.
-  return float(numLights)
-    * areaLight->directIlluminate(rng, incoming, isect, mat, emitter, kdt);
+  return float(numLights) * areaLight->directIlluminate(
+    rng, incoming, isect, mat, emitter, kdAccelTree
+  );
 }

@@ -6,11 +6,11 @@
 class AreaLight;
 class Material;
 class Geom;
+class Camera;
+class Scene;
 
 class Parser {
-  const std::map<std::string, const AreaLight*>& lights;
-  const std::map<std::string, const Material*>& materials;
-  const std::map<std::string, const Geom*>& geometry;
+  const Scene& scene;
   const boost::property_tree::ptree& attributes;
 
 private:
@@ -21,11 +21,15 @@ private:
     bool allowNull
   ) const;
 
+  template<typename T>
+  std::vector<T> getItemsFromStorage(
+    const std::map<std::string, T>& storage,
+    std::string key
+  ) const;
+
 public:
   Parser(
-    const std::map<std::string, const AreaLight*>& ll,
-    const std::map<std::string, const Material*>& mm,
-    const std::map<std::string, const Geom*>& gg,
+    const Scene& sc,
     const boost::property_tree::ptree& attr
   );
 
@@ -36,5 +40,6 @@ public:
   Transform getTransform(std::string key) const;
   const AreaLight* getLight(std::string key) const;
   const Material* getMaterial(std::string key) const;
-  const Geom* getGeom(std::string key) const;
+  const Geom* getGeometry(std::string key) const;
+  std::vector<const Geom*> getGeometryList(std::string key) const;
 };

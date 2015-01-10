@@ -1,15 +1,12 @@
 #include "parser.h"
 #include <boost/format.hpp>
+#include "scene.h"
 
 using boost::property_tree::ptree;
 using boost::format;
 
-Parser::Parser(
-  const std::map<std::string, const AreaLight*>& ll,
-  const std::map<std::string, const Material*>& mm,
-  const std::map<std::string, const Geom*>& gg,
-  const ptree& attr
-) : lights(ll), materials(mm), geometry(gg), attributes(attr) {}
+Parser::Parser(const Scene& sc, const ptree& attr)
+  : scene(sc), attributes(attr) {}
 
 template<typename T>
 T Parser::getItemFromStorage(
@@ -21,13 +18,44 @@ T Parser::getItemFromStorage(
 
   if (name.length() == 0) {
     return nullptr;
-  } else if (storage.count(name) > 0) {
-    return storage.at(name);
-  } else {
+  } else if (storage.count(name) == 0) {
     throw std::runtime_error(
       str(format("Property '%1%' references an unknown object") % key)
     );
   }
+
+  return storage.at(name);
+}
+
+template<typename T>
+std::vector<T> Parser::getItemsFromStorage(
+  const std::map<std::string, T>& storage,
+  std::string key
+) const {
+  const auto& optionalChildren = attributes.get_child_optional(key);
+
+  std::vector<T> result;
+
+  if (!optionalChildren) {
+    return result;
+  }
+
+  int count = 0;
+  for (const auto& child : *optionalChildren) {
+    const auto optionalName = child.second.get_value_optional<std::string>();
+
+    if (!optionalName || storage.count(*optionalName) == 0) {
+      throw std::runtime_error(
+        str(format("Property '%1%' references an unknown object at index %2%")
+          % key % count)
+      );
+    }
+
+    result.push_back(storage.at(*optionalName));
+    count++;
+  }
+
+  return result;
 }
 
 std::string Parser::getString(
@@ -40,9 +68,7 @@ std::string Parser::getString(
     throw std::runtime_error(
       str(format("Required property '%1%' is missing") % key)
     );
-  }
-
-  if (!allowEmpty && optionalString->length() == 0) {
+  } else if (!allowEmpty && optionalString->length() == 0) {
     throw std::runtime_error(
       str(format("Property '%1%' must not be empty") % key)
     );
@@ -126,13 +152,17 @@ Transform Parser::getTransform(std::string key) const {
 }
 
 const AreaLight* Parser::getLight(std::string key) const {
-  return getItemFromStorage<const AreaLight*>(lights, key, true);
+  return getItemFromStorage<const AreaLight*>(scene.allLights, key, true);
 }
 
 const Material* Parser::getMaterial(std::string key) const {
-  return getItemFromStorage<const Material*>(materials, key, true);
+  return getItemFromStorage<const Material*>(scene.allMaterials, key, true);
 }
 
-const Geom* Parser::getGeom(std::string key) const {
-  return getItemFromStorage<const Geom*>(geometry, key, false);
+const Geom* Parser::getGeometry(std::string key) const {
+  return getItemFromStorage<const Geom*>(scene.allGeometry, key, false);
+}
+
+std::vector<const Geom*> Parser::getGeometryList(std::string key) const {
+  return getItemsFromStorage(scene.allGeometry, key);
 }
