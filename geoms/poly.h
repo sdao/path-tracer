@@ -1,6 +1,5 @@
 #pragma once
 #include "../geom.h"
-#include "../mem.h"
 
 namespace geoms {
 
@@ -17,9 +16,9 @@ namespace geoms {
       Vec normal; /**< The normal of the surface at the point. */
     };
 
-    const mem::ID pt0; /** < The index of the first point (in CCW order). */
-    const mem::ID pt1; /** < The index of the second point (in CCW order). */
-    const mem::ID pt2; /** < The index of the third point (in CCW order). */
+    const ID pt0; /** < The index of the first point (in CCW order). */
+    const ID pt1; /** < The index of the second point (in CCW order). */
+    const ID pt2; /** < The index of the third point (in CCW order). */
     /** A point lookup table. We DO NOT own the pointer. */
     std::vector<geoms::Poly::Point>* pointLookup;
 
@@ -34,9 +33,9 @@ namespace geoms {
      * @param l          the area light causing emission from the poly
      */
     Poly(
-      mem::ID a,
-      mem::ID b,
-      mem::ID c,
+      ID a,
+      ID b,
+      ID c,
       std::vector<geoms::Poly::Point>* lookup,
       const Material* m = nullptr,
       const AreaLight* l = nullptr
@@ -60,8 +59,8 @@ namespace geoms {
      * @param i the index to look up in the table
      * @return  the point at the given index
      */
-    inline const Point get(mem::ID i) const {
-      return mem::ref(*pointLookup, i);
+    inline const Point get(ID i) const {
+      return i.refConst(*pointLookup);
     }
   };
 

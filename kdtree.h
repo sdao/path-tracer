@@ -4,7 +4,6 @@
 #include <map>
 #include "core.h"
 #include "geom.h"
-#include "mem.h"
 
 /**
  * A k-d tree used to accelerate ray-object intersections.
@@ -40,10 +39,10 @@ class KDTree {
    * A node in the k-d tree.
    */
   struct KDNode {
-    mem::ID below; /**< The index of the child "below" the split. */
+    ID below; /**< The index of the child "below" the split. */
     axis splitAxis; /**< The axis that the split plane cleaves. */
     float splitPos; /**< The point at which the split axis is cleaved. */
-    std::vector<mem::ID> objIds; /**< The indices of the objects at the leaf. */
+    std::vector<ID> objIds; /**< The indices of the objects at the leaf. */
 
     /** Constructs an empty kdnode. */
     KDNode() : below(),
@@ -57,7 +56,7 @@ class KDTree {
      * @param ids   the indexes of objects in the leaf
      * @param count the number of objects in the leaf
      */
-    inline void makeLeaf(const std::vector<mem::ID>::iterator ids, long count) {
+    inline void makeLeaf(const std::vector<ID>::iterator ids, long count) {
       objIds.reserve(size_t(count));
       objIds.insert(objIds.end(), ids, ids + count);
     }
@@ -91,33 +90,33 @@ class KDTree {
     }
 
     /** Returns the index of the child "above" the split. */
-    inline mem::ID aboveId() const {
+    inline ID aboveId() const {
       return below.offset(1);
     }
 
     /** Returns the index of the child "below" the split. */
-    inline mem::ID belowId() const {
+    inline ID belowId() const {
       return below;
     }
   };
 
   /** Used to keep track of nodes queued to be checked. */
   struct KDTodo {
-    mem::ID nodeId;
+    ID nodeId;
     float tmin;
     float tmax;
   };
 
   /** Used to represent a bbox projected onto a linear axis. */
   struct BBoxEdge {
-    mem::ID objId;
+    ID objId;
     float pos;
     bool starting;
 
     BBoxEdge()
-      : objId(mem::ID_INVALID), pos(0.0f), starting(false) {}
+      : objId(ID::ID_INVALID), pos(0.0f), starting(false) {}
 
-    BBoxEdge(mem::ID o, float p,  bool start)
+    BBoxEdge(ID o, float p,  bool start)
       : objId(o), pos(p), starting(start) {}
 
     bool operator<(const BBoxEdge &e) const {
@@ -130,7 +129,7 @@ class KDTree {
   };
 
   std::vector<KDNode> allNodes; /**< The node lookup table. */
-  mem::ID rootId; /**< The index of the root node (usually 0). */
+  ID rootId; /**< The index of the root node (usually 0). */
   BBox bounds; /**< The bounds encapsulating all the objects in the tree. */
   std::vector<const Geom*> objs; /**< The geometric objects in the k-d tree. */
   std::vector<const Geom*> lights; /**< The geometric objects with a light. */
@@ -150,15 +149,15 @@ class KDTree {
    * @param badRefinesSoFar the number of bad refines in the current branch
    */
   void buildTree(
-    mem::ID nodeId,
+    ID nodeId,
     const BBox& nodeBounds,
     const std::vector<BBox>& allObjBounds,
-    const std::vector<mem::ID>::iterator nodeObjIds,
+    const std::vector<ID>::iterator nodeObjIds,
     long nodeObjCount,
     int depth,
     std::vector<BBoxEdge>::iterator workEdges[],
-    std::vector<mem::ID>::iterator workObjs0,
-    std::vector<mem::ID>::iterator workObjs1,
+    std::vector<ID>::iterator workObjs0,
+    std::vector<ID>::iterator workObjs1,
     int badRefinesSoFar
   );
 
@@ -170,7 +169,7 @@ protected:
    * @param os     the output stream to print to
    * @param level  the level of indentation for the output
    */
-  void print(mem::ID nodeId, std::ostream& os, int level = 0) const;
+  void print(ID nodeId, std::ostream& os, size_t level = 0) const;
 
 public:
   /**

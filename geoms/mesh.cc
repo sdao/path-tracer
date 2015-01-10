@@ -72,9 +72,9 @@ void geoms::Mesh::readPolyModel(std::string name) {
       // Only add the triangles (we should have a triangulated mesh).
       if (face.mNumIndices == 3) {
         geoms::Poly thisPoly(
-          mem::ID(face.mIndices[0]),
-          mem::ID(face.mIndices[1]),
-          mem::ID(face.mIndices[2]),
+          ID(face.mIndices[0]),
+          ID(face.mIndices[1]),
+          ID(face.mIndices[2]),
           &points,
           mat,
           light

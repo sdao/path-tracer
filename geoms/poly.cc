@@ -1,9 +1,9 @@
 #include "poly.h"
 
 geoms::Poly::Poly(
-  mem::ID a,
-  mem::ID b,
-  mem::ID c,
+  ID a,
+  ID b,
+  ID c,
   std::vector<geoms::Poly::Point>* lookup,
   const Material* m,
   const AreaLight* l
