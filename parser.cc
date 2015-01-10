@@ -1,6 +1,7 @@
 #include "parser.h"
 #include <boost/format.hpp>
 #include "scene.h"
+#include "debug.h"
 
 using boost::property_tree::ptree;
 using boost::format;
@@ -18,13 +19,13 @@ T Parser::getItemFromStorage(
 
   if (name.length() == 0) {
     return nullptr;
-  } else if (storage.count(name) == 0) {
+  } else if (storage.count(name) != 0) {
+    return storage.at(name);
+  } else {
     throw std::runtime_error(
       str(format("Property '%1%' references an unknown object") % key)
     );
   }
-
-  return storage.at(name);
 }
 
 template<typename T>
@@ -34,25 +35,26 @@ std::vector<T> Parser::getItemsFromStorage(
 ) const {
   const auto& optionalChildren = attributes.get_child_optional(key);
 
-  std::vector<T> result;
-
   if (!optionalChildren) {
-    return result;
+    throw std::runtime_error(
+      str(format("Cannot read object list property '%1%'") % key)
+    );
   }
 
-  int count = 0;
+  std::vector<T> result;
+  int i = 0;
   for (const auto& child : *optionalChildren) {
     const auto optionalName = child.second.get_value_optional<std::string>();
 
     if (!optionalName || storage.count(*optionalName) == 0) {
       throw std::runtime_error(
         str(format("Property '%1%' references an unknown object at index %2%")
-          % key % count)
+          % key % i)
       );
     }
 
     result.push_back(storage.at(*optionalName));
-    count++;
+    i++;
   }
 
   return result;
@@ -112,30 +114,26 @@ Vec Parser::getVec(std::string key) const {
     throw std::runtime_error(
       str(format("Cannot read vector property '%1%'") % key)
     );
-  }
-
-  Vec result;
-  int count = 0;
-  for (const auto& component : *optionalArray) {
-    const auto optionalVal = component.second.get_value_optional<float>();
-
-    if (count < 3) {
-      if (!optionalVal) {
-        throw std::runtime_error(
-          str(format("Cannot read index %1% of vector '%2%'") % count % key)
-        );
-      }
-
-      result[count] = *optionalVal;
-    }
-
-    count++;
-  }
-
-  if (count != 3) {
+  } else if (optionalArray->size() != 3) {
     throw std::runtime_error(
       str(format("Property '%1%' must have exactly 3 components") % key)
     );
+  }
+
+  Vec result;
+  int i = 0;
+  for (const auto& component : *optionalArray) {
+    assert(i < 3);
+    const auto optionalVal = component.second.get_value_optional<float>();
+
+    if (!optionalVal) {
+      throw std::runtime_error(
+        str(format("Cannot read index %1% of vector '%2%'") % i % key)
+      );
+    }
+
+    result[i] = *optionalVal;
+    i++;
   }
 
   return result;
