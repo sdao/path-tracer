@@ -11,15 +11,17 @@ int main(int argc, char* argv[]) {
     // Parse command-line args using boost::program_options.
     options_description desc("Allowed options");
     desc.add_options()
-      ("help", "produce help message")
-      ("input", value<std::string>()->required(), "JSON scene file input")
+      ("help",
+        "produce help message")
+      ("input", value<std::string>()->required(),
+        "JSON scene file input")
       ("output", value<std::string>()->default_value("output.exr"),
         "EXR output path")
-      ("iterations", value<int>()->default_value(-1),
+      ("iter", value<int>()->default_value(-1),
         "path-tracing iterations, if < 0 then will run forever");
 
     positional_options_description pd;
-    pd.add("input", 1).add("output", 2).add("iterations", 3);
+    pd.add("input", 1).add("output", 2);
 
     variables_map vars;
     store(
