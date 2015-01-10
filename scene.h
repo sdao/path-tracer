@@ -49,4 +49,6 @@ public:
    */
   Scene(std::string jsonFile);
   ~Scene();
+
+  Camera* defaultCamera() const;
 };

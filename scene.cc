@@ -126,3 +126,11 @@ void Scene::readCameras(const ptree& root) {
 
   readMultiple<Camera*>(root, "cameras", cameraLookup, cameras);
 }
+
+Camera* Scene::defaultCamera() const {
+  if (cameras.count("default") == 0) {
+    throw std::runtime_error("Scene contains no default camera");
+  }
+
+  return cameras.at("default");
+}

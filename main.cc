@@ -1,25 +1,47 @@
-#include <vector>
 #include <iostream>
-#include <sstream>
-#include "materials/all.h"
-#include "geoms/all.h"
-#include "light.h"
-#include "camera.h"
-#include "kdtree.h"
+#include <boost/program_options.hpp>
 #include "scene.h"
+#include "camera.h"
 #include "debug.h"
 
 int main(int argc, char* argv[]) {
-  int iterations = -1;
-
-  if (argc >= 2) {
-    std::istringstream itersArg(argv[1]);
-    itersArg >> iterations;
-  }
+  using namespace boost::program_options;
 
   try {
-    Scene scene("scenes/spheres_scene.json");
-    scene.allCameras.at("default")->renderMultiple("output.exr", iterations);
+    // Parse command-line args using boost::program_options.
+    options_description desc("Allowed options");
+    desc.add_options()
+      ("help", "produce help message")
+      ("input", value<std::string>()->required(), "JSON scene file input")
+      ("output", value<std::string>()->default_value("output.exr"),
+        "EXR output path")
+      ("iterations", value<int>()->default_value(-1),
+        "path-tracing iterations, if < 0 then will run forever");
+
+    positional_options_description pd;
+    pd.add("input", 1).add("output", 2).add("iterations", 3);
+
+    variables_map vars;
+    store(
+      command_line_parser(argc, argv).options(desc).positional(pd).run(), vars
+    );
+
+    // Print help message if requested by user.
+    if (vars.count("help")) {
+      std::cout << desc;
+      return 0;
+    }
+
+    // Raise errors after checking the help flag.
+    notify(vars);
+
+    // Load scene and set up rendering.
+    std::string input = vars["input"].as<std::string>();
+    std::string output = vars["output"].as<std::string>();
+    int iterations = vars["iterations"].as<int>();
+
+    Scene scene(input);
+    scene.defaultCamera()->renderMultiple(output, iterations);
   } catch (std::exception& e) {
     debug::printNestedException(e);
     return 42;
