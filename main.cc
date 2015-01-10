@@ -17,11 +17,11 @@ int main(int argc, char* argv[]) {
         "JSON scene file input")
       ("output", value<std::string>()->default_value("output.exr"),
         "EXR output path")
-      ("iter", value<int>()->default_value(-1),
+      ("iterations", value<int>()->default_value(-1),
         "path-tracing iterations, if < 0 then will run forever");
 
     positional_options_description pd;
-    pd.add("input", 1).add("output", 2);
+    pd.add("input", 1).add("output", 1).add("iterations", 1);
 
     variables_map vars;
     store(
