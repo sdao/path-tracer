@@ -9,7 +9,7 @@ namespace chrono = std::chrono;
 
 Camera::Camera(
   Transform xform,
-  std::vector<const Geom*> objs,
+  const std::vector<const Geom*> objs,
   long ww,
   long hh,
   float fov,
