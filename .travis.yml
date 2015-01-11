@@ -5,16 +5,17 @@ compiler:
 
 install:
   - sudo apt-get -qq update
-  - sudo apt-get install -qq libboost-dev
-  - sudo apt-get install -qq libboost-program-options-dev
   - sudo apt-get install -qq libopenexr-dev
   - sudo apt-get install -qq libeigen3-dev
   - sudo apt-get install -qq libtbb-dev
   - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
   - sudo add-apt-repository --yes ppa:openrave/release
+  - sudo add-apt-repository --yes ppa:boost-latest/ppa
   - sudo apt-get -qq update
   - sudo apt-get install -qq libstdc++-4.8-dev
   - sudo apt-get install -qq assimp
+  - sudo apt-get install -qq libboost1.55-dev
+  - sudo apt-get install -qq libboost-program-options1.55-dev
 
 script:
   - make
