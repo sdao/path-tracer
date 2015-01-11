@@ -14,7 +14,7 @@ std::string Node::getString(std::string key) const {
 
   if (!result) {
     throw std::runtime_error(
-      str(format("Cannot read string property '%1'") % key)
+      str(format("Cannot read string property '%1%'") % key)
     );
   }
 
@@ -26,7 +26,7 @@ int Node::getInt(std::string key) const {
 
   if (!result) {
     throw std::runtime_error(
-      str(format("Cannot read integer property '%1'") % key)
+      str(format("Cannot read integer property '%1%'") % key)
     );
   }
 
@@ -38,7 +38,7 @@ float Node::getFloat(std::string key) const {
 
   if (!result) {
     throw std::runtime_error(
-      str(format("Cannot read float property '%1'") % key)
+      str(format("Cannot read float property '%1%'") % key)
     );
   }
 
@@ -51,7 +51,7 @@ Vec Node::getVec(std::string key) const {
 
   if (!result) {
     throw std::runtime_error(
-      str(format("Cannot read vector property '%1'") % key)
+      str(format("Cannot read vector property '%1%'") % key)
     );
   }
 
@@ -66,7 +66,7 @@ const AreaLight* Node::getLight(std::string key) const {
 
   if (!result) {
     throw std::runtime_error(
-      str(format("Cannot resolve light reference property '%1'") % key)
+      str(format("Cannot resolve light reference property '%1%'") % key)
     );
   }
 
@@ -81,7 +81,7 @@ const Material* Node::getMaterial(std::string key) const {
 
   if (!result) {
     throw std::runtime_error(
-      str(format("Cannot resolve material reference property '%1'") % key)
+      str(format("Cannot resolve material reference property '%1%'") % key)
     );
   }
 
@@ -96,7 +96,7 @@ const Geom* Node::getGeometry(std::string key) const {
 
   if (!result) {
     throw std::runtime_error(
-      str(format("Cannot resolve geometry reference property '%1'") % key)
+      str(format("Cannot resolve geometry reference property '%1%'") % key)
     );
   }
 
@@ -109,7 +109,7 @@ std::vector<const Geom*> Node::getGeometryList(std::string key) const {
   const auto& listRoot = attributes.get_child_optional(key);
 
   if (!listRoot) {
-    throw std::runtime_error(str(format("Cannot read list '%1'") % key));
+    throw std::runtime_error(str(format("Cannot read list '%1%'") % key));
   }
 
   std::vector<const Geom*> result;
@@ -119,7 +119,7 @@ std::vector<const Geom*> Node::getGeometryList(std::string key) const {
     if (!item) {
       const std::string itemName = listItem.second.get_value<std::string>();
       const std::string msg =
-        "Cannot resolve geometry reference '%1' in list '%2'";
+        "Cannot resolve geometry reference '%1%' in list '%2%'";
       throw std::runtime_error(str(format(msg) % itemName % key));
     }
 
