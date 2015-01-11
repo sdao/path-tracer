@@ -65,9 +65,10 @@ const AreaLight* Node::getLight(std::string key) const {
     attributes.get_optional<const AreaLight*, NodeLightTranslator>(key, t);
 
   if (!result) {
-    throw std::runtime_error(
-      str(format("Cannot resolve light reference property '%1%'") % key)
-    );
+    const std::string itemName = attributes.get<std::string>(key);
+    const std::string msg =
+      "Cannot resolve light reference '%1%' in property '%2%'";
+    throw std::runtime_error(str(format(msg) % itemName % key));
   }
 
   return *result;
@@ -80,9 +81,10 @@ const Material* Node::getMaterial(std::string key) const {
     attributes.get_optional<const Material*, NodeMaterialTranslator>(key, t);
 
   if (!result) {
-    throw std::runtime_error(
-      str(format("Cannot resolve material reference property '%1%'") % key)
-    );
+    const std::string itemName = attributes.get<std::string>(key);
+    const std::string msg =
+      "Cannot resolve material reference '%1%' in property '%2%'";
+    throw std::runtime_error(str(format(msg) % itemName % key));
   }
 
   return *result;
@@ -95,9 +97,10 @@ const Geom* Node::getGeometry(std::string key) const {
     attributes.get_optional<const Geom*, NodeGeometryTranslator>(key, t);
 
   if (!result) {
-    throw std::runtime_error(
-      str(format("Cannot resolve geometry reference property '%1%'") % key)
-    );
+    const std::string itemName = attributes.get<std::string>(key);
+    const std::string msg =
+      "Cannot resolve geometry reference '%1%' in property '%2%'";
+    throw std::runtime_error(str(format(msg) % itemName % key));
   }
 
   return *result;
