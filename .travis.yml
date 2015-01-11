@@ -13,4 +13,6 @@ install:
   - sudo apt-get install -qq libeigen3-dev
   - sudo apt-get install -qq libtbb-dev
 
-script: make
+script:
+  - make
+  - bin/path-tracer scenes/spheres_scene.json output.exr 10
