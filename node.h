@@ -46,5 +46,4 @@ public:
   const Material* getMaterial(std::string key) const;
   const Geom* getGeometry(std::string key) const;
   std::vector<const Geom*> getGeometryList(std::string key) const;
-  Transform getTransform(std::string key) const;
 };

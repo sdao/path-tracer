@@ -130,13 +130,9 @@
   "cameras" : {
     "default" : {
       "type" : "persp",
-      "xform" : {
-        "translate" : "-2 8 30",
-        "rotate" : {
-          "angle" : -0.26180,
-          "axis" : "1 0 0"
-        }
-      },
+      "translate" : "-2 8 30",
+      "rotateAngle" :  -0.26180,
+      "rotateAxis" : "1 0 0",
       "objects" : [
         "worldSphereInv", "bottom", "lightSource", "sphere1", "sphere2",
         "sphere3", "sphere4", "sphere5", "sphere6", "sphere7", "sphere8",

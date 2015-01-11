@@ -39,7 +39,12 @@ Camera::Camera(
 }
 
 Camera::Camera(const Node& n)
-  : Camera(n.getTransform("xform"), n.getGeometryList("objects"),
+  : Camera(math::rotationThenTranslation(
+             n.getFloat("rotateAngle"),
+             n.getVec("rotateAxis"),
+             n.getVec("translate")
+           ),
+           n.getGeometryList("objects"),
            n.getInt("width"), n.getInt("height"),
            n.getFloat("fov"), n.getFloat("focalLength"),
            n.getFloat("fStop")) {}

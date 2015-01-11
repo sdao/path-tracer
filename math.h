@@ -554,16 +554,16 @@ namespace math {
     return (f * f) / (f * f + g * g);
   }
 
-  inline Transform translation(float x, float y, float z) {
-    return Transform(Eigen::Translation<float, 3>(x, y, z));
-  }
-
   inline Transform translation(Vec v) {
     return Transform(Eigen::Translation<float, 3>(v.x(), v.y(), v.z()));
   }
 
-  inline Transform angleAxisRotation(float angle, Vec axis) {
+  inline Transform rotation(float angle, Vec axis) {
     return Transform(Eigen::AngleAxis<float>(angle, axis));
+  }
+
+  inline Transform rotationThenTranslation(float angle, Vec axis, Vec offset) {
+    return translation(offset) * rotation(angle, axis);
   }
 
 }

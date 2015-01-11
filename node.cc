@@ -1,68 +1,132 @@
 #include "node.h"
+#include <exception>
 #include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 #include "scene.h"
+
+using boost::format;
 
 Node::Node(const boost::property_tree::ptree& attr, const Scene& cont)
   : attributes(attr), container(cont) {}
 
 std::string Node::getString(std::string key) const {
-  return attributes.get<std::string>(key);
+  auto result = attributes.get_optional<std::string>(key);
+
+  if (!result) {
+    throw std::runtime_error(
+      str(format("Cannot read string property '%1'") % key)
+    );
+  }
+
+  return *result;
 }
 
 int Node::getInt(std::string key) const {
-  return attributes.get<int>(key);
+  auto result = attributes.get_optional<int>(key);
+
+  if (!result) {
+    throw std::runtime_error(
+      str(format("Cannot read integer property '%1'") % key)
+    );
+  }
+
+  return *result;
 }
 
 float Node::getFloat(std::string key) const {
-  return attributes.get<float>(key);
+  auto result = attributes.get_optional<float>(key);
+
+  if (!result) {
+    throw std::runtime_error(
+      str(format("Cannot read float property '%1'") % key)
+    );
+  }
+
+  return *result;
 }
 
 Vec Node::getVec(std::string key) const {
   const NodeVecTranslator t;
-  return attributes.get<Vec, NodeVecTranslator>(key, t);
+  auto result = attributes.get_optional<Vec, NodeVecTranslator>(key, t);
+
+  if (!result) {
+    throw std::runtime_error(
+      str(format("Cannot read vector property '%1'") % key)
+    );
+  }
+
+  return *result;
 }
 
 const AreaLight* Node::getLight(std::string key) const {
   using NodeLightTranslator = Node::NodeLookupTranslator<const AreaLight*>;
   const NodeLightTranslator t(container.lights);
-  return attributes.get<const AreaLight*, NodeLightTranslator>(key, t);
+  auto result =
+    attributes.get_optional<const AreaLight*, NodeLightTranslator>(key, t);
+
+  if (!result) {
+    throw std::runtime_error(
+      str(format("Cannot resolve light reference property '%1'") % key)
+    );
+  }
+
+  return *result;
 }
 
 const Material* Node::getMaterial(std::string key) const {
   using NodeMaterialTranslator = Node::NodeLookupTranslator<const Material*>;
   const NodeMaterialTranslator t(container.materials);
-  return attributes.get<const Material*, NodeMaterialTranslator>(key, t);
+  auto result =
+    attributes.get_optional<const Material*, NodeMaterialTranslator>(key, t);
+
+  if (!result) {
+    throw std::runtime_error(
+      str(format("Cannot resolve material reference property '%1'") % key)
+    );
+  }
+
+  return *result;
 }
 
 const Geom* Node::getGeometry(std::string key) const {
   using NodeGeometryTranslator = Node::NodeLookupTranslator<const Geom*>;
   const NodeGeometryTranslator t(container.geometry);
-  return attributes.get<const Geom*, NodeGeometryTranslator>(key, t);
+  auto result =
+    attributes.get_optional<const Geom*, NodeGeometryTranslator>(key, t);
+
+  if (!result) {
+    throw std::runtime_error(
+      str(format("Cannot resolve geometry reference property '%1'") % key)
+    );
+  }
+
+  return *result;
 }
 
 std::vector<const Geom*> Node::getGeometryList(std::string key) const {
   using NodeGeometryTranslator = Node::NodeLookupTranslator<const Geom*, false>;
   const NodeGeometryTranslator t(container.geometry);
+  const auto& listRoot = attributes.get_child_optional(key);
 
-  const auto& listRoot = attributes.get_child(key);
+  if (!listRoot) {
+    throw std::runtime_error(str(format("Cannot read list '%1'") % key));
+  }
 
   std::vector<const Geom*> result;
-  for (const auto& listItem : listRoot) {
-    const Geom* item = listItem.second.get_value<const Geom*>(t);
-    result.push_back(item);
+  for (const auto& listItem : *listRoot) {
+    const auto item = listItem.second.get_value_optional<const Geom*>(t);
+
+    if (!item) {
+      const std::string itemName = listItem.second.get_value<std::string>();
+      const std::string msg =
+        "Cannot resolve geometry reference '%1' in list '%2'";
+      throw std::runtime_error(str(format(msg) % itemName % key));
+    }
+
+    result.push_back(*item);
   }
 
   return result;
-}
-
-Transform Node::getTransform(std::string key) const {
-  Transform translation = math::translation(getVec(key + ".translate"));
-  Transform rotation = math::angleAxisRotation(
-    getFloat(key + ".rotate.angle"),
-    getVec(key + ".rotate.axis")
-  );
-
-  return translation * rotation;
 }
 
 Node::NodeVecTranslator::NodeVecTranslator() {}

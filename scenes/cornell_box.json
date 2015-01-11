@@ -109,13 +109,9 @@
   "cameras" : {
     "default" : {
       "type" : "persp",
-      "xform" : {
-        "translate" : "0 0 32",
-        "rotate" : {
-          "angle" : 0,
-          "axis" : "1 0 0"
-        }
-      },
+      "translate" : "0 0 32",
+      "rotateAngle" : 0,
+      "rotateAxis" : "1 0 0",
       "objects" : [
         "smallSphere", "bigSphere", "bottom", "top", "back", "left", "right",
         "lightSource", "dragon"
