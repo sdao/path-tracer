@@ -38,11 +38,11 @@ Camera::Camera(
   kdAccelTree.build();
 }
 
-Camera::Camera(const Parser& p)
-  : Camera(p.getTransform("xform"), p.getGeometryList("objects"),
-           p.getInt("width"), p.getInt("height"),
-           p.getFloat("fov"), p.getFloat("focalLength"),
-           p.getFloat("fStop")) {}
+Camera::Camera(const Node& n)
+  : Camera(n.getTransform("xform"), n.getGeometryList("objects"),
+           n.getInt("width"), n.getInt("height"),
+           n.getFloat("fov"), n.getFloat("focalLength"),
+           n.getFloat("fStop")) {}
 
 void Camera::renderOnce(
   std::string name

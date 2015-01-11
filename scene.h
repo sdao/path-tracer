@@ -4,16 +4,19 @@
 #include <functional>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include "core.h"
 
 class AreaLight;
 class Material;
 class Geom;
 class Camera;
-class Parser;
+class Node;
 
 class Scene {
+  friend class Node;
+
   template <typename T>
-  using LookupMap = std::map< std::string, std::function<T(const Parser&)> >;
+  using LookupMap = std::map< std::string, std::function<T(const Node&)> >;
 
   std::map<std::string, const AreaLight*> lights;
   std::map<std::string, const Material*> materials;
@@ -35,11 +38,6 @@ class Scene {
   void readCameras(const boost::property_tree::ptree& root);
   
 public:
-  const std::map<std::string, const AreaLight*>& allLights;
-  const std::map<std::string, const Material*>& allMaterials;
-  const std::map<std::string, const Geom*>& allGeometry;
-  const std::map<std::string, Camera*>& allCameras;
-
   /**
    * Constructs a scene by reading it from a JSON scene description.
    *

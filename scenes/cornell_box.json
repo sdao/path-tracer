@@ -2,31 +2,31 @@
   "lights" : {
     "ceiling" : {
       "type" : "area",
-      "color" : [4, 4, 4]
+      "color" : "4 4 4"
     }
   },
   "materials" : {
     "green" : {
       "type" : "lambert",
-      "albedo" : [0.5, 1.0, 0.5]
+      "albedo" : "0.5 1.0 0.5"
     },
     "white" : {
       "type" : "lambert",
-      "albedo" : [1, 1, 1]
+      "albedo" : "1 1 1"
     },
     "red" : {
       "type" : "lambert",
-      "albedo" : [1.0, 0.5, 0.5]
+      "albedo" : "1.0 0.5 0.5"
     },
     "dielectric" : {
       "type" : "dielectric",
       "ior" : 1.5,
-      "color" : [1, 1, 1]
+      "color" : "1 1 1"
     },
     "glossy" : {
       "type" : "phong",
       "exponent" : 100,
-      "color" : [1, 1, 1]
+      "color" : "1 1 1"
     }
   },
   "geometry" : {
@@ -34,22 +34,22 @@
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
-      "origin" : [-2, -14, -16],
+      "origin" : "-2 -14 -16",
       "radius" : 4.0
     },
     "bigSphere" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
-      "origin" : [10, -12, -22],
+      "origin" : "10 -12 -22",
       "radius" : 6.0
     },
     "bottom" : {
       "type" : "disc",
       "mat" : "white",
       "light" : "",
-      "origin" : [0, -18, -25],
-      "normal" : [0, 1, 0],
+      "origin" : "0 -18 -25",
+      "normal" : "0 1 0",
       "radiusOuter" : 100.0,
       "radiusInner" : 0.0
     },
@@ -57,8 +57,8 @@
       "type" : "disc",
       "mat" : "white",
       "light" : "",
-      "origin" : [0, 18, -25],
-      "normal" : [0, -1, 0],
+      "origin" : "0 18 -25",
+      "normal" : "0 -1 0",
       "radiusOuter" : 100.0,
       "radiusInner" : 10.0
     },
@@ -66,8 +66,8 @@
       "type" : "disc",
       "mat" : "white",
       "light" : "",
-      "origin" : [0, 0, -50],
-      "normal" : [0, 0, 1],
+      "origin" : "0 0 -50",
+      "normal" : "0 0 1",
       "radiusOuter" : 100.0,
       "radiusInner" : 0.0
     },
@@ -75,8 +75,8 @@
       "type" : "disc",
       "mat" : "red",
       "light" : "",
-      "origin" : [-22, 0, -25],
-      "normal" : [1, 0, 0],
+      "origin" : "-22 0 -25",
+      "normal" : "1 0 0",
       "radiusOuter" : 100.0,
       "radiusInner" : 0.0
     },
@@ -84,8 +84,8 @@
       "type" : "disc",
       "mat" : "green",
       "light" : "",
-      "origin" : [22, -0, -25],
-      "normal" : [-1, 0, 0],
+      "origin" : "22 -0 -25",
+      "normal" : "-1 0 0",
       "radiusOuter" : 100.0,
       "radiusInner" : 0.0
     },
@@ -93,8 +93,8 @@
       "type" : "disc",
       "mat" : "",
       "light" : "ceiling",
-      "origin" : [0, 18.5, -25],
-      "normal" : [0, -1, 0],
+      "origin" : "0 18.5 -25",
+      "normal" : "0 -1 0",
       "radiusOuter" : 12.0,
       "radiusInner" : 0.0
     },
@@ -102,7 +102,7 @@
       "type" : "mesh",
       "mat" : "glossy",
       "light" : "",
-      "origin" : [-8, -18, -28],
+      "origin" : "-8 -18 -28",
       "file" : "assets/dragon100k.obj"
     }
   },
@@ -110,10 +110,10 @@
     "default" : {
       "type" : "persp",
       "xform" : {
-        "translate" : [0, 0, 32],
+        "translate" : "0 0 32",
         "rotate" : {
           "angle" : 0,
-          "axis" : [1, 0, 0]
+          "axis" : "1 0 0"
         }
       },
       "objects" : [

@@ -9,8 +9,8 @@ materials::Phong::Phong(float e, Vec c)
     invExponent(1.0f / (e + 1.0f)),
     color(c), exponent(e) {}
 
-materials::Phong::Phong(const Parser& p)
-  : Phong(p.getFloat("exponent"), p.getVec("color")) {}
+materials::Phong::Phong(const Node& n)
+  : Phong(n.getFloat("exponent"), n.getVec("color")) {}
 
 inline Vec materials::Phong::evalBSDFInternal(
   const Vec& perfectReflect,

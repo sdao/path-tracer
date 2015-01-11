@@ -46,9 +46,9 @@ namespace geoms {
     );
 
     /**
-     * Constructs a mesh from the given parser.
+     * Constructs a mesh from the given node.
      */
-    Mesh(const Parser& p);
+    Mesh(const Node& n);
 
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
     virtual bool intersectShadow(const Ray& r, float maxDist) const override;

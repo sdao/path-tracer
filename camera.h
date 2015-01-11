@@ -5,7 +5,7 @@
 #include "geom.h"
 #include "kdtree.h"
 #include "image.h"
-#include "parser.h"
+#include "node.h"
 
 /**
  * Manages rendering by simulating the action of a physical pinhole camera.
@@ -102,9 +102,9 @@ public:
   );
 
   /**
-   * Constructs a camera from the given parser.
+   * Constructs a camera from the given node.
    */
-   Camera(const Parser& p);
+   Camera(const Node& n);
 
   /**
    * Renders an additional iteration of the image by path-tracing.

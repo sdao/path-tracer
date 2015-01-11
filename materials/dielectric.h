@@ -45,9 +45,9 @@ namespace materials {
     Dielectric(float ior = IOR_GLASS, Vec c = Vec(1, 1, 1));
 
     /**
-     * Creates a dielectric material from the given parser.
+     * Creates a dielectric material from the given node.
      */
-    Dielectric(const Parser& p);
+    Dielectric(const Node& n);
 
     virtual void sampleLocal(
       Randomness& rng,

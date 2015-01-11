@@ -1,6 +1,6 @@
 #pragma once
 #include "core.h"
-#include "parser.h"
+#include "node.h"
 
 class Material;
 class AreaLight;
@@ -19,9 +19,9 @@ protected:
   Geom(const Material* m = nullptr, const AreaLight* l = nullptr);
 
   /**
-   * Constructs a geom from the given parser.
+   * Constructs a geom from the given node.
    */
-  Geom(const Parser& p);
+  Geom(const Node& n);
 
 public:
   const Material* mat; /**< The material used to render the geom. */

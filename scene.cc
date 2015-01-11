@@ -7,14 +7,13 @@
 #include "geom.h"
 #include "materials/all.h"
 #include "geoms/all.h"
-#include "parser.h"
+#include "node.h"
 
 using boost::property_tree::ptree;
 using boost::format;
 
 Scene::Scene(std::string jsonFile)
-  : lights(), materials(), geometry(), cameras(), allLights(lights),
-    allMaterials(materials), allGeometry(geometry), allCameras(cameras)
+  : lights(), materials(), geometry(), cameras()
 {
   try {
     ptree pt;
@@ -66,8 +65,8 @@ void Scene::readMultiple(
     const std::string name = child.first;
 
     try {
-      const Parser parser(*this, child.second);
-      const std::string type = parser.getString("type", false);
+      const Node node(child.second, *this);
+      const std::string type = node.getString("type");
 
       if (name.length() == 0) {
         throw std::runtime_error("No name");
@@ -77,7 +76,7 @@ void Scene::readMultiple(
         throw std::runtime_error(type + " is not a recognized type");
       }
 
-      storage[name] = lookup.at(type)(parser);
+      storage[name] = lookup.at(type)(node);
     } catch (...) {
       std::throw_with_nested(std::runtime_error(
         str(format("Error parsing node (%1%.[%2%]%3%)") % prefix % count % name)
@@ -90,7 +89,7 @@ void Scene::readMultiple(
 
 void Scene::readLights(const ptree& root) {
   static const LookupMap<const AreaLight*> lightLookup = {
-    { "area", [](const Parser& p) { return new AreaLight(p); } }
+    { "area", [](const Node& n) { return new AreaLight(n); } }
   };
 
   readMultiple<const AreaLight*>(root, "lights", lightLookup, lights);
@@ -99,9 +98,9 @@ void Scene::readLights(const ptree& root) {
 void Scene::readMats(const ptree& root) {
   using namespace materials;
   static const LookupMap<const Material*> materialLookup = {
-    { "dielectric", [](const Parser& p) { return new Dielectric(p); } },
-    { "lambert",    [](const Parser& p) { return new Lambert(p); } },
-    { "phong",      [](const Parser& p) { return new Phong(p); } }
+    { "dielectric", [](const Node& n) { return new Dielectric(n); } },
+    { "lambert",    [](const Node& n) { return new Lambert(n); } },
+    { "phong",      [](const Node& n) { return new Phong(n); } }
   };
 
   readMultiple<const Material*>(root, "materials", materialLookup, materials);
@@ -110,10 +109,10 @@ void Scene::readMats(const ptree& root) {
 void Scene::readGeoms(const ptree& root) {
   using namespace geoms;
   static const LookupMap<const Geom*> geometryLookup = {
-    { "disc",     [](const Parser& p) { return new Disc(p); } },
-    { "inverted", [](const Parser& p) { return new Inverted(p); } },
-    { "sphere",   [](const Parser& p) { return new Sphere(p); } },
-    { "mesh",     [](const Parser& p) { return new Mesh(p); } }
+    { "disc",     [](const Node& n) { return new Disc(n); } },
+    { "inverted", [](const Node& n) { return new Inverted(n); } },
+    { "sphere",   [](const Node& n) { return new Sphere(n); } },
+    { "mesh",     [](const Node& n) { return new Mesh(n); } }
   };
 
   readMultiple<const Geom*>(root, "geometry", geometryLookup, geometry);
@@ -121,7 +120,7 @@ void Scene::readGeoms(const ptree& root) {
 
 void Scene::readCameras(const ptree& root) {
   static const LookupMap<Camera*> cameraLookup = {
-    { "persp", [](const Parser& p) { return new Camera(p); } }
+    { "persp", [](const Node& n) { return new Camera(n); } }
   };
 
   readMultiple<Camera*>(root, "cameras", cameraLookup, cameras);

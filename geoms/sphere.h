@@ -32,9 +32,9 @@ namespace geoms {
     Sphere(const geoms::Sphere& other);
 
     /**
-     * Constructs a sphere from the given parser.
+     * Constructs a sphere from the given node.
      */
-    Sphere(const Parser& p);
+    Sphere(const Node& n);
 
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
     virtual bool intersectShadow(const Ray& r, float maxDist) const override;

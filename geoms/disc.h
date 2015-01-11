@@ -42,9 +42,9 @@ namespace geoms {
     Disc(const geoms::Disc& other);
 
     /**
-     * Constructs a disc from the given parser.
+     * Constructs a disc from the given node.
      */
-    Disc(const Parser& p);
+    Disc(const Node& n);
 
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
     virtual bool intersectShadow(const Ray& r, float maxDist) const override;

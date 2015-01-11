@@ -9,7 +9,7 @@ namespace geoms {
 
     Inverted(const Geom* g);
 
-    Inverted(const Parser& p);
+    Inverted(const Node& n);
 
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
     virtual bool intersectShadow(const Ray& r, float maxDist) const override;

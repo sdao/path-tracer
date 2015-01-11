@@ -14,9 +14,9 @@ geoms::Mesh::Mesh(
   readPolyModel(name);
 }
 
-geoms::Mesh::Mesh(const Parser& p)
-  : Mesh(p.getVec("origin"), p.getString("file", false),
-         p.getMaterial("mat"), p.getLight("light")) {}
+geoms::Mesh::Mesh(const Node& n)
+  : Mesh(n.getVec("origin"), n.getString("file"),
+         n.getMaterial("mat"), n.getLight("light")) {}
 
 void geoms::Mesh::readPolyModel(std::string name) {
   // Create an instance of the Importer class

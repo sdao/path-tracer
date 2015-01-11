@@ -20,10 +20,10 @@ geoms::Disc::Disc(const geoms::Disc& other)
     radiusInner(other.radiusInner),
     origin(other.origin), normal(other.normal) {}
 
-geoms::Disc::Disc(const Parser&p)
-  : Disc(p.getVec("origin"), p.getVec("normal"),
-         p.getFloat("radiusOuter"), p.getFloat("radiusInner"),
-         p.getMaterial("mat"), p.getLight("light")) {}
+geoms::Disc::Disc(const Node& n)
+  : Disc(n.getVec("origin"), n.getVec("normal"),
+         n.getFloat("radiusOuter"), n.getFloat("radiusInner"),
+         n.getMaterial("mat"), n.getLight("light")) {}
 
 bool geoms::Disc::intersect(const Ray& r, Intersection* isectOut) const {
   // See Wikipedia:

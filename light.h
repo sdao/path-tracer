@@ -3,7 +3,7 @@
 #include "geom.h"
 #include "material.h"
 #include "kdtree.h"
-#include "parser.h"
+#include "node.h"
 
 /**
  * A diffuse area light that causes radiance to be emitted from a piece of
@@ -52,9 +52,9 @@ public:
   AreaLight(Vec c);
 
   /**
-   * Constructs a light from the given parser.
+   * Constructs a light from the given node.
    */
-  AreaLight(const Parser& p);
+  AreaLight(const Node& n);
 
   /**
    * Evaluates the emittance from an emission object onto a given point via

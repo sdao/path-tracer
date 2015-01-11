@@ -2,7 +2,7 @@
 
 Geom::Geom(const Material* m, const AreaLight* l) : mat(m), light(l) {}
 
-Geom::Geom(const Parser& p) : Geom(p.getMaterial("mat"), p.getLight("light")) {}
+Geom::Geom(const Node& n) : Geom(n.getMaterial("mat"), n.getLight("light")) {}
 
 Geom::~Geom() {}
 

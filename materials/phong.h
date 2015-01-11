@@ -50,9 +50,9 @@ namespace materials {
     Phong(float e, Vec c = Vec(1, 1, 1));
     
     /**
-     * Constructs a Phong material from the given parser.
+     * Constructs a Phong material from the given node.
      */
-    Phong(const Parser& p);
+    Phong(const Node& n);
 
     virtual void sampleLocal(
       Randomness& rng,
