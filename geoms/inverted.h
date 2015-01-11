@@ -3,12 +3,18 @@
 
 namespace geoms {
 
+  /**
+   * A wrapper that simply inverts the normals of another geometry object.
+   */
   class Inverted : public Geom {
   public:
+    /** The original (uninverted) geometry. */
     const Geom* original;
 
+    /** Constructs an inverted version of the given geometry object. */
     Inverted(const Geom* g);
 
+    /** Constructs an inverted geometry object from the given node. */
     Inverted(const Node& n);
 
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;

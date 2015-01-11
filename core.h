@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <boost/format.hpp>
 #include "math.h"
 #include "randomness.h"
 
@@ -38,8 +39,8 @@ struct Ray {
   inline Vec at(float d) const { return origin + direction * d; }
 
   friend std::ostream& operator<<(std::ostream& os, const Ray& r) {
-    os << "<origin: " << r.origin
-       << ", direction: " << r.direction << ">";
+    os << boost::format("<origin: %1%, direction: %2%>")
+      % r.origin % r.direction;
     return os;
   }
 };
@@ -210,7 +211,7 @@ struct BBox {
   }
 
   friend std::ostream& operator<<(std::ostream& os, const BBox& b) {
-    os << "<lower: " << b.lower << ", upper: " << b.upper << ">";
+    os << boost::format("<lower: %1%, upper: %2%>") % b.lower % b.upper;
     return os;
   }
 };
