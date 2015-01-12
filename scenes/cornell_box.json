@@ -41,26 +41,24 @@
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
-      "origin" : "10 -12 -20",
+      "origin" : "10 -12 -22",
       "radius" : 6.0
     },
     "bottom" : {
       "type" : "disc",
       "mat" : "white",
       "light" : "",
-      "origin" : "0 -18 -20",
+      "origin" : "0 -18 -22",
       "normal" : "0 1 0",
       "radiusOuter" : 100.0,
       "radiusInner" : 0.0
     },
     "top" : {
-      "type" : "disc",
+      "type" : "mesh",
       "mat" : "white",
       "light" : "",
-      "origin" : "0 18 -20",
-      "normal" : "0 -1 0",
-      "radiusOuter" : 100.0,
-      "radiusInner" : 6.0
+      "origin" : "0 18 -22",
+      "file" : "assets/lightbox.obj"
     },
     "back" : {
       "type" : "disc",
@@ -75,7 +73,7 @@
       "type" : "disc",
       "mat" : "red",
       "light" : "",
-      "origin" : "-18 0 -20",
+      "origin" : "-18 0 -22",
       "normal" : "1 0 0",
       "radiusOuter" : 100.0,
       "radiusInner" : 0.0
@@ -84,7 +82,7 @@
       "type" : "disc",
       "mat" : "green",
       "light" : "",
-      "origin" : "18 -0 -20",
+      "origin" : "18 -0 -22",
       "normal" : "-1 0 0",
       "radiusOuter" : 100.0,
       "radiusInner" : 0.0
@@ -93,9 +91,9 @@
       "type" : "disc",
       "mat" : "",
       "light" : "ceiling",
-      "origin" : "0 18.5 -20",
+      "origin" : "0 18.5 -22",
       "normal" : "0 -1 0",
-      "radiusOuter" : 8.0,
+      "radiusOuter" : 10.0,
       "radiusInner" : 0.0
     },
     "dragon" : {
