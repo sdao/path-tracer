@@ -17,9 +17,9 @@ dependencies. If you're on Linux, you can use your package manager.
 * [OpenEXR libraries](http://openexr.com/)
   (links with libIlmImf and libHalf)
 * [Open Asset Import Library](http://assimp.sourceforge.net/)
-  (links with libassimp) 
+  (links with libassimp)
 * [Boost](http://www.boost.org/)
-  (template libraries)
+  (template libraries; also links with libboost_program_options)
 
 Reference
 ---------
