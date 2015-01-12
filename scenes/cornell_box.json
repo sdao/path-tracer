@@ -2,7 +2,7 @@
   "lights" : {
     "ceiling" : {
       "type" : "area",
-      "color" : "4 4 4"
+      "color" : "12 12 12"
     }
   },
   "materials" : {
@@ -41,14 +41,14 @@
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
-      "origin" : "10 -12 -22",
+      "origin" : "10 -12 -20",
       "radius" : 6.0
     },
     "bottom" : {
       "type" : "disc",
       "mat" : "white",
       "light" : "",
-      "origin" : "0 -18 -25",
+      "origin" : "0 -18 -20",
       "normal" : "0 1 0",
       "radiusOuter" : 100.0,
       "radiusInner" : 0.0
@@ -57,16 +57,16 @@
       "type" : "disc",
       "mat" : "white",
       "light" : "",
-      "origin" : "0 18 -25",
+      "origin" : "0 18 -20",
       "normal" : "0 -1 0",
       "radiusOuter" : 100.0,
-      "radiusInner" : 10.0
+      "radiusInner" : 6.0
     },
     "back" : {
       "type" : "disc",
       "mat" : "white",
       "light" : "",
-      "origin" : "0 0 -50",
+      "origin" : "0 0 -40",
       "normal" : "0 0 1",
       "radiusOuter" : 100.0,
       "radiusInner" : 0.0
@@ -75,7 +75,7 @@
       "type" : "disc",
       "mat" : "red",
       "light" : "",
-      "origin" : "-22 0 -25",
+      "origin" : "-18 0 -20",
       "normal" : "1 0 0",
       "radiusOuter" : 100.0,
       "radiusInner" : 0.0
@@ -84,7 +84,7 @@
       "type" : "disc",
       "mat" : "green",
       "light" : "",
-      "origin" : "22 -0 -25",
+      "origin" : "18 -0 -20",
       "normal" : "-1 0 0",
       "radiusOuter" : 100.0,
       "radiusInner" : 0.0
@@ -93,16 +93,16 @@
       "type" : "disc",
       "mat" : "",
       "light" : "ceiling",
-      "origin" : "0 18.5 -25",
+      "origin" : "0 18.5 -20",
       "normal" : "0 -1 0",
-      "radiusOuter" : 12.0,
+      "radiusOuter" : 8.0,
       "radiusInner" : 0.0
     },
     "dragon" : {
       "type" : "mesh",
       "mat" : "glossy",
       "light" : "",
-      "origin" : "-8 -18 -28",
+      "origin" : "-6 -18 -28",
       "file" : "assets/dragon100k.obj"
     }
   },
