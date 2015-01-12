@@ -33,5 +33,5 @@ My renderer is also influenced by Kevin Beason's
 
 Renderings
 ----------
-![Cornell box](https://raw.githubusercontent.com/wiki/sdao/path-tracer/pathtracer_dragon_400iters_30min.png)
-![Spheres with depth of field](https://raw.githubusercontent.com/wiki/sdao/path-tracer/pathtracer_spheres_400iters_15min.png)
+![Cornell box](https://raw.githubusercontent.com/wiki/sdao/path-tracer/pathtracer_dragon_800iters_1hr.png)
+![Spheres with depth of field](https://raw.githubusercontent.com/wiki/sdao/path-tracer/pathtracer_spheres_800iters_30min.png)
