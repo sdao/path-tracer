@@ -41,28 +41,38 @@ namespace geoms {
       const Material* m = nullptr,
       const AreaLight* l = nullptr
     );
+
     /**
      * Constructs a poly from another poly.
      */
     Poly(const geoms::Poly& other);
+
+    /**
+     * Gets the actual point data for point 0.
+     */
+    inline const Point getPt0() const {
+      return pt0.refConst(*pointLookup);
+    }
+
+    /**
+     * Gets the actual point data for point 1.
+     */
+    inline const Point getPt1() const {
+      return pt1.refConst(*pointLookup);
+    }
+
+    /**
+     * Gets the actual point data for point 2.
+     */
+    inline const Point getPt2() const {
+      return pt2.refConst(*pointLookup);
+    }
 
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
     virtual bool intersectShadow(const Ray& r, float maxDist) const override;
     virtual BBox bounds() const override;
     virtual Vec samplePoint(Randomness& rng) const override;
     virtual float area() const override;
-
-  private:
-    /**
-     * Gets the actual point data for the given point index by consulting
-     * the point lookup table.
-     *
-     * @param i the index to look up in the table
-     * @return  the point at the given index
-     */
-    inline const Point get(ID i) const {
-      return i.refConst(*pointLookup);
-    }
   };
 
 }

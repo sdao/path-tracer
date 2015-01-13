@@ -117,3 +117,62 @@ void geoms::Mesh::refine(std::vector<const Geom*>& refined) const {
     refined.push_back(&p);
   }
 }
+
+void geoms::Mesh::embreeIntersectCallback(
+  const Embree::EmbreeObj* eo,
+  const RTCRay& ray,
+  Intersection* isectOut
+) {
+  float u = ray.u;
+  float v = ray.v;
+  float w = 1.0f - u - v;
+  const geoms::Mesh* mesh = reinterpret_cast<const geoms::Mesh*>(eo->geom);
+  const geoms::Poly& p = mesh->getFaces()[ray.primID];
+  
+  isectOut->position = Vec(
+    ray.org[0] + ray.dir[0] * ray.tfar,
+    ray.org[1] + ray.dir[1] * ray.tfar,
+    ray.org[2] + ray.dir[2] * ray.tfar
+  );
+  isectOut->distance = ray.tfar;
+  isectOut->normal = (
+    p.getPt0().normal * w + p.getPt1().normal * u + p.getPt2().normal * v
+  ).normalized();
+}
+
+Embree::EmbreeObj* geoms::Mesh::makeEmbreeObject(Embree& embree) const {
+  unsigned geomId = rtcNewTriangleMesh(
+    embree.scene,
+    RTC_GEOMETRY_STATIC,
+    faces.size(),
+    points.size()
+  );
+
+  Embree::EmbreeVert* vertices = reinterpret_cast<Embree::EmbreeVert*>(
+    rtcMapBuffer(embree.scene, geomId, RTC_VERTEX_BUFFER)
+  );
+  for (size_t i = 0; i < points.size(); ++i) {
+    const Poly::Point& pt = points[i];
+    vertices[i].x = pt.position.x();
+    vertices[i].y = pt.position.y();
+    vertices[i].z = pt.position.z();
+    vertices[i].a = 0.0f;
+  }
+  rtcUnmapBuffer(embree.scene, geomId, RTC_VERTEX_BUFFER);
+
+  Embree::EmbreeTri* triangles =  reinterpret_cast<Embree::EmbreeTri*>(
+    rtcMapBuffer(embree.scene, geomId, RTC_INDEX_BUFFER)
+  );
+  for (size_t i = 0; i < faces.size(); ++i) {
+    const Poly& p = faces[i];
+    triangles[i].v0 = int(p.pt0.val);
+    triangles[i].v1 = int(p.pt1.val);
+    triangles[i].v2 = int(p.pt2.val);
+  }
+  rtcUnmapBuffer(embree.scene, geomId, RTC_INDEX_BUFFER);
+
+  Embree::EmbreeObj* eo = new Embree::EmbreeObj(
+    this, geomId, &geoms::Mesh::embreeIntersectCallback
+  );
+  return eo;
+}

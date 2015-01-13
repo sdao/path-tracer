@@ -3,6 +3,7 @@
 #include "scene.h"
 #include "camera.h"
 #include "debug.h"
+#include "embree.h"
 
 int main(int argc, char* argv[]) {
   using namespace boost::program_options;
@@ -42,8 +43,10 @@ int main(int argc, char* argv[]) {
     std::string output = vars["output"].as<std::string>();
     int iterations = vars["iterations"].as<int>();
 
+    Embree::init();
     Scene scene(input);
     scene.defaultCamera()->renderMultiple(output, iterations);
+    Embree::exit();
   } catch (std::exception& e) {
     debug::printNestedException(e);
     return 42;

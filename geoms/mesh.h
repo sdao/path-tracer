@@ -13,6 +13,12 @@ namespace geoms {
     std::vector<Poly::Point> points; /**< The point lookup table. */
     std::vector<Poly> faces; /**< The faces of the mesh. */
 
+    static void embreeIntersectCallback(
+      const Embree::EmbreeObj* eo,
+      const RTCRay& ray,
+      Intersection* isectOut
+    );
+
   private:
     /**
      * Reads a polygon model from a file and populates a mesh.
@@ -50,12 +56,21 @@ namespace geoms {
      */
     Mesh(const Node& n);
 
+    inline const std::vector<Poly::Point>& getPoints() const {
+      return points;
+    }
+
+    inline const std::vector<Poly>& getFaces() const {
+      return faces;
+    }
+
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
     virtual bool intersectShadow(const Ray& r, float maxDist) const override;
     virtual BBox bounds() const override;
     virtual Vec samplePoint(Randomness& rng) const override;
     virtual float area() const override;
     virtual void refine(std::vector<const Geom*>& refined) const override;
+    virtual Embree::EmbreeObj* makeEmbreeObject(Embree& embree) const override;
   };
 
 }

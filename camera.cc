@@ -3,6 +3,8 @@
 #include <chrono>
 #include "light.h"
 
+#define NO_DIRECT_ILLUM
+
 using std::max;
 using std::min;
 namespace chrono = std::chrono;
@@ -15,7 +17,7 @@ Camera::Camera(
   float fov,
   float len,
   float fStop
-) : kdAccelTree(objs), focalLength(len),
+) : kdAccelTree(objs), embreeAccel(objs), focalLength(len),
     lensRadius((len / fStop) * 0.5f), // Diameter = focalLength / fStop.
     camToWorldXform(xform),
     masterRng(), rowSeeds(size_t(hh)), img(ww, hh), iters(0)
@@ -34,8 +36,6 @@ Camera::Camera(
   focalPlaneUp = -2.0f * halfFocalPlaneUp;
   focalPlaneRight = 2.0f * halfFocalPlaneRight;
   focalPlaneOrigin = Vec(-halfFocalPlaneRight, halfFocalPlaneUp, -focalLength);
-
-  kdAccelTree.build();
 }
 
 Camera::Camera(const Node& n)
@@ -159,7 +159,7 @@ Vec Camera::trace(
 
     // Bounce ray and kill if nothing hit.
     Intersection isect;
-    const Geom* g = kdAccelTree.intersect(r, &isect);
+    const Geom* g = embreeAccel.intersect(r, &isect);
     if (!g) {
       // End path in empty space.
       break;
@@ -211,13 +211,13 @@ Vec Camera::uniformSampleOneLight(
   const Intersection& isect,
   const Material* mat
 ) const {
-  size_t numLights = kdAccelTree.allLights().size();
+  size_t numLights = kdAccelTree.getLights().size();
   if (numLights == 0) {
     return Vec(0, 0, 0);
   }
 
   size_t lightIdx = size_t(floorf(rng.nextUnitFloat() * numLights));
-  const Geom* emitter = kdAccelTree.allLights()[min(lightIdx, numLights - 1)];
+  const Geom* emitter = kdAccelTree.getLights()[min(lightIdx, numLights - 1)];
   const AreaLight* areaLight = emitter->light;
 
   // P[this light] = 1 / numLights, so 1 / P[this light] = numLights.

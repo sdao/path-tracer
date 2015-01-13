@@ -18,12 +18,12 @@ bool geoms::Poly::intersect(const Ray& r, Intersection* isectOut) const {
   // See <http://en.wikipedia.org/wiki/
   // M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm> for more info.
 
-  const Point& pt0_data = get(pt0);
-  const Point& pt1_data = get(pt1);
-  const Point& pt2_data = get(pt2);
+  const Point& data0 = getPt0();
+  const Point& data1 = getPt1();
+  const Point& data2 = getPt2();
 
-  const Vec edge1 = pt1_data.position - pt0_data.position;
-  const Vec edge2 = pt2_data.position - pt0_data.position;
+  const Vec edge1 = data1.position - data0.position;
+  const Vec edge2 = data2.position - data0.position;
 
   const Vec p = r.direction.cross(edge2);
   const float det = edge1.dot(p);
@@ -33,7 +33,7 @@ bool geoms::Poly::intersect(const Ray& r, Intersection* isectOut) const {
   }
 
   const float invDet = 1.0f / det;
-  const Vec t = r.origin - pt0_data.position;
+  const Vec t = r.origin - data0.position;
 
   const float u = t.dot(p) * invDet;
   if (u < 0.0f || u > 1.0f) {
@@ -57,7 +57,7 @@ bool geoms::Poly::intersect(const Ray& r, Intersection* isectOut) const {
   isect.position = r.at(dist);
   isect.distance = dist;
   isect.normal =
-    w * pt0_data.normal + u * pt1_data.normal + v * pt2_data.normal;
+    w * data0.normal + u * data1.normal + v * data2.normal;
 
   *isectOut = isect;
   return true;
@@ -68,12 +68,12 @@ bool geoms::Poly::intersectShadow(const Ray& r, float maxDist) const {
   // See <http://en.wikipedia.org/wiki/
   // M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm> for more info.
 
-  const Point& pt0_data = get(pt0);
-  const Point& pt1_data = get(pt1);
-  const Point& pt2_data = get(pt2);
+  const Point& data0 = getPt0();
+  const Point& data1 = getPt1();
+  const Point& data2 = getPt2();
 
-  const Vec edge1 = pt1_data.position - pt0_data.position;
-  const Vec edge2 = pt2_data.position - pt0_data.position;
+  const Vec edge1 = data1.position - data0.position;
+  const Vec edge2 = data2.position - data0.position;
 
   const Vec p = r.direction.cross(edge2);
   const float det = edge1.dot(p);
@@ -83,7 +83,7 @@ bool geoms::Poly::intersectShadow(const Ray& r, float maxDist) const {
   }
 
   const float invDet = 1.0f / det;
-  const Vec t = r.origin - pt0_data.position;
+  const Vec t = r.origin - data0.position;
 
   const float u = t.dot(p) * invDet;
   if (u < 0.0f || u > 1.0f) {
@@ -105,8 +105,8 @@ bool geoms::Poly::intersectShadow(const Ray& r, float maxDist) const {
 }
 
 BBox geoms::Poly::bounds() const {
-  BBox b(get(pt0).position, get(pt1).position);
-  b.expand(get(pt2).position);
+  BBox b(getPt0().position, getPt1().position);
+  b.expand(getPt2().position);
 
   return b;
 }
@@ -122,14 +122,14 @@ Vec geoms::Poly::samplePoint(Randomness& rng) const {
   }
   float c = 1.0f - a - b;
 
-  return a * get(pt0).position + b * get(pt1).position + c * get(pt2).position;
+  return a * getPt0().position + b * getPt1().position + c * getPt2().position;
 }
 
 float geoms::Poly::area() const {
   // See MathWorld <http://mathworld.wolfram.com/TriangleArea.html>.
-  Vec x0 = get(pt0).position;
-  Vec x1 = get(pt1).position;
-  Vec x2 = get(pt2).position;
+  Vec x0 = getPt0().position;
+  Vec x1 = getPt1().position;
+  Vec x2 = getPt2().position;
 
   return 0.5f * (x1 - x0).cross(x0 - x2).norm();
 }
