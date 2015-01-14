@@ -25,6 +25,9 @@ namespace math {
   /** A very small nonzero value. */
   static constexpr float VERY_SMALL = 0.0001f;
 
+  /** A very big non-infinite value. */
+  static constexpr float VERY_BIG = std::numeric_limits<float>::max();
+
   /** Pi as a single-precision float. */
   static constexpr float PI = float(M_PI);
 

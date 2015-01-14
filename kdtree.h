@@ -3,7 +3,7 @@
 #include <vector>
 #include <map>
 #include "core.h"
-#include "geom.h"
+#include "accelerator.h"
 #include "id.h"
 
 /**
@@ -11,7 +11,7 @@
  * This implementation is mostly taken from Pharr and Humphreys' Physically
  * Based Rendering, second edition.
  */
-class KDTree {
+class KDTree : public Accelerator {
   /**
    * The number of objects in a tree leaf at which point the leaf should no
    * longer be refined. (There can be leafs larger than this, however.)
@@ -162,6 +162,11 @@ class KDTree {
     int badRefinesSoFar
   );
 
+  /**
+   * Kicks off the recursive build of the k-d tree.
+   */
+  void build();
+
 protected:
   /**
    * Prints the subtree beginning at the given node.
@@ -180,42 +185,12 @@ public:
    */
   KDTree(const std::vector<const Geom*>& o);
 
-  /**
-   * Actually builds out the k-d tree structure.
-   */
-  void build();
-
-  /**
-   * Determines what object (if any) in the k-d tree a given ray intersects.
-   *
-   * @param r              the ray to send through the k-d tree
-   * @param isectOut [out] the intersection information if the ray hit some
-   *                       geometry, otherwise unmodified; the pointer must not
-   *                       be null
-   * @returns              the geom that was hit, or nullptr if none was hit
-   */
-  const Geom* intersect(const Ray& r, Intersection* isectOut) const;
-
-  /**
-   * Determines if any object in the k-d tree intersects the given shadow ray
-   * within a maximum distance.
-   *
-   * @param r       the shadow ray to send through the k-d tree
-   * @param maxDist the maximum distance to check for intersections
-   * @returns       true if any geom hit within maxDist, otherwise false
-   */
-  bool intersectShadow(const Ray& r, float maxDist) const;
-
-  /**
-   * Returns a reference to the list of all (refined) geometry in the k-d tree.
-   */
-  const std::vector<const Geom*>& allObjecs() const;
-
-  /**
-   * Returns a reference to the list of all light-source geometry in the k-d
-   * tree.
-   */
-  const std::vector<const Geom*>& allLights() const;
+  virtual const Geom* intersect(
+    const Ray& r,
+    Intersection* isectOut
+  ) const override;
+  virtual bool intersectShadow(const Ray& r, float maxDist) const override;
+  virtual const std::vector<const Geom*>& getLights() const override;
 
   friend std::ostream& operator<<(std::ostream& os, const KDTree& tree) {
     tree.print(tree.rootId, os);

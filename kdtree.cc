@@ -1,4 +1,5 @@
 #include "kdtree.h"
+#include "geom.h"
 
 KDTree::KDTree(const std::vector<const Geom*>& o)
   : allNodes(), rootId(), objs(), lights()
@@ -14,6 +15,8 @@ KDTree::KDTree(const std::vector<const Geom*>& o)
       lights.push_back(g);
     }
   }
+
+  build();
 }
 
 void KDTree::build() {
@@ -452,10 +455,6 @@ void KDTree::print(ID nodeId, std::ostream& os, size_t level) const {
   os << "\n" << header << "}";
 }
 
-const std::vector<const Geom*>& KDTree::allObjecs() const {
-  return objs;
-}
-
-const std::vector<const Geom*>& KDTree::allLights() const {
+const std::vector<const Geom*>& KDTree::getLights() const {
   return lights;
 }

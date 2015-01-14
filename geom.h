@@ -1,6 +1,7 @@
 #pragma once
 #include "core.h"
 #include "node.h"
+#include "embree.h"
 
 class Material;
 class AreaLight;
@@ -9,6 +10,15 @@ class AreaLight;
  * The base interface for all renderable geometry.
  */
 class Geom {
+  static void embreeBoundsFunc(void* user, size_t i, RTCBounds& bounds);
+  static void embreeIntersectFunc(void* user, RTCRay& ray, size_t i);
+  static void embreeOccludedFunc(void* user , RTCRay& ray, size_t i);
+  static void embreeIntersectCallback(
+    const Embree::EmbreeObj* eo,
+    const RTCRay& ray,
+    Intersection* isectOut
+  );
+
 protected:
   /**
    * Constructs a geom with the specified material.
@@ -76,5 +86,19 @@ public:
    */
   virtual float area() const = 0;
 
+  /**
+   * Refines a composite object into its constituent parts until the
+   * parts can be intersected.
+   */
   virtual void refine(std::vector<const Geom*>& refined) const;
+
+  /**
+   * Makes an Embree geometry object from this geometry.
+   * Composite objects may choose to create one Embree object composed of
+   * multiple primitives if they can do so.
+   *
+   * @param scene the scene in which to create the Embree object
+   * @param eo    the Embree object to populate
+   */
+  virtual void makeEmbreeObject(RTCScene scene, Embree::EmbreeObj& eo) const;
 };
