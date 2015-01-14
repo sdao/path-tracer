@@ -128,7 +128,7 @@ void geoms::Mesh::embreeIntersectCallback(
   );
   isectOut->distance = ray.tfar;
   isectOut->normal = (
-    p.getPt0().normal * w + p.getPt1().normal * u + p.getPt2().normal * v
+    w * p.getPt0().normal + u * p.getPt1().normal + v * p.getPt2().normal
   ).normalized();
 }
 

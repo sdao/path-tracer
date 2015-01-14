@@ -27,7 +27,9 @@ dependencies. If you're on Linux, you can use your package manager.
     source.
   * You can use the built-in k-d tree accelerator instead of Intel Embree, by
     editing the `Camera` class: change the line `using AccelStructure = Embree`
-    in `camera.h` to `using AccelStructure = KDTree`.
+    in `camera.h` to `using AccelStructure = KDTree`. Using Embree's
+    intersection routines is roughly 2x faster than using the built-in k-d
+    tree implementation.
 
 Reference
 ---------

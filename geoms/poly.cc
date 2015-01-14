@@ -57,7 +57,7 @@ bool geoms::Poly::intersect(const Ray& r, Intersection* isectOut) const {
   isect.position = r.at(dist);
   isect.distance = dist;
   isect.normal =
-    w * data0.normal + u * data1.normal + v * data2.normal;
+    (w * data0.normal + u * data1.normal + v * data2.normal).normalized();
 
   *isectOut = isect;
   return true;
