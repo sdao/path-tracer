@@ -23,11 +23,3 @@ BBox geoms::Inverted::bounds() const {
 BSphere geoms::Inverted::boundSphere() const {
   return original->boundSphere();
 }
-
-Vec geoms::Inverted::samplePoint(Randomness& rng) const {
-  return original->samplePoint(rng);
-}
-
-float geoms::Inverted::area() const {
-  return original->area();
-}

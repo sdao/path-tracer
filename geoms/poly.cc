@@ -110,26 +110,3 @@ BBox geoms::Poly::bounds() const {
 
   return b;
 }
-
-Vec geoms::Poly::samplePoint(Randomness& rng) const {
-  // See MathWorld <http://mathworld.wolfram.com/TrianglePointPicking.html>.
-  // Verified working in Mathematica.
-  float a = rng.nextUnitFloat();
-  float b = rng.nextUnitFloat();
-  if (a + b > 1.0f) {
-    a = 1.0f - a;
-    b = 1.0f - b;
-  }
-  float c = 1.0f - a - b;
-
-  return a * getPt0().position + b * getPt1().position + c * getPt2().position;
-}
-
-float geoms::Poly::area() const {
-  // See MathWorld <http://mathworld.wolfram.com/TriangleArea.html>.
-  Vec x0 = getPt0().position;
-  Vec x1 = getPt1().position;
-  Vec x2 = getPt2().position;
-
-  return 0.5f * (x1 - x0).cross(x0 - x2).norm();
-}

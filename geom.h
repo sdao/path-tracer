@@ -73,20 +73,6 @@ public:
   virtual BSphere boundSphere() const;
 
   /**
-   * Randomly samples a point on the geometry, uniform with respect to the area
-   * of the geometry.
-   *
-   * @param rng the per-thread RNG in use
-   * @returns   the position of the sampled point
-   */
-  virtual Vec samplePoint(Randomness& rng) const = 0;
-
-  /**
-   * Gets the total surface area of the geometry.
-   */
-  virtual float area() const = 0;
-
-  /**
    * Refines a composite object into its constituent parts until the
    * parts can be intersected.
    */

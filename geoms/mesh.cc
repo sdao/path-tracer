@@ -104,14 +104,6 @@ BBox geoms::Mesh::bounds() const {
   return debug::shouldNotReach(BBox());
 }
 
-Vec geoms::Mesh::samplePoint(Randomness& /* rng */) const {
-  return debug::shouldNotReach(Vec(0, 0, 0));
-}
-
-float geoms::Mesh::area() const {
-  return debug::shouldNotReach(0.0f);
-}
-
 void geoms::Mesh::refine(std::vector<const Geom*>& refined) const {
   for (const Poly& p : faces) {
     refined.push_back(&p);

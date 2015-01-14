@@ -86,11 +86,3 @@ BBox geoms::Sphere::bounds() const {
 BSphere geoms::Sphere::boundSphere() const {
   return BSphere(origin, radius);
 }
-
-Vec geoms::Sphere::samplePoint(Randomness& rng) const {
-  return origin + radius * math::uniformSampleSphere(rng);
-}
-
-float geoms::Sphere::area() const {
-  return 4.0f * math::PI * radius * radius;
-}
