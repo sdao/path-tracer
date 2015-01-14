@@ -26,7 +26,7 @@ dependencies. If you're on Linux, you can use your package manager.
     from [http://embree.github.io/](http://embree.github.io/) or compile from
     source.
   * You can use the built-in k-d tree accelerator instead of Intel Embree, by
-    editing the `Camera` class: change the line`using AccelStructure = Embree`
+    editing the `Camera` class: change the line `using AccelStructure = Embree`
     in `camera.h` to `using AccelStructure = KDTree`.
 
 Reference
