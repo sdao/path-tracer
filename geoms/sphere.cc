@@ -78,7 +78,7 @@ bool geoms::Sphere::intersectShadow(const Ray& r, float maxDist) const {
   return false;
 }
 
-BBox geoms::Sphere::bounds() const {
+BBox geoms::Sphere::boundBox() const {
   Vec boundsDiag(radius, radius, radius);
   return BBox(origin - boundsDiag, origin + boundsDiag);
 }

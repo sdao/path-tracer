@@ -16,8 +16,8 @@ bool geoms::Inverted::intersectShadow(const Ray& r, float maxDist) const {
   return original->intersectShadow(r, maxDist);
 }
 
-BBox geoms::Inverted::bounds() const {
-  return original->bounds();
+BBox geoms::Inverted::boundBox() const {
+  return original->boundBox();
 }
 
 BSphere geoms::Inverted::boundSphere() const {

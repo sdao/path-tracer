@@ -102,7 +102,7 @@ bool geoms::Mesh::intersectShadow(
   return debug::shouldNotReach(false);
 }
 
-BBox geoms::Mesh::bounds() const {
+BBox geoms::Mesh::boundBox() const {
   return debug::shouldNotReach(BBox());
 }
 

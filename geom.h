@@ -63,7 +63,7 @@ public:
   /**
    * A bounding box encapsulating the entire geometry.
    */
-  virtual BBox bounds() const = 0;
+  virtual BBox boundBox() const = 0;
 
   /**
    * A bounding sphere encapsulating the entire geometry.

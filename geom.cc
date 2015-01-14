@@ -12,12 +12,12 @@ void Geom::refine(std::vector<const Geom*>& refined) const {
 }
 
 BSphere Geom::boundSphere() const {
-  return BSphere(bounds());
+  return BSphere(boundBox());
 }
 
 void Geom::embreeBoundsFunc(void* user, size_t /* i */, RTCBounds& bounds) {
   const Embree::EmbreeObj* eo = reinterpret_cast<Embree::EmbreeObj*>(user);
-  BBox b = eo->geom->bounds();
+  BBox b = eo->geom->boundBox();
   bounds.lower_x = b.lower.x();
   bounds.lower_y = b.lower.y();
   bounds.lower_z = b.lower.z();

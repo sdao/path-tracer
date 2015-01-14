@@ -104,7 +104,7 @@ bool geoms::Poly::intersectShadow(const Ray& r, float maxDist) const {
   return true;
 }
 
-BBox geoms::Poly::bounds() const {
+BBox geoms::Poly::boundBox() const {
   BBox b(getPt0().position, getPt1().position);
   b.expand(getPt2().position);
 

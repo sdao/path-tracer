@@ -66,7 +66,7 @@ namespace geoms {
 
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
     virtual bool intersectShadow(const Ray& r, float maxDist) const override;
-    virtual BBox bounds() const override;
+    virtual BBox boundBox() const override;
     virtual void refine(std::vector<const Geom*>& refined) const override;
     virtual void makeEmbreeObject(
       RTCScene scene,

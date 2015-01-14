@@ -75,7 +75,7 @@ bool geoms::Disc::intersectShadow(const Ray& r, float maxDist) const {
   return false;
 }
 
-BBox geoms::Disc::bounds() const {
+BBox geoms::Disc::boundBox() const {
   Vec tangent;
   Vec binormal;
   math::coordSystem(normal, &tangent, &binormal);
