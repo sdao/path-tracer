@@ -1,0 +1,104 @@
+{
+  "lights" : {
+    "ceiling" : {
+      "type" : "area",
+      "color" : "12 12 12"
+    }
+  },
+  "materials" : {
+    "green" : {
+      "type" : "lambert",
+      "albedo" : "0.5 1.0 0.5"
+    },
+    "white" : {
+      "type" : "lambert",
+      "albedo" : "1 1 1"
+    },
+    "red" : {
+      "type" : "lambert",
+      "albedo" : "1.0 0.5 0.5"
+    },
+    "glossy" : {
+      "type" : "phong",
+      "exponent" : 100,
+      "color" : "1 1 1"
+    }
+  },
+  "geometry" : {
+    "bottom" : {
+      "type" : "disc",
+      "mat" : "white",
+      "light" : "",
+      "origin" : "0 -18 -22",
+      "normal" : "0 1 0",
+      "radiusOuter" : 100.0,
+      "radiusInner" : 0.0
+    },
+    "top" : {
+      "type" : "mesh",
+      "mat" : "white",
+      "light" : "",
+      "origin" : "0 18 -22",
+      "file" : "assets/lightbox.obj"
+    },
+    "back" : {
+      "type" : "disc",
+      "mat" : "white",
+      "light" : "",
+      "origin" : "0 0 -40",
+      "normal" : "0 0 1",
+      "radiusOuter" : 100.0,
+      "radiusInner" : 0.0
+    },
+    "left" : {
+      "type" : "disc",
+      "mat" : "red",
+      "light" : "",
+      "origin" : "-18 0 -22",
+      "normal" : "1 0 0",
+      "radiusOuter" : 100.0,
+      "radiusInner" : 0.0
+    },
+    "right" : {
+      "type" : "disc",
+      "mat" : "green",
+      "light" : "",
+      "origin" : "18 -0 -22",
+      "normal" : "-1 0 0",
+      "radiusOuter" : 100.0,
+      "radiusInner" : 0.0
+    },
+    "lightSource" : {
+      "type" : "disc",
+      "mat" : "",
+      "light" : "ceiling",
+      "origin" : "0 18.5 -22",
+      "normal" : "0 -1 0",
+      "radiusOuter" : 10.0,
+      "radiusInner" : 0.0
+    },
+    "normals" : {
+      "type" : "mesh",
+      "mat" : "glossy",
+      "light" : "",
+      "origin" : "0 -18 -28",
+      "file" : "assets/normals.obj"
+    }
+  },
+  "cameras" : {
+    "default" : {
+      "type" : "persp",
+      "translate" : "0 0 32",
+      "rotateAngle" : 0,
+      "rotateAxis" : "1 0 0",
+      "objects" : [
+        "bottom", "top", "back", "left", "right", "lightSource", "normals"
+      ],
+      "width" : 512,
+      "height" : 384,
+      "fov" : 0.78540,
+      "focalLength" : 48.0,
+      "fStop" : 32.0
+    }
+  }
+}
