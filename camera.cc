@@ -15,7 +15,7 @@ Camera::Camera(
   float fov,
   float len,
   float fStop
-) : embreeAccel(objs), focalLength(len),
+) : accel(objs), focalLength(len),
     lensRadius((len / fStop) * 0.5f), // Diameter = focalLength / fStop.
     camToWorldXform(xform),
     masterRng(), rowSeeds(size_t(hh)), img(ww, hh), iters(0)
@@ -157,7 +157,7 @@ Vec Camera::trace(
 
     // Bounce ray and kill if nothing hit.
     Intersection isect;
-    const Geom* g = embreeAccel.intersect(r, &isect);
+    const Geom* g = accel.intersect(r, &isect);
     if (!g) {
       // End path in empty space.
       break;
@@ -209,17 +209,17 @@ Vec Camera::uniformSampleOneLight(
   const Intersection& isect,
   const Material* mat
 ) const {
-  size_t numLights = embreeAccel.getLights().size();
+  size_t numLights = accel.getLights().size();
   if (numLights == 0) {
     return Vec(0, 0, 0);
   }
 
   size_t lightIdx = size_t(floorf(rng.nextUnitFloat() * numLights));
-  const Geom* emitter = embreeAccel.getLights()[min(lightIdx, numLights - 1)];
+  const Geom* emitter = accel.getLights()[min(lightIdx, numLights - 1)];
   const AreaLight* areaLight = emitter->light;
 
   // P[this light] = 1 / numLights, so 1 / P[this light] = numLights.
   return float(numLights) * areaLight->directIlluminate(
-    rng, incoming, isect, mat, emitter, &embreeAccel
+    rng, incoming, isect, mat, emitter, &accel
   );
 }
