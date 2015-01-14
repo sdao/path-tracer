@@ -53,6 +53,7 @@ void geoms::Mesh::readPolyModel(std::string name) {
     }
 
     // Add points.
+    points.reserve(mesh->mNumVertices);
     for (size_t i = 0; i < mesh->mNumVertices; ++i) {
       aiVector3D thisPos = mesh->mVertices[i];
       aiVector3D thisNorm = mesh->mNormals[i];
@@ -66,6 +67,7 @@ void geoms::Mesh::readPolyModel(std::string name) {
     }
 
     // Add faces.
+    faces.reserve(mesh->mNumFaces);
     for (size_t i = 0; i < mesh->mNumFaces; ++i) {
       aiFace face = mesh->mFaces[i];
 
