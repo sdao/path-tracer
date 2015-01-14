@@ -4,7 +4,6 @@
 #include <map>
 #include "core.h"
 #include "accelerator.h"
-#include "geom.h"
 #include "id.h"
 
 /**

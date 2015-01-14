@@ -2,8 +2,9 @@
 #include "core.h"
 #include "geom.h"
 #include "material.h"
-#include "kdtree.h"
 #include "node.h"
+
+class Accelerator;
 
 /**
  * A diffuse area light that causes radiance to be emitted from a piece of
@@ -24,7 +25,7 @@ private:
     const Intersection& isect,
     const Material* mat,
     const Geom* emitter,
-    const KDTree& kdt
+    const Accelerator* accel
   ) const;
 
   /**
@@ -40,7 +41,7 @@ private:
     const Intersection& isect,
     const Material* mat,
     const Geom* emitter,
-    const KDTree& kdt
+    const Accelerator* accel
   ) const;
 
 public:
@@ -61,8 +62,7 @@ public:
    * a specified direction. (Note that a diffuse area light can illuminate a
    * point from multiple different directions.)
    *
-   * @param kdt                  the k-d tree containing all geometry in the
-   *                             scene
+   * @param accel                the accelerator containing the scene geometry
    * @param emitter              the geometry from which light is emitted
    * @param point                the world-space point being illuminated by the
    *                             emitter
@@ -76,7 +76,7 @@ public:
    *                             world-space point
    */
   void evalLight(
-    const KDTree& kdt,
+    const Accelerator* accel,
     const Geom* emitter,
     const Vec& point,
     const Vec& dirToLight,
@@ -90,8 +90,7 @@ public:
    * point from multiple different directions.)
    *
    * @param rng                  the per-thread RNG in use
-   * @param kdt                  the k-d tree containing all geometry in the
-   *                             scene
+   * @param accel                the accelerator containing the scene geometry
    * @param emitter              the geometry from which light is emitted
    * @param point                the world-space point being illuminated by the
    *                             emitter
@@ -103,7 +102,7 @@ public:
    */
   void sampleLight(
     Randomness& rng,
-    const KDTree& kdt,
+    const Accelerator* accel,
     const Geom* emitter,
     const Vec& point,
     Vec* dirToLightOut,
@@ -130,13 +129,13 @@ public:
    *
    * @param incoming     the incoming ray that struck the surface
    * @param isect        the intersection information for the incoming ray
-   * @param kdt          the k-d tree containing all geometry in the scene
+   * @param accel        the accelerator containing the scene geometry
    * @returns            the emittance from the light
    */
   Vec emit(
     const Ray& incoming,
     const Intersection& isect,
-    const KDTree& kdt
+    const Accelerator* accel
   ) const;
 
   /**
@@ -152,7 +151,7 @@ public:
    * @param mat             the material of the target geometry being
    *                        illuminated
    * @param emitter         the object doing the illuminating (the emitter)
-   * @param kdt             the k-d tree containing all geometry in the scene
+   * @param accel           the accelerator containing the scene geometry
    */
   Vec directIlluminate(
     Randomness& rng,
@@ -160,6 +159,6 @@ public:
     const Intersection& isect,
     const Material* mat,
     const Geom* emitter,
-    const KDTree& kdt
+    const Accelerator* accel
   ) const;
 };

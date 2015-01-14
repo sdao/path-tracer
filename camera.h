@@ -30,8 +30,7 @@ class Camera {
    */
   static constexpr float BIASED_RADIANCE_CLAMPING = 50.0f;
 
-  KDTree kdAccelTree; /**< The k-d tree containing the renderable geometry. */
-  Embree embreeAccel;
+  Embree embreeAccel; /**< The accelerator containing renderable geometry. */
 
   const float focalLength; /**< The distance from the eye to the focal plane. */
   const float lensRadius; /**< The radius of the lens opening. */

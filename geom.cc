@@ -51,14 +51,13 @@ void Geom::embreeOccludedFunc(void* user, RTCRay& ray, size_t /* i */) {
     Vec(ray.org[0], ray.org[1], ray.org[2]),
     Vec(ray.dir[0], ray.dir[1], ray.dir[2])
   );
-  Intersection isect;
   if (eo->geom->intersectShadow(r, ray.tfar)) {
     ray.geomID = 0;
   }
 }
 
 void Geom::embreeIntersectCallback(
-  const Embree::EmbreeObj* eo,
+  const Embree::EmbreeObj* /* eo */,
   const RTCRay& ray,
   Intersection* isectOut
 ) {
@@ -68,19 +67,15 @@ void Geom::embreeIntersectCallback(
     ray.org[2] + ray.dir[2] * ray.tfar
   );
   isectOut->distance = ray.tfar;
-  isectOut->normal = Vec(ray.Ng[0], ray.Ng[1], ray.Ng[2]).normalized();
+  isectOut->normal = Vec(ray.Ng[0], ray.Ng[1], ray.Ng[2]);
 }
 
-Embree::EmbreeObj* Geom::makeEmbreeObject(Embree& embree) const {
-  unsigned geomId = rtcNewUserGeometry(embree.scene, 1);
-  Embree::EmbreeObj* eo = new Embree::EmbreeObj(
-    this, geomId, &Geom::embreeIntersectCallback
-  );
+void Geom::makeEmbreeObject(RTCScene scene, Embree::EmbreeObj& eo) const {
+  unsigned geomId = rtcNewUserGeometry(scene, 1);
+  eo = Embree::EmbreeObj(this, geomId, &Geom::embreeIntersectCallback);
 
-  rtcSetUserData(embree.scene, geomId, eo);
-  rtcSetBoundsFunction(embree.scene, geomId, &Geom::embreeBoundsFunc);
-  rtcSetIntersectFunction(embree.scene, geomId, &Geom::embreeIntersectFunc);
-  rtcSetOccludedFunction(embree.scene, geomId, &Geom::embreeOccludedFunc);
-
-  return eo;
+  rtcSetUserData(scene, geomId, &eo);
+  rtcSetBoundsFunction(scene, geomId, &Geom::embreeBoundsFunc);
+  rtcSetIntersectFunction(scene, geomId, &Geom::embreeIntersectFunc);
+  rtcSetOccludedFunction(scene, geomId, &Geom::embreeOccludedFunc);
 }

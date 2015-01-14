@@ -3,8 +3,6 @@
 #include <chrono>
 #include "light.h"
 
-#define NO_DIRECT_ILLUM
-
 using std::max;
 using std::min;
 namespace chrono = std::chrono;
@@ -17,7 +15,7 @@ Camera::Camera(
   float fov,
   float len,
   float fStop
-) : kdAccelTree(objs), embreeAccel(objs), focalLength(len),
+) : embreeAccel(objs), focalLength(len),
     lensRadius((len / fStop) * 0.5f), // Diameter = focalLength / fStop.
     camToWorldXform(xform),
     masterRng(), rowSeeds(size_t(hh)), img(ww, hh), iters(0)
@@ -211,17 +209,17 @@ Vec Camera::uniformSampleOneLight(
   const Intersection& isect,
   const Material* mat
 ) const {
-  size_t numLights = kdAccelTree.getLights().size();
+  size_t numLights = embreeAccel.getLights().size();
   if (numLights == 0) {
     return Vec(0, 0, 0);
   }
 
   size_t lightIdx = size_t(floorf(rng.nextUnitFloat() * numLights));
-  const Geom* emitter = kdAccelTree.getLights()[min(lightIdx, numLights - 1)];
+  const Geom* emitter = embreeAccel.getLights()[min(lightIdx, numLights - 1)];
   const AreaLight* areaLight = emitter->light;
 
   // P[this light] = 1 / numLights, so 1 / P[this light] = numLights.
   return float(numLights) * areaLight->directIlluminate(
-    rng, incoming, isect, mat, emitter, kdAccelTree
+    rng, incoming, isect, mat, emitter, &embreeAccel
   );
 }

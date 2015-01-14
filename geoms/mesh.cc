@@ -127,7 +127,7 @@ void geoms::Mesh::embreeIntersectCallback(
   float v = ray.v;
   float w = 1.0f - u - v;
   const geoms::Mesh* mesh = reinterpret_cast<const geoms::Mesh*>(eo->geom);
-  const geoms::Poly& p = mesh->getFaces()[ray.primID];
+  const geoms::Poly& p = mesh->getFaces()[size_t(ray.primID)];
   
   isectOut->position = Vec(
     ray.org[0] + ray.dir[0] * ray.tfar,
@@ -140,16 +140,16 @@ void geoms::Mesh::embreeIntersectCallback(
   ).normalized();
 }
 
-Embree::EmbreeObj* geoms::Mesh::makeEmbreeObject(Embree& embree) const {
+void geoms::Mesh::makeEmbreeObject(RTCScene scene, Embree::EmbreeObj& eo) const {
   unsigned geomId = rtcNewTriangleMesh(
-    embree.scene,
+    scene,
     RTC_GEOMETRY_STATIC,
     faces.size(),
     points.size()
   );
 
   Embree::EmbreeVert* vertices = reinterpret_cast<Embree::EmbreeVert*>(
-    rtcMapBuffer(embree.scene, geomId, RTC_VERTEX_BUFFER)
+    rtcMapBuffer(scene, geomId, RTC_VERTEX_BUFFER)
   );
   for (size_t i = 0; i < points.size(); ++i) {
     const Poly::Point& pt = points[i];
@@ -158,10 +158,10 @@ Embree::EmbreeObj* geoms::Mesh::makeEmbreeObject(Embree& embree) const {
     vertices[i].z = pt.position.z();
     vertices[i].a = 0.0f;
   }
-  rtcUnmapBuffer(embree.scene, geomId, RTC_VERTEX_BUFFER);
+  rtcUnmapBuffer(scene, geomId, RTC_VERTEX_BUFFER);
 
   Embree::EmbreeTri* triangles =  reinterpret_cast<Embree::EmbreeTri*>(
-    rtcMapBuffer(embree.scene, geomId, RTC_INDEX_BUFFER)
+    rtcMapBuffer(scene, geomId, RTC_INDEX_BUFFER)
   );
   for (size_t i = 0; i < faces.size(); ++i) {
     const Poly& p = faces[i];
@@ -169,10 +169,7 @@ Embree::EmbreeObj* geoms::Mesh::makeEmbreeObject(Embree& embree) const {
     triangles[i].v1 = int(p.pt1.val);
     triangles[i].v2 = int(p.pt2.val);
   }
-  rtcUnmapBuffer(embree.scene, geomId, RTC_INDEX_BUFFER);
+  rtcUnmapBuffer(scene, geomId, RTC_INDEX_BUFFER);
 
-  Embree::EmbreeObj* eo = new Embree::EmbreeObj(
-    this, geomId, &geoms::Mesh::embreeIntersectCallback
-  );
-  return eo;
+  eo = Embree::EmbreeObj(this, geomId, &geoms::Mesh::embreeIntersectCallback);
 }

@@ -70,7 +70,10 @@ namespace geoms {
     virtual Vec samplePoint(Randomness& rng) const override;
     virtual float area() const override;
     virtual void refine(std::vector<const Geom*>& refined) const override;
-    virtual Embree::EmbreeObj* makeEmbreeObject(Embree& embree) const override;
+    virtual void makeEmbreeObject(
+      RTCScene scene,
+      Embree::EmbreeObj& eo
+    ) const override;
   };
 
 }

@@ -1,4 +1,5 @@
 #include "light.h"
+#include "accelerator.h"
 
 AreaLight::AreaLight(Vec c) : color(c) {}
 
@@ -10,7 +11,7 @@ inline Vec AreaLight::directIlluminateByLightPDF(
   const Intersection& isect,
   const Material* mat,
   const Geom* emissionObj,
-  const KDTree& kdt
+  const Accelerator* accel
 ) const {
   // Sample random from light PDF.
   Vec outgoingWorld;
@@ -18,7 +19,7 @@ inline Vec AreaLight::directIlluminateByLightPDF(
   float lightPdf;
   sampleLight(
     rng,
-    kdt,
+    accel,
     emissionObj,
     isect.position,
     &outgoingWorld,
@@ -55,7 +56,7 @@ inline Vec AreaLight::directIlluminateByMatPDF(
   const Intersection& isect,
   const Material* mat,
   const Geom* emissionObj,
-  const KDTree& kdt
+  const Accelerator* accel
 ) const {
   // Sample random from BSDF PDF.
   Vec outgoingWorld;
@@ -75,7 +76,7 @@ inline Vec AreaLight::directIlluminateByMatPDF(
     Vec lightColor;
     float lightPdf;
     evalLight(
-      kdt,
+      accel,
       emissionObj,
       isect.position,
       outgoingWorld,
@@ -110,7 +111,7 @@ Vec AreaLight::emit(
 Vec AreaLight::emit(
   const Ray& incoming,
   const Intersection& isect,
-  const KDTree& kdt
+  const Accelerator* accel
 ) const {
   // Only emit on the normal-facing side of objects, e.g. on the outside of a
   // sphere or on the normal side of a disc.
@@ -120,7 +121,7 @@ Vec AreaLight::emit(
 
   // Object might be occluded behind another object.
   float dist = isect.distance - 2.0f * math::VERY_SMALL;
-  if (kdt.intersectShadow(incoming, dist)) {
+  if (accel->intersectShadow(incoming, dist)) {
     return Vec(0, 0, 0);
   }
 
@@ -128,7 +129,7 @@ Vec AreaLight::emit(
 }
 
 void AreaLight::evalLight(
-  const KDTree& kdt,
+  const Accelerator* accel,
   const Geom* emissionObj,
   const Vec& point,
   const Vec& dirToLight,
@@ -165,7 +166,7 @@ void AreaLight::evalLight(
     emittedColor = Vec(0, 0, 0);
   } else {
     // Emits color if the ray does hit the light.
-    emittedColor = emit(pointToLight, lightIsect, kdt);
+    emittedColor = emit(pointToLight, lightIsect, accel);
   }
 
   *colorOut = emittedColor;
@@ -174,7 +175,7 @@ void AreaLight::evalLight(
 
 void AreaLight::sampleLight(
   Randomness& rng,
-  const KDTree& kdt,
+  const Accelerator* accel,
   const Geom* emissionObj,
   const Vec& point,
   Vec* dirToLightOut,
@@ -217,7 +218,7 @@ void AreaLight::sampleLight(
     emittedColor = Vec(0, 0, 0);
   } else {
     // Emits color if the ray does hit the light.
-    emittedColor = emit(pointToLight, lightIsect, kdt);
+    emittedColor = emit(pointToLight, lightIsect, accel);
   }
 
   *dirToLightOut = dirToLight;
@@ -231,12 +232,14 @@ Vec AreaLight::directIlluminate(
   const Intersection& isect,
   const Material* mat,
   const Geom* emissionObj,
-  const KDTree& kdt
+  const Accelerator* accel
 ) const {
   Vec Ld(0, 0, 0);
   
-  Ld += directIlluminateByLightPDF(rng, incoming, isect, mat, emissionObj, kdt);
-  Ld += directIlluminateByMatPDF(rng, incoming, isect, mat, emissionObj, kdt);
+  Ld +=
+    directIlluminateByLightPDF(rng, incoming, isect, mat, emissionObj, accel);
+  Ld +=
+    directIlluminateByMatPDF(rng, incoming, isect, mat, emissionObj, accel);
 
   return Ld;
 }

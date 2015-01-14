@@ -21,8 +21,8 @@ public:
   virtual const Geom* intersect(const Ray& r, Intersection* isectOut) const = 0;
 
   /**
-   * Determines if any object in the intersects the given shadow ray within a
-   * maximum distance.
+   * Determines if any object intersects the given shadow ray within a maximum
+   * distance.
    *
    * @param r       the shadow ray to send through the k-d tree
    * @param maxDist the maximum distance to check for intersections

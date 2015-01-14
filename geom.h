@@ -93,9 +93,12 @@ public:
   virtual void refine(std::vector<const Geom*>& refined) const;
 
   /**
-   * Makes an Embree geometry object from the object.
+   * Makes an Embree geometry object from this geometry.
    * Composite objects may choose to create one Embree object composed of
    * multiple primitives if they can do so.
+   *
+   * @param scene the scene in which to create the Embree object
+   * @param eo    the Embree object to populate
    */
-  virtual Embree::EmbreeObj* makeEmbreeObject(Embree& embree) const;
+  virtual void makeEmbreeObject(RTCScene scene, Embree::EmbreeObj& eo) const;
 };

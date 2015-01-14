@@ -3,16 +3,16 @@
 #include <map>
 #include <functional>
 #include "core.h"
+#include "accelerator.h"
 
 class Geom;
 
-extern "C" {
-  #include <embree2/rtcore.h>
-  #include <embree2/rtcore_ray.h>
-}
+#include <embree2/rtcore.h>
+#include <embree2/rtcore_ray.h>
 
-class Embree {
+class Embree : public Accelerator {
   static bool embreeInited;
+  RTCScene scene;
 
 public:
   struct EmbreeVert { float x, y, z, a; };
@@ -27,18 +27,24 @@ public:
     
     EmbreeObj(const Geom* g, unsigned i, IntersectionCallback c)
       : geom(g), geomId(i), isectCallback(c) {}
+    EmbreeObj()
+      : geom(nullptr), geomId(RTC_INVALID_GEOMETRY_ID), isectCallback() {}
   };
-
-  RTCScene scene;
 
   Embree(const std::vector<const Geom*>& o);
 
   static void init();
   static void exit();
 
-  const Geom* intersect(const Ray& r, Intersection* isectOut) const;
+  virtual const Geom* intersect(
+    const Ray& r,
+    Intersection* isectOut
+  ) const override;
+  virtual bool intersectShadow(const Ray& r, float maxDist) const override;
+  virtual const std::vector<const Geom*>& getLights() const override;
 
 private:
-  std::map<unsigned, const EmbreeObj*> embreeObjs;
+  std::vector<EmbreeObj> embreeObjStorage;
+  std::map<unsigned, const EmbreeObj*> embreeObjLookup;
   std::vector<const Geom*> lights;
 };
