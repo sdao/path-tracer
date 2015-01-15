@@ -5,15 +5,12 @@
 #include "geom.h"
 #include "image.h"
 #include "node.h"
-#include "kdtree.h"
 #include "embree.h"
 
 /**
  * Manages rendering by simulating the action of a physical pinhole camera.
  */
 class Camera {
-  using AccelStructure = Embree; // Use Embree or KDTree.
-
   /**
    * The number of bounces at which a ray is subject to Russian Roulette
    * termination, stage 1 (less aggressive).
@@ -32,7 +29,7 @@ class Camera {
    */
   static constexpr float BIASED_RADIANCE_CLAMPING = 50.0f;
 
-  AccelStructure accel; /**< The accelerator containing renderable geometry. */
+  Embree accel; /**< The accelerator containing renderable geometry. */
 
   const float focalLength; /**< The distance from the eye to the focal plane. */
   const float lensRadius; /**< The radius of the lens opening. */

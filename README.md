@@ -22,14 +22,13 @@ dependencies. If you're on Linux, you can use your package manager.
   (template libraries; also links with libboost_program_options)
 * [Intel Embree](http://embree.github.io/)
   (links with libembree)
-  * Note: Embree is not available from Homebrew. You can download binaries
-    from [http://embree.github.io/](http://embree.github.io/) or compile from
-    source.
-  * You can use the built-in k-d tree accelerator instead of Intel Embree, by
-    editing the `Camera` class: change the line `using AccelStructure = Embree`
-    in `camera.h` to `using AccelStructure = KDTree`. Using Embree's
-    intersection routines is roughly 2x faster than using the built-in k-d
-    tree implementation.
+  * Note: Embree is not available from Homebrew. A quick-and-dirty Homebrew
+    formula for installing the Embree binaries is available
+    [here](https://gist.github.com/sdao/5d51acc7b1f983a7a063).
+  * If you'd like to do things yourself, you can download binaries from
+    [http://embree.github.io/](http://embree.github.io/) or compile from
+    source. Prebuilt x64 binaries are available for Windows, Mac OS X, and
+    Linux.
 
 Reference
 ---------
