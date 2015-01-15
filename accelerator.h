@@ -29,9 +29,4 @@ public:
    * @returns       true if any geom hit within maxDist, otherwise false
    */
   virtual bool intersectShadow(const Ray& r, float maxDist) const = 0;
-
-  /**
-   * Returns a reference to the list of all light-source geometry.
-   */
-  virtual const std::vector<const Geom*>& getLights() const = 0;
 };

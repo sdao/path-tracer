@@ -5,17 +5,12 @@
 bool Embree::embreeInited = false;
 
 Embree::Embree(const std::vector<const Geom*>& o)
-  : embreeObjStorage(o.size()), embreeObjLookup(), lights() {
+  : embreeObjStorage(o.size()), embreeObjLookup() {
   assert(embreeInited);
   scene = rtcNewScene(RTC_SCENE_STATIC, RTC_INTERSECT1);
 
   size_t i = 0;
   for (const Geom* g : o) {
-    // Only refine lights; normal objects don't need refinement.
-    if (g->light) {
-      g->refine(lights);
-    }
-
     // Composite objects might become one object in Embree.
     EmbreeObj& eo = embreeObjStorage[i];
     g->makeEmbreeObject(scene, eo);
@@ -81,8 +76,4 @@ bool Embree::intersectShadow(const Ray& r, float maxDist) const {
   rtcOccluded(scene, ray);
 
   return ray.geomID == 0;
-}
-
-const std::vector<const Geom*>& Embree::getLights() const {
-  return lights;
 }

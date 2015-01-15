@@ -30,6 +30,7 @@ class Camera {
   static constexpr float BIASED_RADIANCE_CLAMPING = 50.0f;
 
   Embree accel; /**< The accelerator containing renderable geometry. */
+  std::vector<const Geom*> emitters; /**< List of all light emitters. */
 
   const float focalLength; /**< The distance from the eye to the focal plane. */
   const float lensRadius; /**< The radius of the lens opening. */

@@ -20,6 +20,7 @@ Camera::Camera(
     camToWorldXform(xform),
     masterRng(), rowSeeds(size_t(hh)), img(ww, hh), iters(0)
 {
+  // Calculate ray-tracing vectors.
   float halfFocalPlaneUp;
   float halfFocalPlaneRight;
 
@@ -34,6 +35,13 @@ Camera::Camera(
   focalPlaneUp = -2.0f * halfFocalPlaneUp;
   focalPlaneRight = 2.0f * halfFocalPlaneRight;
   focalPlaneOrigin = Vec(-halfFocalPlaneRight, halfFocalPlaneUp, -focalLength);
+
+  // Refine emitters so we can compute direct illumination.
+  for (const Geom* g : objs) {
+    if (g->light) {
+      g->refine(emitters);
+    }
+  }
 }
 
 Camera::Camera(const Node& n)
@@ -209,13 +217,13 @@ Vec Camera::uniformSampleOneLight(
   const Intersection& isect,
   const Material* mat
 ) const {
-  size_t numLights = accel.getLights().size();
+  size_t numLights = emitters.size();
   if (numLights == 0) {
     return Vec(0, 0, 0);
   }
 
   size_t lightIdx = size_t(floorf(rng.nextUnitFloat() * numLights));
-  const Geom* emitter = accel.getLights()[min(lightIdx, numLights - 1)];
+  const Geom* emitter = emitters[min(lightIdx, numLights - 1)];
   const AreaLight* areaLight = emitter->light;
 
   // P[this light] = 1 / numLights, so 1 / P[this light] = numLights.

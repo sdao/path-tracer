@@ -41,10 +41,8 @@ public:
     Intersection* isectOut
   ) const override;
   virtual bool intersectShadow(const Ray& r, float maxDist) const override;
-  virtual const std::vector<const Geom*>& getLights() const override;
 
 private:
   std::vector<EmbreeObj> embreeObjStorage;
   std::map<unsigned, const EmbreeObj*> embreeObjLookup;
-  std::vector<const Geom*> lights;
 };
