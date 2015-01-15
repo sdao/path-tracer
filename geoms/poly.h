@@ -50,21 +50,21 @@ namespace geoms {
     /**
      * Gets the actual point data for point 0.
      */
-    inline const Point getPt0() const {
+    inline const Point& getPt0() const {
       return pt0.refConst(*pointLookup);
     }
 
     /**
      * Gets the actual point data for point 1.
      */
-    inline const Point getPt1() const {
+    inline const Point& getPt1() const {
       return pt1.refConst(*pointLookup);
     }
 
     /**
      * Gets the actual point data for point 2.
      */
-    inline const Point getPt2() const {
+    inline const Point& getPt2() const {
       return pt2.refConst(*pointLookup);
     }
 
