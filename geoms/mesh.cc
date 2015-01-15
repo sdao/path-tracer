@@ -74,10 +74,9 @@ void geoms::Mesh::readPolyModel(std::string name) {
       // Only add the triangles (we should have a triangulated mesh).
       if (face.mNumIndices == 3) {
         geoms::Poly thisPoly(
-          ID(face.mIndices[0]),
-          ID(face.mIndices[1]),
-          ID(face.mIndices[2]),
-          &points,
+          &points[face.mIndices[0]],
+          &points[face.mIndices[1]],
+          &points[face.mIndices[2]],
           mat,
           light
         );
@@ -129,9 +128,8 @@ void geoms::Mesh::embreeIntersectCallback(
     ray.org[2] + ray.dir[2] * ray.tfar
   );
   isectOut->distance = ray.tfar;
-  isectOut->normal = (
-    w * p.getPt0().normal + u * p.getPt1().normal + v * p.getPt2().normal
-  ).normalized();
+  isectOut->normal =
+    (w * p.pt0->normal + u * p.pt1->normal + v * p.pt2->normal).normalized();
 }
 
 void geoms::Mesh::makeEmbreeObject(RTCScene scene, Embree::EmbreeObj& eo) const {
@@ -157,11 +155,12 @@ void geoms::Mesh::makeEmbreeObject(RTCScene scene, Embree::EmbreeObj& eo) const 
   Embree::EmbreeTri* triangles =  reinterpret_cast<Embree::EmbreeTri*>(
     rtcMapBuffer(scene, geomId, RTC_INDEX_BUFFER)
   );
+  const Poly::Point* pointZero = &points[0];
   for (size_t i = 0; i < faces.size(); ++i) {
     const Poly& p = faces[i];
-    triangles[i].v0 = int(p.pt0.val);
-    triangles[i].v1 = int(p.pt1.val);
-    triangles[i].v2 = int(p.pt2.val);
+    triangles[i].v0 = int(p.pt0 - pointZero);
+    triangles[i].v1 = int(p.pt1 - pointZero);
+    triangles[i].v2 = int(p.pt2 - pointZero);
   }
   rtcUnmapBuffer(scene, geomId, RTC_INDEX_BUFFER);
 

@@ -1,6 +1,5 @@
 #pragma once
 #include "../geom.h"
-#include "../id.h"
 
 namespace geoms {
 
@@ -17,27 +16,23 @@ namespace geoms {
       Vec normal; /**< The normal of the surface at the point. */
     };
 
-    const ID pt0; /** < The index of the first point (in CCW order). */
-    const ID pt1; /** < The index of the second point (in CCW order). */
-    const ID pt2; /** < The index of the third point (in CCW order). */
-    /** A point lookup table. We DO NOT own the pointer. */
-    std::vector<geoms::Poly::Point>* pointLookup;
+    const Point* pt0; /**< Pointer to the first point (in CCW order). */
+    const Point* pt1; /**< Pointer to the second point (in CCW order). */
+    const Point* pt2; /**< Pointer to the third point (in CCW order). */
 
     /**
      * Constructs a poly.
      *
-     * @param a          the index of the first point (in CCW winding order)
-     * @param b          the index of the second point (in CCW winding order)
-     * @param c          the index of the third point (in CCW winding order)
-     * @param lookup     a pointer to a point lookup table
+     * @param a          a pointer to the first point (in CCW winding order)
+     * @param b          a pointer to the second point (in CCW winding order)
+     * @param c          a pointer to the third point (in CCW winding order)
      * @param m          the material used to render the poly
      * @param l          the area light causing emission from the poly
      */
     Poly(
-      ID a,
-      ID b,
-      ID c,
-      std::vector<geoms::Poly::Point>* lookup,
+      const Point* a,
+      const Point* b,
+      const Point* c,
       const Material* m = nullptr,
       const AreaLight* l = nullptr
     );
@@ -46,27 +41,6 @@ namespace geoms {
      * Constructs a poly from another poly.
      */
     Poly(const geoms::Poly& other);
-
-    /**
-     * Gets the actual point data for point 0.
-     */
-    inline const Point& getPt0() const {
-      return pt0.refConst(*pointLookup);
-    }
-
-    /**
-     * Gets the actual point data for point 1.
-     */
-    inline const Point& getPt1() const {
-      return pt1.refConst(*pointLookup);
-    }
-
-    /**
-     * Gets the actual point data for point 2.
-     */
-    inline const Point& getPt2() const {
-      return pt2.refConst(*pointLookup);
-    }
 
     virtual bool intersect(const Ray& r, Intersection* isectOut) const override;
     virtual bool intersectShadow(const Ray& r, float maxDist) const override;

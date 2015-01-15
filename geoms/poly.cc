@@ -1,29 +1,24 @@
 #include "poly.h"
 
 geoms::Poly::Poly(
-  ID a,
-  ID b,
-  ID c,
-  std::vector<geoms::Poly::Point>* lookup,
+  const Point* a,
+  const Point* b,
+  const Point* c,
   const Material* m,
   const AreaLight* l
-) : Geom(m, l), pt0(a), pt1(b), pt2(c), pointLookup(lookup) {}
+) : Geom(m, l), pt0(a), pt1(b), pt2(c) {}
 
 geoms::Poly::Poly(const geoms::Poly& other)
-  : Geom(other.mat, other.light), pt0(other.pt0), pt1(other.pt1), pt2(other.pt2),
-    pointLookup(other.pointLookup) {}
+  : Geom(other.mat, other.light),
+    pt0(other.pt0), pt1(other.pt1), pt2(other.pt2) {}
 
 bool geoms::Poly::intersect(const Ray& r, Intersection* isectOut) const {
   // Uses the Moller-Trumbore intersection algorithm.
   // See <http://en.wikipedia.org/wiki/
   // M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm> for more info.
 
-  const Point& data0 = getPt0();
-  const Point& data1 = getPt1();
-  const Point& data2 = getPt2();
-
-  const Vec edge1 = data1.position - data0.position;
-  const Vec edge2 = data2.position - data0.position;
+  const Vec edge1 = pt1->position - pt0->position;
+  const Vec edge2 = pt2->position - pt0->position;
 
   const Vec p = r.direction.cross(edge2);
   const float det = edge1.dot(p);
@@ -33,7 +28,7 @@ bool geoms::Poly::intersect(const Ray& r, Intersection* isectOut) const {
   }
 
   const float invDet = 1.0f / det;
-  const Vec t = r.origin - data0.position;
+  const Vec t = r.origin - pt0->position;
 
   const float u = t.dot(p) * invDet;
   if (u < 0.0f || u > 1.0f) {
@@ -57,7 +52,7 @@ bool geoms::Poly::intersect(const Ray& r, Intersection* isectOut) const {
   isect.position = r.at(dist);
   isect.distance = dist;
   isect.normal =
-    (w * data0.normal + u * data1.normal + v * data2.normal).normalized();
+    (w * pt0->normal + u * pt1->normal + v * pt2->normal).normalized();
 
   *isectOut = isect;
   return true;
@@ -68,12 +63,8 @@ bool geoms::Poly::intersectShadow(const Ray& r, float maxDist) const {
   // See <http://en.wikipedia.org/wiki/
   // M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm> for more info.
 
-  const Point& data0 = getPt0();
-  const Point& data1 = getPt1();
-  const Point& data2 = getPt2();
-
-  const Vec edge1 = data1.position - data0.position;
-  const Vec edge2 = data2.position - data0.position;
+  const Vec edge1 = pt1->position - pt0->position;
+  const Vec edge2 = pt2->position - pt0->position;
 
   const Vec p = r.direction.cross(edge2);
   const float det = edge1.dot(p);
@@ -83,7 +74,7 @@ bool geoms::Poly::intersectShadow(const Ray& r, float maxDist) const {
   }
 
   const float invDet = 1.0f / det;
-  const Vec t = r.origin - data0.position;
+  const Vec t = r.origin - pt0->position;
 
   const float u = t.dot(p) * invDet;
   if (u < 0.0f || u > 1.0f) {
@@ -105,8 +96,8 @@ bool geoms::Poly::intersectShadow(const Ray& r, float maxDist) const {
 }
 
 BBox geoms::Poly::boundBox() const {
-  BBox b(getPt0().position, getPt1().position);
-  b.expand(getPt2().position);
+  BBox b(pt0->position, pt1->position);
+  b.expand(pt2->position);
 
   return b;
 }
