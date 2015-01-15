@@ -33,6 +33,18 @@ int Node::getInt(std::string key) const {
   return *result;
 }
 
+bool Node::getBool(std::string key) const {
+  auto result = attributes.get_optional<bool>(key);
+
+  if (!result) {
+    throw std::runtime_error(
+      str(format("Cannot read boolean property '%1%'") % key)
+    );
+  }
+
+  return *result;
+}
+
 float Node::getFloat(std::string key) const {
   auto result = attributes.get_optional<float>(key);
 

@@ -110,7 +110,6 @@ void Scene::readGeoms(const ptree& root) {
   using namespace geoms;
   static const LookupMap<const Geom*> geometryLookup = {
     { "disc",     [](const Node& n) { return new Disc(n); } },
-    { "inverted", [](const Node& n) { return new Inverted(n); } },
     { "sphere",   [](const Node& n) { return new Sphere(n); } },
     { "mesh",     [](const Node& n) { return new Mesh(n); } }
   };

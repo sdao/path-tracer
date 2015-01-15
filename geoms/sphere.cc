@@ -1,13 +1,15 @@
 #include "sphere.h"
 
-geoms::Sphere::Sphere(Vec o, float r, const Material* m, const AreaLight* l)
-  : Geom(m, l), origin(o), radius(r) {}
+geoms::Sphere::Sphere(
+  Vec o, float r, bool i, const Material* m, const AreaLight* l
+) : Geom(m, l), origin(o), radius(r), inverted(i) {}
 
 geoms::Sphere::Sphere(const geoms::Sphere& other)
-  : Geom(other.mat, other.light), origin(other.origin), radius(other.radius) {}
+  : Geom(other.mat, other.light),
+    origin(other.origin), radius(other.radius), inverted(other.inverted) {}
 
 geoms::Sphere::Sphere(const Node& n)
-  : Sphere(n.getVec("origin"), n.getFloat("radius"),
+  : Sphere(n.getVec("origin"), n.getFloat("radius"), n.getBool("inverted"),
            n.getMaterial("mat"), n.getLight("light")) {}
 
 bool geoms::Sphere::intersect(const Ray& r, Intersection* isectOut) const {
@@ -31,13 +33,13 @@ bool geoms::Sphere::intersect(const Ray& r, Intersection* isectOut) const {
     // Neg before pos because we want to return closest isect first.
     if (math::isPositive(resNeg)) {
       Vec pt = r.at(resNeg);
-      Vec normal = (pt - origin).normalized();
+      Vec normal = (inverted ? origin - pt : pt - origin).normalized();
 
       *isectOut = Intersection(pt, normal, resNeg);
       return true;
     } else if (math::isPositive(resPos)) {
       Vec pt = r.at(resPos);
-      Vec normal = (pt - origin).normalized();
+      Vec normal = (inverted ? origin - pt : pt - origin).normalized();
 
       *isectOut = Intersection(pt, normal, resPos);
       return true;

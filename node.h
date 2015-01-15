@@ -50,6 +50,8 @@ public:
   std::string getString(std::string key) const;
   /** Gets the integer property at the given key. */
   int getInt(std::string key) const;
+  /** Gets the boolean property at the given key. */
+  bool getBool(std::string key) const;
   /** Gets the float property at the given key. */
   float getFloat(std::string key) const;
   /** Gets the 3D vector property at the given key. */

@@ -30,11 +30,8 @@
       "mat" : "sky",
       "light" : "skyLight",
       "origin" : "0 0 0",
-      "radius" : 2000.0
-    },
-    "worldSphereInv" : {
-      "type" : "inverted",
-      "original" : "worldSphere"
+      "radius" : 2000.0,
+      "inverted" : true
     },
     "bottom" : {
       "type" : "disc",
@@ -50,77 +47,88 @@
       "mat" : "",
       "light" : "sunLight",
       "origin" : "0 2500 0",
-      "radius" : 1000.0
+      "radius" : 1000.0,
+      "inverted" : false
     },
     "sphere1" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
       "origin" : "16 -12 -22",
-      "radius" : 8.0
+      "radius" : 8.0,
+      "inverted" : false
     },
     "sphere2" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
       "origin" : "2 -12 -40",
-      "radius" : 8.0
+      "radius" : 8.0,
+      "inverted" : false
     },
     "sphere3" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
       "origin" : "-12 -12 -58",
-      "radius" : 8.0
+      "radius" : 8.0,
+      "inverted" : false
     },
     "sphere4" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
       "origin" : "-26 -12 -76",
-      "radius" : 8.0
+      "radius" : 8.0,
+      "inverted" : false
     },
     "sphere5" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
       "origin" : "-40 -12 -94",
-      "radius" : 8.0
+      "radius" : 8.0,
+      "inverted" : false
     },
     "sphere6" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
       "origin" : "-54 -12 -112",
-      "radius" : 8.0
+      "radius" : 8.0,
+      "inverted" : false
     },
     "sphere7" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
       "origin" : "-68 -12 -130",
-      "radius" : 8.0
+      "radius" : 8.0,
+      "inverted" : false
     },
     "sphere8" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
       "origin" : "-82 -12 -148",
-      "radius" : 8.0
+      "radius" : 8.0,
+      "inverted" : false
     },
     "sphere9" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
       "origin" : "-96 -12 -166",
-      "radius" : 8.0
+      "radius" : 8.0,
+      "inverted" : false
     },
     "sphere10" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
       "origin" : "-110 -12 -184",
-      "radius" : 8.0
+      "radius" : 8.0,
+      "inverted" : false
     }
   },
   "cameras" : {
@@ -130,7 +138,7 @@
       "rotateAngle" :  -0.26180,
       "rotateAxis" : "1 0 0",
       "objects" : [
-        "worldSphereInv", "bottom", "lightSource", "sphere1", "sphere2",
+        "worldSphere", "bottom", "lightSource", "sphere1", "sphere2",
         "sphere3", "sphere4", "sphere5", "sphere6", "sphere7", "sphere8",
         "sphere9", "sphere10"
       ],

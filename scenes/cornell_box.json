@@ -35,14 +35,16 @@
       "mat" : "dielectric",
       "light" : "",
       "origin" : "-2 -14 -16",
-      "radius" : 4.0
+      "radius" : 4.0,
+      "inverted" : false
     },
     "bigSphere" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
       "origin" : "10 -12 -22",
-      "radius" : 6.0
+      "radius" : 6.0,
+      "inverted" : false
     },
     "bottom" : {
       "type" : "disc",
