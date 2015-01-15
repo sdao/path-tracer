@@ -1,7 +1,7 @@
 #include "light.h"
 #include "accelerator.h"
 
-AreaLight::AreaLight(Vec c) : color(c) {}
+AreaLight::AreaLight(const Vec& c) : color(c) {}
 
 AreaLight::AreaLight(const Node& n) : AreaLight(n.getVec("color")) {}
 

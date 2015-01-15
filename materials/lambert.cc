@@ -1,6 +1,6 @@
 #include "lambert.h"
 
-materials::Lambert::Lambert(Vec a) : albedo(a) {}
+materials::Lambert::Lambert(const Vec& a) : albedo(a) {}
 
 materials::Lambert::Lambert(const Node& n) : Lambert(n.getVec("albedo")) {}
 

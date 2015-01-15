@@ -50,7 +50,7 @@ public:
   /**
    * Constructs a light that emits the specified color.
    */
-  AreaLight(Vec c);
+  AreaLight(const Vec& c);
 
   /**
    * Constructs a light from the given node.

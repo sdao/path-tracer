@@ -8,8 +8,8 @@ using std::min;
 namespace chrono = std::chrono;
 
 Camera::Camera(
-  Transform xform,
-  const std::vector<const Geom*> objs,
+  const Transform& xform,
+  const std::vector<const Geom*>& objs,
   long ww,
   long hh,
   float fov,

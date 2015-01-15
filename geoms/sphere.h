@@ -22,7 +22,7 @@ namespace geoms {
      * @param l the area light causing emission from the sphere
      */
     Sphere(
-      Vec o = Vec(0, 0, 0),
+      const Vec& o = Vec(0, 0, 0),
       float r = 1.0f,
       bool i = false,
       const Material* m = nullptr,

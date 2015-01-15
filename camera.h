@@ -93,8 +93,8 @@ public:
    * @param fStop the f-stop (aperture) of the lens
    */
   Camera(
-    Transform xform,
-    const std::vector<const Geom*> objs,
+    const Transform& xform,
+    const std::vector<const Geom*>& objs,
     long ww,
     long hh,
     float fov = math::PI_4,

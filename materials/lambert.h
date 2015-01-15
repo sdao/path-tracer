@@ -17,7 +17,7 @@ namespace materials {
     const Vec albedo; /**< The albedo (diffuse color). */
 
     /** Constructs a diffuse material with the given albedo (diffuse color). */
-    Lambert(Vec a);
+    Lambert(const Vec& a);
 
     /** Constructs a diffuse material from the given node. */
     Lambert(const Node& n);

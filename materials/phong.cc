@@ -3,7 +3,7 @@
 using std::min;
 using std::max;
 
-materials::Phong::Phong(float e, Vec c)
+materials::Phong::Phong(float e, const Vec& c)
   : scaleBRDF(c * (e + 2.0f) / math::TWO_PI),
     scaleProb((e + 1.0f) / math::TWO_PI),
     invExponent(1.0f / (e + 1.0f)),

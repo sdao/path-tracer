@@ -1,7 +1,7 @@
 #include "sphere.h"
 
 geoms::Sphere::Sphere(
-  Vec o, float r, bool i, const Material* m, const AreaLight* l
+  const Vec& o, float r, bool i, const Material* m, const AreaLight* l
 ) : Geom(m, l), origin(o), radius(r), inverted(i) {}
 
 geoms::Sphere::Sphere(const geoms::Sphere& other)

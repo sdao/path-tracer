@@ -28,8 +28,8 @@ namespace geoms {
      * @param l      the area light causing emission from the disc
      */
     Disc(
-      Vec o = Vec(0, 0, 0),
-      Vec n = Vec(0, 1, 0),
+      const Vec& o = Vec(0, 0, 0),
+      const Vec& n = Vec(0, 1, 0),
       float rOuter = 10.0f,
       float rInner = 0.0f,
       const Material* m = nullptr,

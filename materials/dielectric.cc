@@ -1,6 +1,6 @@
 #include "dielectric.h"
 
-materials::Dielectric::Dielectric(float ior, Vec c)
+materials::Dielectric::Dielectric(float ior, const Vec& c)
   : r0(schickR0(ior)),
     etaEntering(IOR_VACUUM / ior), etaExiting(ior / IOR_VACUUM),
     color(c) {}

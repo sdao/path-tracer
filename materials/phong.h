@@ -47,7 +47,7 @@ namespace materials {
      *          ~1000 = almost perfectly specular, lower values are more glossy
      * @param c the color of the material
      */
-    Phong(float e, Vec c = Vec(1, 1, 1));
+    Phong(float e, const Vec& c = Vec(1, 1, 1));
     
     /**
      * Constructs a Phong material from the given node.

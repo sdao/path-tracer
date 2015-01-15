@@ -45,7 +45,7 @@ namespace geoms {
      * @throws geoms::Mesh::MeshFileImportError if the file couldn't be read
      */
     Mesh(
-      Vec o,
+      const Vec& o,
       std::string name,
       const Material* m = nullptr,
       const AreaLight* l = nullptr

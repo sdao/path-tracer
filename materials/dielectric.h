@@ -42,7 +42,7 @@ namespace materials {
      * @param ior the index of reflection on the inside of the material
      * @param c   the color of the material
      */
-    Dielectric(float ior = IOR_GLASS, Vec c = Vec(1, 1, 1));
+    Dielectric(float ior = IOR_GLASS, const Vec& c = Vec(1, 1, 1));
 
     /**
      * Creates a dielectric material from the given node.

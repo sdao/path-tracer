@@ -1,8 +1,8 @@
 #include "disc.h"
 
 geoms::Disc::Disc(
-  Vec o,
-  Vec n,
+  const Vec& o,
+  const Vec& n,
   float rOuter,
   float rInner,
   const Material* m,

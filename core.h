@@ -20,7 +20,7 @@ struct Ray {
    * @param o the ray's origin
    * @param d the ray's direction (and magnitude, if desired)
    */
-  Ray(Vec o, Vec d) : origin(o), direction(d) {}
+  Ray(const Vec& o, const Vec& d) : origin(o), direction(d) {}
 
   /**
    * Constructs a ray with origin at (0, 0, 0) and neither direction nor
@@ -58,7 +58,7 @@ struct LightRay : public Ray {
    * @param d the ray's direction (and magnitude, if desired)
    * @param c the ray's light color
    */
-  LightRay(Vec o, Vec d, Vec c) : Ray(o, d), color(c) {}
+  LightRay(const Vec& o, const Vec& d, const Vec& c) : Ray(o, d), color(c) {}
 
   /**
    * Constructs a white lightray with the given origin and direction.
@@ -66,7 +66,7 @@ struct LightRay : public Ray {
    * @param o the ray's origin
    * @param d the ray's direction (and magnitude, if desired)
    */
-  LightRay(Vec o, Vec d) : Ray(o, d), color(1, 1, 1) {}
+  LightRay(const Vec& o, const Vec& d) : Ray(o, d), color(1, 1, 1) {}
 
   /**
    * Constructs a white lightray with origin at (0, 0, 0) and neither direction
@@ -107,7 +107,7 @@ struct BBox {
   BBox() : lower(0, 0, 0), upper(0, 0, 0) {}
 
   /** Constructs a bbox containing the two given points. */
-  BBox(Vec a, Vec b) {
+  BBox(const Vec& a, const Vec& b) {
     lower = Vec(min(a.x(), b.x()), min(a.y(), b.y()), min(a.z(), b.z()));
     upper = Vec(max(a.x(), b.x()), max(a.y(), b.y()), max(a.z(), b.z()));
   }
@@ -223,9 +223,9 @@ struct BSphere {
   Vec origin;
   float radius;
 
-  BSphere(Vec o, float r = 0.0f) : origin(o), radius(r) {}
+  BSphere(const Vec& o, float r = 0.0f) : origin(o), radius(r) {}
 
-  BSphere(BBox b) {
+  BSphere(const BBox& b) {
     origin = (b.lower + b.upper) * 0.5f;
     radius = fabsf((b.upper - origin).norm());
   }
@@ -256,7 +256,7 @@ struct Intersection {
    * @param n the normal of the surface at the intersection
    * @param d the distance from the ray origin to the intersection
    */
-  Intersection(Vec p, Vec n, float d)
+  Intersection(const Vec& p, const Vec& n, float d)
     : position(p), normal(n), distance(d) {}
 
 };

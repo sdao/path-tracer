@@ -6,7 +6,7 @@
 #include "../debug.h"
 
 geoms::Mesh::Mesh(
-  Vec o,
+  const Vec& o,
   std::string name,
   const Material* m,
   const AreaLight* l
