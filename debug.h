@@ -7,7 +7,7 @@
 namespace debug {
 
   inline bool isNaN(const Vec& v) {
-    return isnan(v.x()) || isnan(v.y()) || isnan(v.z());
+    return std::isnan(v.x()) || std::isnan(v.y()) || std::isnan(v.z());
   }
 
   inline void printNestedException(const std::exception& e)
