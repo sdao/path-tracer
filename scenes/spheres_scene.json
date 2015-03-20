@@ -22,6 +22,21 @@
       "type" : "dielectric",
       "ior" : 1.5,
       "color" : "1 1 1"
+    },
+    "dielectric-g" : {
+      "type" : "dielectric",
+      "ior" : 1.5,
+      "color" : "0.8 1 0.9"
+    },
+    "dielectric-b" : {
+      "type" : "dielectric",
+      "ior" : 1.5,
+      "color" : "0.8 0.9 1"
+    },
+    "dielectric-r" : {
+      "type" : "dielectric",
+      "ior" : 1.5,
+      "color" : "1 0.8 0.9"
     }
   },
   "geometry" : {
@@ -54,80 +69,80 @@
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
-      "origin" : "16 -12 -22",
-      "radius" : 8.0,
+      "origin" : "16 -10 -22",
+      "radius" : 10.0,
       "inverted" : false
     },
     "sphere2" : {
       "type" : "sphere",
-      "mat" : "dielectric",
+      "mat" : "dielectric-r",
       "light" : "",
-      "origin" : "2 -12 -40",
-      "radius" : 8.0,
+      "origin" : "2 -10 -40",
+      "radius" : 10.0,
       "inverted" : false
     },
     "sphere3" : {
       "type" : "sphere",
-      "mat" : "dielectric",
+      "mat" : "dielectric-g",
       "light" : "",
-      "origin" : "-12 -12 -58",
-      "radius" : 8.0,
+      "origin" : "-12 -10 -58",
+      "radius" : 10.0,
       "inverted" : false
     },
     "sphere4" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
-      "origin" : "-26 -12 -76",
-      "radius" : 8.0,
+      "origin" : "-26 -10 -76",
+      "radius" : 10.0,
       "inverted" : false
     },
     "sphere5" : {
       "type" : "sphere",
-      "mat" : "dielectric",
+      "mat" : "dielectric-g",
       "light" : "",
-      "origin" : "-40 -12 -94",
-      "radius" : 8.0,
+      "origin" : "-40 -10 -94",
+      "radius" : 10.0,
       "inverted" : false
     },
     "sphere6" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
-      "origin" : "-54 -12 -112",
-      "radius" : 8.0,
+      "origin" : "-54 -10 -112",
+      "radius" : 10.0,
       "inverted" : false
     },
     "sphere7" : {
       "type" : "sphere",
-      "mat" : "dielectric",
+      "mat" : "dielectric-b",
       "light" : "",
-      "origin" : "-68 -12 -130",
-      "radius" : 8.0,
+      "origin" : "-68 -10 -130",
+      "radius" : 10.0,
       "inverted" : false
     },
     "sphere8" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
-      "origin" : "-82 -12 -148",
-      "radius" : 8.0,
+      "origin" : "-82 -10 -148",
+      "radius" : 10.0,
       "inverted" : false
     },
     "sphere9" : {
       "type" : "sphere",
-      "mat" : "dielectric",
+      "mat" : "dielectric-b",
       "light" : "",
-      "origin" : "-96 -12 -166",
-      "radius" : 8.0,
+      "origin" : "-96 -10 -166",
+      "radius" : 10.0,
       "inverted" : false
     },
     "sphere10" : {
       "type" : "sphere",
       "mat" : "dielectric",
       "light" : "",
-      "origin" : "-110 -12 -184",
-      "radius" : 8.0,
+      "origin" : "-110 -10 -184",
+      "radius" : 10.0,
       "inverted" : false
     }
   },
@@ -142,8 +157,8 @@
         "sphere3", "sphere4", "sphere5", "sphere6", "sphere7", "sphere8",
         "sphere9", "sphere10"
       ],
-      "width" : 512,
-      "height" : 384,
+      "width" : 450,
+      "height" : 337,
       "fov" : 0.78540,
       "focalLength" : 88.0,
       "fStop" : 16.0
