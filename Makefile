@@ -3,17 +3,7 @@ LDLIBS = -lIlmImf -lHalf -ltbb -lassimp -lboost_program_options -lembree
 INCLUDES = -isystem /usr/local/include/eigen3 -isystem /usr/include/eigen3 \
            -isystem /usr/local/include/OpenEXR -isystem /usr/include/OpenEXR
 
-ifeq ($(strip $(CXX)),icpc)
-	# Intel C++ compiler: enable profile-guided optimization
-
-	WARN = -Werror -Wall -Wcheck
-
-	CXXFLAGS = $(WARN) -std=c++11 -DNDEBUG -fast -parallel
-	CXXFLAGS_DEBUG = $(WARN) -std=c++11 -DDEBUG -O0 -g
-	CXXFLAGS_GENPROF = $(CXXFLAGS) -prof-gen -prof-dir=prof
-	CXXFLAGS_USEPROF = $(CXXFLAGS) -prof-use -prof-dir=prof
-
-else ifeq ($(strip $(CXX)),clang++)
+ifeq ($(strip $(CXX)),clang++)
 	# Clang compiler: enable extra warnings
 
 	WARN = -Werror -Weverything -Wno-c++98-compat -Wno-padded -Wno-float-equal \

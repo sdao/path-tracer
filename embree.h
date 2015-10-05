@@ -12,6 +12,7 @@ class Geom;
 
 class Embree : public Accelerator {
   static bool embreeInited;
+  static RTCDevice device;
   RTCScene scene;
 
 public:
@@ -24,7 +25,7 @@ public:
     const Geom* geom;
     unsigned geomId;
     IntersectionCallback isectCallback;
-    
+
     EmbreeObj(const Geom* g, unsigned i, IntersectionCallback c)
       : geom(g), geomId(i), isectCallback(c) {}
     EmbreeObj()

@@ -3,11 +3,12 @@
 #include "geom.h"
 
 bool Embree::embreeInited = false;
+RTCDevice Embree::device = nullptr;
 
 Embree::Embree(const std::vector<const Geom*>& o)
   : embreeObjStorage(o.size()), embreeObjLookup() {
   assert(embreeInited);
-  scene = rtcNewScene(RTC_SCENE_STATIC, RTC_INTERSECT1);
+  scene = rtcDeviceNewScene(device, RTC_SCENE_STATIC, RTC_INTERSECT1);
 
   size_t i = 0;
   for (const Geom* g : o) {
@@ -23,12 +24,12 @@ Embree::Embree(const std::vector<const Geom*>& o)
 }
 
 void Embree::init() {
-  rtcInit();
+  device = rtcNewDevice(nullptr);
   embreeInited = true;
 }
 
 void Embree::exit() {
-  rtcExit();
+  rtcDeleteDevice(device);
   embreeInited = false;
 }
 
