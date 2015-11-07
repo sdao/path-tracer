@@ -1,7 +1,18 @@
+UNAME := $(shell uname)
+
 SOURCES = *.cc materials/*.cc geoms/*.cc
-LDLIBS = -lIlmImf -lHalf -ltbb -lassimp -lboost_program_options -lembree
+LDLIBS = -lIlmImf -lHalf -ltbb -lassimp -lboost_program_options
 INCLUDES = -isystem /usr/local/include/eigen3 -isystem /usr/include/eigen3 \
            -isystem /usr/local/include/OpenEXR -isystem /usr/include/OpenEXR
+
+# Choose specific Embree v2 library based on filename. Filename depends on OS.
+ifeq ($(UNAME), Linux)
+	LDLIBS += -l:libembree.so.2
+endif
+
+ifeq ($(DARWIN), Darwin)
+	LDLIBS += -l:libembree.2.dylib
+endif
 
 ifeq ($(strip $(CXX)),clang++)
 	# Clang compiler: enable extra warnings
