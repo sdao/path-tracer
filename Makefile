@@ -10,8 +10,8 @@ ifeq ($(UNAME), Linux)
 	LDLIBS += -l:libembree.so.2
 endif
 
-ifeq ($(DARWIN), Darwin)
-	LDLIBS += -l:libembree.2.dylib
+ifeq ($(UNAME), Darwin)
+	LDLIBS += -lembree.2
 endif
 
 ifeq ($(strip $(CXX)),clang++)
