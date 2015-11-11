@@ -50,6 +50,13 @@ namespace geoms {
     virtual bool intersectShadow(const Ray& r, float maxDist) const override;
     virtual BBox boundBox() const override;
     virtual BSphere boundSphere() const override;
+    virtual void sampleRay(
+      Randomness& rng,
+      Ray* rayOut,
+      float* pdfPosOut,
+      float* pdfDirOut
+    ) const override;
+    virtual float area() const override;
   };
 
 }

@@ -96,6 +96,26 @@ struct LightRay : public Ray {
   }
 };
 
+struct RenderVertex : public LightRay {
+  float pdf;
+  Vec emission;
+
+  RenderVertex(const Vec& o, const Vec& d, const Vec& c, float p, Vec e)
+    : LightRay(o, d, c), pdf(p), emission(e) {}
+
+  RenderVertex(const LightRay& r, const Vec& e = Vec(0.0f, 0.0f, 0.0f))
+    : LightRay(r), pdf(1.0f), emission(e) {}
+
+  RenderVertex() : LightRay(), pdf(1.0f), emission(0.0f, 0.0f, 0.0f) {}
+
+  /**
+   * Determines whether the ray's color is black, within a small epsilon.
+   */
+  inline bool hasEmission() const {
+    return !math::isNearlyZero(emission);
+  }
+};
+
 /**
  * An axis-aligned bounding box.
  */

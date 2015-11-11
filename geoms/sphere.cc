@@ -88,3 +88,27 @@ BBox geoms::Sphere::boundBox() const {
 BSphere geoms::Sphere::boundSphere() const {
   return BSphere(origin, radius);
 }
+
+void geoms::Sphere::sampleRay(
+  Randomness& rng,
+  Ray* rayOut,
+  float* pdfPosOut,
+  float* pdfDirOut
+) const {
+  Vec normal = math::uniformSampleSphere(rng);
+  Vec tangent;
+  Vec binormal;
+  math::coordSystem(normal, &tangent, &binormal);
+
+  Vec rayOrigin = origin + radius * normal;
+  Vec dirLocal = math::cosineSampleHemisphere(rng, false);
+  Vec dir = math::localToWorld(dirLocal, tangent, binormal, normal);
+
+  *rayOut = Ray(rayOrigin, dir);
+  *pdfPosOut = 1.0f / area();
+  *pdfDirOut = math::cosineSampleHemispherePDF(dirLocal);
+}
+
+float geoms::Sphere::area() const {
+  return 4.0f * math::PI * radius * radius;
+}

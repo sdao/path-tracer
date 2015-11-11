@@ -101,3 +101,43 @@ BBox geoms::Poly::boundBox() const {
 
   return b;
 }
+
+void geoms::Poly::sampleRay(
+  Randomness& rng,
+  Ray* rayOut,
+  float* pdfPosOut,
+  float* pdfDirOut
+) const {
+  // See MathWorld <http://mathworld.wolfram.com/TrianglePointPicking.html>.
+  // Verified working in Mathematica.
+  float a = rng.nextUnitFloat();
+  float b = rng.nextUnitFloat();
+  if (a + b > 1.0f) {
+    a = 1.0f - a;
+    b = 1.0f - b;
+  }
+  float c = 1.0f - a - b;
+
+  Vec normal =
+    (a * pt0->normal + b * pt1->normal + c * pt2->normal).normalized();
+  Vec tangent;
+  Vec binormal;
+  math::coordSystem(normal, &tangent, &binormal);
+
+  Vec origin = a * pt0->position + b * pt1->position + c * pt2->position;
+  Vec dirLocal = math::cosineSampleHemisphere(rng, false);
+  Vec dir = math::localToWorld(dirLocal, tangent, binormal, normal);
+
+  *rayOut = Ray(origin, dir);
+  *pdfPosOut = 1.0f / area();
+  *pdfDirOut = math::cosineSampleHemispherePDF(dirLocal);
+}
+
+float geoms::Poly::area() const {
+  // See MathWorld <http://mathworld.wolfram.com/TriangleArea.html>.
+  Vec x0 = pt0->position;
+  Vec x1 = pt1->position;
+  Vec x2 = pt2->position;
+
+  return 0.5f * (x1 - x0).cross(x0 - x2).norm();
+}

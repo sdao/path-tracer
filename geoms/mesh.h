@@ -72,6 +72,13 @@ namespace geoms {
       RTCScene scene,
       Embree::EmbreeObj& eo
     ) const override;
+    virtual void sampleRay(
+      Randomness& rng,
+      Ray* rayOut,
+      float* pdfPosOut,
+      float* pdfDirOut
+    ) const override;
+    virtual float area() const override;
   };
 
 }

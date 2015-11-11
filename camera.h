@@ -22,6 +22,11 @@ class Camera {
    */
   static constexpr int RUSSIAN_ROULETTE_DEPTH_2 = 50;
   /**
+   * The number of vertices for which memory should be initially allocated for
+   * each render path.
+   */
+  static constexpr size_t MAX_PATH_LENGTH = 100;
+  /**
    * Limits any given sample to the given amount of radiance. This helps to
    * reduce "fireflies" in the output. The lower this value, the more bias will
    * be introduced into the image. For unbiased rendering, set this to
@@ -35,11 +40,11 @@ class Camera {
   const float focalLength; /**< The distance from the eye to the focal plane. */
   const float lensRadius; /**< The radius of the lens opening. */
   const Transform camToWorldXform; /**< Transform from camera to world space. */
-  
+
   float focalPlaneUp; /**< The height of the focal plane. */
   float focalPlaneRight; /**< The width of the focal plane. */
   Vec focalPlaneOrigin; /**< The origin (corner) of the focal plane. */
-  
+
   Randomness masterRng; /**< The RNG used to seed the per-row RNGs. */
   std::vector<unsigned> rowSeeds; /**< The per-row RNG seeds. */
 
@@ -56,7 +61,13 @@ class Camera {
    * @returns   the sampled radiance of the path
    */
   Vec trace(
-    LightRay r,
+    const LightRay& r,
+    Randomness& rng
+  ) const;
+
+  void randomWalk(
+    const LightRay& initialRay,
+    std::vector<RenderVertex>& path,
     Randomness& rng
   ) const;
 

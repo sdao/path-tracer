@@ -110,6 +110,14 @@ public:
     float* pdfOut
   ) const;
 
+  void sampleRay(
+    Randomness& rng,
+    const Geom* emitter,
+    LightRay* lightRayOut,
+    float* pdfPosOut,
+    float* pdfDirOut
+  ) const;
+
   /**
    * Calculates the emittance of the area light via a given ray intersection on
    * the light, assuming there is no occlusion.

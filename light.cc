@@ -226,6 +226,20 @@ void AreaLight::sampleLight(
   *pdfOut = pdf;
 }
 
+void AreaLight::sampleRay(
+  Randomness& rng,
+  const Geom* emitter,
+  LightRay* lightRayOut,
+  float* pdfPosOut,
+  float* pdfDirOut
+) const {
+  Ray r;
+  emitter->sampleRay(rng, &r, pdfPosOut, pdfDirOut);
+
+  // Ray should be guaranteed facing outwards.
+  *lightRayOut = LightRay(r.origin, r.direction, color);
+}
+
 Vec AreaLight::directIlluminate(
   Randomness& rng,
   const Ray& incoming,
@@ -235,7 +249,7 @@ Vec AreaLight::directIlluminate(
   const Accelerator* accel
 ) const {
   Vec Ld(0, 0, 0);
-  
+
   Ld +=
     directIlluminateByLightPDF(rng, incoming, isect, mat, emissionObj, accel);
   Ld +=

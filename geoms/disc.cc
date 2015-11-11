@@ -93,3 +93,33 @@ BBox geoms::Disc::boundBox() const {
 BSphere geoms::Disc::boundSphere() const {
   return BSphere(origin, radiusOuter);
 }
+
+void geoms::Disc::sampleRay(
+  Randomness& rng,
+  Ray* rayOut,
+  float* pdfPosOut,
+  float* pdfDirOut
+) const {
+  // See Bostock <http://bl.ocks.org/mbostock/d8b1e0a25467e6034bb9>.
+  Vec tangent;
+  Vec binormal;
+  math::coordSystem(normal, &tangent, &binormal);
+
+  float thickness = radiusOuterSquared - radiusInnerSquared;
+  float a = rng.nextFloat(math::TWO_PI);
+  float r = sqrtf(rng.nextFloat(thickness) + radiusInnerSquared);
+  float x = r * cosf(a);
+  float y = r * sinf(a);
+
+  Vec rayOrigin = origin + (x * tangent) + (y * binormal);
+  Vec dirLocal = math::cosineSampleHemisphere(rng, false);
+  Vec dir = math::localToWorld(dirLocal, tangent, binormal, normal);
+
+  *rayOut = Ray(rayOrigin, dir);
+  *pdfPosOut = 1.0f / area();
+  *pdfDirOut = math::cosineSampleHemispherePDF(dirLocal);
+}
+
+float geoms::Disc::area() const {
+  return (math::PI * radiusOuterSquared) - (math::PI * radiusInnerSquared);
+}

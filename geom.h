@@ -1,6 +1,7 @@
 #pragma once
 #include "core.h"
 #include "node.h"
+#include "randomness.h"
 #include "embree.h"
 
 class Material;
@@ -87,4 +88,13 @@ public:
    * @param eo    the Embree object to populate
    */
   virtual void makeEmbreeObject(RTCScene scene, Embree::EmbreeObj& eo) const;
+
+  virtual void sampleRay(
+    Randomness& rng,
+    Ray* rayOut,
+    float* pdfPosOut,
+    float* pdfDirOut
+  ) const = 0;
+
+  virtual float area() const = 0;
 };

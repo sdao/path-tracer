@@ -121,7 +121,7 @@ void geoms::Mesh::embreeIntersectCallback(
   float w = 1.0f - u - v;
   const geoms::Mesh* mesh = reinterpret_cast<const geoms::Mesh*>(eo->geom);
   const geoms::Poly& p = mesh->getFaces()[size_t(ray.primID)];
-  
+
   isectOut->position = Vec(
     ray.org[0] + ray.dir[0] * ray.tfar,
     ray.org[1] + ray.dir[1] * ray.tfar,
@@ -165,4 +165,17 @@ void geoms::Mesh::makeEmbreeObject(RTCScene scene, Embree::EmbreeObj& eo) const 
   rtcUnmapBuffer(scene, geomId, RTC_INDEX_BUFFER);
 
   eo = Embree::EmbreeObj(this, geomId, &geoms::Mesh::embreeIntersectCallback);
+}
+
+void geoms::Mesh::sampleRay(
+  Randomness& rng,
+  Ray* rayOut,
+  float* pdfPosOut,
+  float* pdfDirOut
+) const {
+  debug::shouldNotReach(nullptr);
+}
+
+float geoms::Mesh::area() const {
+  return debug::shouldNotReach(0.0f);
 }
