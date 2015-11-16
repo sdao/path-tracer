@@ -21,9 +21,7 @@ private:
    */
   inline Vec directIlluminateByLightPDF(
     Randomness& rng,
-    const Ray& incoming,
     const Intersection& isect,
-    const Material* mat,
     const Geom* emitter,
     const Accelerator* accel
   ) const;
@@ -37,9 +35,7 @@ private:
    */
   inline Vec directIlluminateByMatPDF(
     Randomness& rng,
-    const Ray& incoming,
     const Intersection& isect,
-    const Material* mat,
     const Geom* emitter,
     const Accelerator* accel
   ) const;
@@ -114,12 +110,10 @@ public:
    * Calculates the emittance of the area light via a given ray intersection on
    * the light, assuming there is no occlusion.
    *
-   * @param incoming     the incoming ray that struck the surface
    * @param isect        the intersection information for the incoming ray
    * @returns            the emittance from the light
    */
   Vec emit(
-    const Ray& incoming,
     const Intersection& isect
   ) const;
 
@@ -144,20 +138,14 @@ public:
    * the specified intersection point.
    *
    * @param rng             the per-thread RNG in use
-   * @param incoming        the ray coming into the intersection on the target
-   *                        geometry (on the reflector)
    * @param isect           the intersection on the target geometry that should
    *                        be illuminated
-   * @param mat             the material of the target geometry being
-   *                        illuminated
    * @param emitter         the object doing the illuminating (the emitter)
    * @param accel           the accelerator containing the scene geometry
    */
   Vec directIlluminate(
     Randomness& rng,
-    const Ray& incoming,
     const Intersection& isect,
-    const Material* mat,
     const Geom* emitter,
     const Accelerator* accel
   ) const;

@@ -44,7 +44,7 @@ void Embree::exit() {
   embreeInited = false;
 }
 
-const Geom* Embree::intersect(const Ray& r, Intersection* isectOut) const {
+bool Embree::intersect(const Ray& r, Intersection* isectOut) const {
   RTCRay ray;
   ray.org[0] = r.origin.x();
   ray.org[1] = r.origin.y();
@@ -64,10 +64,10 @@ const Geom* Embree::intersect(const Ray& r, Intersection* isectOut) const {
   if (ray.geomID != int(RTC_INVALID_GEOMETRY_ID)) {
     const EmbreeObj* eo = embreeObjLookup.at(unsigned(ray.geomID));
     eo->isectCallback(eo, ray, isectOut);
-    return eo->geom;
+    return true;
   }
 
-  return nullptr;
+  return false;
 }
 
 bool Embree::intersectShadow(const Ray& r, float maxDist) const {

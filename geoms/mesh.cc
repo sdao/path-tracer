@@ -121,15 +121,20 @@ void geoms::Mesh::embreeIntersectCallback(
   float w = 1.0f - u - v;
   const geoms::Mesh* mesh = reinterpret_cast<const geoms::Mesh*>(eo->geom);
   const geoms::Poly& p = mesh->getFaces()[size_t(ray.primID)];
-  
+
   isectOut->position = Vec(
     ray.org[0] + ray.dir[0] * ray.tfar,
     ray.org[1] + ray.dir[1] * ray.tfar,
     ray.org[2] + ray.dir[2] * ray.tfar
   );
+  isectOut->incomingRay = Ray(
+    Vec(ray.org[0], ray.org[1], ray.org[2]),
+    Vec(ray.dir[0], ray.dir[1], ray.dir[2])
+  );
   isectOut->distance = ray.tfar;
   isectOut->normal =
     (w * p.pt0->normal + u * p.pt1->normal + v * p.pt2->normal).normalized();
+  isectOut->geom = eo->geom;
 }
 
 void geoms::Mesh::makeEmbreeObject(RTCScene scene, Embree::EmbreeObj& eo) const {

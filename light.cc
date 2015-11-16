@@ -7,9 +7,7 @@ AreaLight::AreaLight(const Node& n) : AreaLight(n.getVec("color")) {}
 
 inline Vec AreaLight::directIlluminateByLightPDF(
   Randomness& rng,
-  const Ray& incoming,
   const Intersection& isect,
-  const Material* mat,
   const Geom* emissionObj,
   const Accelerator* accel
 ) const {
@@ -31,9 +29,9 @@ inline Vec AreaLight::directIlluminateByLightPDF(
     // Evaluate material BSDF and PDF as well.
     Vec bsdf;
     float bsdfPdf;
-    mat->evalWorld(
+    isect.geom->mat->evalWorld(
       isect,
-      -incoming.direction,
+      -isect.incomingRay.direction,
       outgoingWorld,
       &bsdf,
       &bsdfPdf
@@ -52,9 +50,7 @@ inline Vec AreaLight::directIlluminateByLightPDF(
 
 inline Vec AreaLight::directIlluminateByMatPDF(
   Randomness& rng,
-  const Ray& incoming,
   const Intersection& isect,
-  const Material* mat,
   const Geom* emissionObj,
   const Accelerator* accel
 ) const {
@@ -62,10 +58,10 @@ inline Vec AreaLight::directIlluminateByMatPDF(
   Vec outgoingWorld;
   Vec bsdf;
   float bsdfPdf;
-  mat->sampleWorld(
+  isect.geom->mat->sampleWorld(
     isect,
     rng,
-    -incoming.direction,
+    -isect.incomingRay.direction,
     &outgoingWorld,
     &bsdf,
     &bsdfPdf
@@ -96,12 +92,11 @@ inline Vec AreaLight::directIlluminateByMatPDF(
 }
 
 Vec AreaLight::emit(
-  const Ray& incoming,
   const Intersection& isect
 ) const {
   // Only emit on the normal-facing side of objects, e.g. on the outside of a
   // sphere or on the normal side of a disc.
-  if (incoming.direction.dot(isect.normal) > 0.0f) {
+  if (isect.incomingRay.direction.dot(isect.normal) > 0.0f) {
     return Vec(0, 0, 0);
   }
 
@@ -228,18 +223,16 @@ void AreaLight::sampleLight(
 
 Vec AreaLight::directIlluminate(
   Randomness& rng,
-  const Ray& incoming,
   const Intersection& isect,
-  const Material* mat,
   const Geom* emissionObj,
   const Accelerator* accel
 ) const {
   Vec Ld(0, 0, 0);
-  
+
   Ld +=
-    directIlluminateByLightPDF(rng, incoming, isect, mat, emissionObj, accel);
+    directIlluminateByLightPDF(rng, isect, emissionObj, accel);
   Ld +=
-    directIlluminateByMatPDF(rng, incoming, isect, mat, emissionObj, accel);
+    directIlluminateByMatPDF(rng, isect, emissionObj, accel);
 
   return Ld;
 }

@@ -57,7 +57,7 @@ void Geom::embreeOccludedFunc(void* user, RTCRay& ray, size_t /* i */) {
 }
 
 void Geom::embreeIntersectCallback(
-  const Embree::EmbreeObj* /* eo */,
+  const Embree::EmbreeObj* eo,
   const RTCRay& ray,
   Intersection* isectOut
 ) {
@@ -66,8 +66,13 @@ void Geom::embreeIntersectCallback(
     ray.org[1] + ray.dir[1] * ray.tfar,
     ray.org[2] + ray.dir[2] * ray.tfar
   );
+  isectOut->incomingRay = Ray(
+    Vec(ray.org[0], ray.org[1], ray.org[2]),
+    Vec(ray.dir[0], ray.dir[1], ray.dir[2])
+  );
   isectOut->distance = ray.tfar;
   isectOut->normal = Vec(ray.Ng[0], ray.Ng[1], ray.Ng[2]);
+  isectOut->geom = eo->geom;
 }
 
 void Geom::makeEmbreeObject(RTCScene scene, Embree::EmbreeObj& eo) const {

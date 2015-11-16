@@ -93,7 +93,7 @@ void Camera::renderOnce(
         Vec eyeWorld = camToWorldXform * eye;
         Vec lookAtWorld = camToWorldXform * lookAt;
         Vec dir = (lookAtWorld - eyeWorld).normalized();
-      
+
         Vec L = trace(LightRay(eyeWorld, dir), rng);
         img.setSample(x, y, posX, posY, samp, L);
       }
@@ -165,16 +165,17 @@ Vec Camera::trace(
 
     // Bounce ray and kill if nothing hit.
     Intersection isect;
-    const Geom* g = accel.intersect(r, &isect);
-    if (!g) {
+    if (!accel.intersect(r, &isect)) {
       // End path in empty space.
       break;
     }
 
+    const Geom* g = isect.geom;
+
     // Check for lighting.
     if (g->light && !didDirectIlluminate) {
       // Accumulate emission normally.
-      L += r.color.cwiseProduct(g->light->emit(r, isect));
+      L += r.color.cwiseProduct(g->light->emit(isect));
     } else if (g->light && didDirectIlluminate) {
       // Skip emission accumulation because it was accumulated already
       // in a direct lighting calculation. We don't want to double-count.
@@ -186,19 +187,19 @@ Vec Camera::trace(
       break;
     } else if (g->mat && !g->mat->shouldDirectIlluminate()) {
       // Continue path normally.
-      r = g->mat->scatter(rng, r, isect);
+      r = g->mat->scatter(rng, isect, r.color);
       didDirectIlluminate = false;
     } else if (g->mat && g->mat->shouldDirectIlluminate()) {
 #ifndef NO_DIRECT_ILLUM
       // Sample direct lighting and then continue path.
       L += r.color.cwiseProduct(
-        uniformSampleOneLight(rng, r, isect, g->mat)
+        uniformSampleOneLight(rng, isect)
       );
-      r = g->mat->scatter(rng, r, isect);
+      r = g->mat->scatter(rng, isect, r.color);
       didDirectIlluminate = true;
 #else
       // Continue path normally.
-      r = g->mat->scatter(rng, r, isect);
+      r = g->mat->scatter(rng, isect, r.color);
       didDirectIlluminate = false;
 #endif
     }
@@ -213,9 +214,7 @@ Vec Camera::trace(
 
 Vec Camera::uniformSampleOneLight(
   Randomness& rng,
-  const LightRay& incoming,
-  const Intersection& isect,
-  const Material* mat
+  const Intersection& isect
 ) const {
   size_t numLights = emitters.size();
   if (numLights == 0) {
@@ -228,6 +227,6 @@ Vec Camera::uniformSampleOneLight(
 
   // P[this light] = 1 / numLights, so 1 / P[this light] = numLights.
   return float(numLights) * areaLight->directIlluminate(
-    rng, incoming, isect, mat, emitter, &accel
+    rng, isect, emitter, &accel
   );
 }

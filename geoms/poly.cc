@@ -48,11 +48,18 @@ bool geoms::Poly::intersect(const Ray& r, Intersection* isectOut) const {
 
   const float w = 1.0f - u - v;
 
-  Intersection isect;
-  isect.position = r.at(dist);
-  isect.distance = dist;
-  isect.normal =
-    (w * pt0->normal + u * pt1->normal + v * pt2->normal).normalized();
+  Intersection isect(
+    /* position */
+      r.at(dist),
+    /* normal */
+      (w * pt0->normal + u * pt1->normal + v * pt2->normal).normalized(),
+    /* incomingRay */
+      r,
+    /* geom */
+      this,
+    /* distance */
+      dist
+  );
 
   *isectOut = isect;
   return true;

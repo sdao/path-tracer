@@ -40,7 +40,7 @@ bool geoms::Disc::intersect(const Ray& r, Intersection* isectOut) const {
       if (isectToOriginDist <= radiusOuterSquared
           && isectToOriginDist >= radiusInnerSquared) {
         // In the disc.
-        *isectOut = Intersection(isectPoint, normal, d);
+        *isectOut = Intersection(isectPoint, normal, r, this, d);
 
         return true;
       }

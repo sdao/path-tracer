@@ -12,13 +12,13 @@ protected:
    * (normal) coordinate system. If you have not changed the default behavior of
    * Material::sampleBSDF, you can assume that the incoming and outgoing
    * directions are in the same hemisphere.
-   * 
+   *
    * If the BSDF is a delta distribution (i.e. it is only non-zero for one
    * point), you should return 0 from this function and override
    * Material::sampleBSDFLocal only.
    */
   virtual Vec evalBSDFLocal(const Vec& incoming, const Vec& outgoing) const = 0;
-  
+
   /**
    * Returns the probability that the given outgoing vector will be sampled
    * for the given incoming vector by the function Material::sampleBSDFLocal,
@@ -37,7 +37,6 @@ public:
    * Determines whether another ray should be cast as a consequence of a
    * lightray hitting a surface.
    *
-   * @param incoming the incoming ray that struck the surface
    * @param isect    the intersection information for the incoming ray
    * @param rng      the per-thread RNG in use
    * @returns        a lightray to cast as a consequence; a zero-length ray will
@@ -45,8 +44,8 @@ public:
    */
   LightRay scatter(
     Randomness& rng,
-    const LightRay& incoming,
-    const Intersection& isect
+    const Intersection& isect,
+    const Vec& beta
   ) const;
 
   /**

@@ -7,6 +7,8 @@
 using std::min;
 using std::max;
 
+class Geom;
+
 /**
  * A directed line segment.
  */
@@ -86,13 +88,6 @@ struct LightRay : public Ray {
    */
   inline float luminance() const {
     return 0.21f * color.x() + 0.71f * color.y() + 0.08f * color.z();
-  }
-
-  /**
-   * Determines whether the ray's magnitude is zero, with a small epsilon.
-   */
-  inline bool isZeroLength() const {
-    return math::isNearlyZero(direction);
   }
 };
 
@@ -241,22 +236,26 @@ struct BSphere {
 struct Intersection {
   Vec position; /**< The point of the intersection in 3D space. */
   Vec normal; /**< The normal of the surface at the intersection. */
+  Ray incomingRay; /**< The incoming ray that caused the intersection. */
+  const Geom* geom; /**< The geometry hit at the intersection. */
   float distance; /**< The distance from the ray origin to the intersection. */
 
   /**
    * Constructs an intersection with no information.
    */
   Intersection()
-    : position(0, 0, 0), normal(0, 0, 0),
+    : position(0, 0, 0), normal(0, 0, 0), incomingRay(), geom(nullptr),
       distance(std::numeric_limits<float>::max()) {}
 
   /**
-   * Constructs an intersection with the given position, normal, and distance.   *
+   * Constructs an intersection with the given position, normal, and distance.
    * @param p the point of the intersection in 3D space
    * @param n the normal of the surface at the intersection
+   * @param r the incoming ray that caused the Intersection
+   * @param g the geometry hit, or nullptr
    * @param d the distance from the ray origin to the intersection
    */
-  Intersection(const Vec& p, const Vec& n, float d)
-    : position(p), normal(n), distance(d) {}
+  Intersection(const Vec& p, const Vec& n, const Ray& r, const Geom* g, float d)
+    : position(p), normal(n), incomingRay(r), geom(g), distance(d) {}
 
 };

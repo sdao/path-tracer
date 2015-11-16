@@ -35,11 +35,11 @@ class Camera {
   const float focalLength; /**< The distance from the eye to the focal plane. */
   const float lensRadius; /**< The radius of the lens opening. */
   const Transform camToWorldXform; /**< Transform from camera to world space. */
-  
+
   float focalPlaneUp; /**< The height of the focal plane. */
   float focalPlaneRight; /**< The width of the focal plane. */
   Vec focalPlaneOrigin; /**< The origin (corner) of the focal plane. */
-  
+
   Randomness masterRng; /**< The RNG used to seed the per-row RNGs. */
   std::vector<unsigned> rowSeeds; /**< The per-row RNG seeds. */
 
@@ -66,17 +66,12 @@ class Camera {
    * the light.
    *
    * @param rng         the per-thread RNG in use
-   * @param incoming    the ray coming into the intersection on the target
-   *                    geometry (on the reflector)
    * @param isect       the intersection on the target geometry that should be
    *                    illuminated
-   * @param mat         the material of the target geometry being illuminated
    */
   Vec uniformSampleOneLight(
     Randomness& rng,
-    const LightRay& incoming,
-    const Intersection& isect,
-    const Material* mat
+    const Intersection& isect
   ) const;
 
 public:

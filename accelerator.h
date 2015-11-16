@@ -16,9 +16,9 @@ public:
    * @param isectOut [out] the intersection information if the ray hit some
    *                       geometry, otherwise unmodified; the pointer must not
    *                       be null
-   * @returns              the geom that was hit, or nullptr if none was hit
+   * @returns              true if any geom was hit, otherwise false
    */
-  virtual const Geom* intersect(const Ray& r, Intersection* isectOut) const = 0;
+  virtual bool intersect(const Ray& r, Intersection* isectOut) const = 0;
 
   /**
    * Determines if any object intersects the given shadow ray within a maximum

@@ -35,13 +35,13 @@ bool geoms::Sphere::intersect(const Ray& r, Intersection* isectOut) const {
       Vec pt = r.at(resNeg);
       Vec normal = (inverted ? origin - pt : pt - origin).normalized();
 
-      *isectOut = Intersection(pt, normal, resNeg);
+      *isectOut = Intersection(pt, normal, r, this, resNeg);
       return true;
     } else if (math::isPositive(resPos)) {
       Vec pt = r.at(resPos);
       Vec normal = (inverted ? origin - pt : pt - origin).normalized();
 
-      *isectOut = Intersection(pt, normal, resPos);
+      *isectOut = Intersection(pt, normal, r, this, resPos);
       return true;
     }
   }

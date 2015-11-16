@@ -4,13 +4,13 @@ Material::~Material() {}
 
 LightRay Material::scatter(
   Randomness& rng,
-  const LightRay& incoming,
-  const Intersection& isect
+  const Intersection& isect,
+  const Vec& beta
 ) const {
   Vec outgoingWorld;
   Vec bsdf;
   float pdf;
-  sampleWorld(isect, rng, -incoming.direction, &outgoingWorld, &bsdf, &pdf);
+  sampleWorld(isect, rng, -isect.incomingRay.direction, &outgoingWorld, &bsdf, &pdf);
 
   Vec scale;
   if (pdf > 0.0f) {
@@ -22,7 +22,7 @@ LightRay Material::scatter(
   return LightRay(
     isect.position + outgoingWorld * math::VERY_SMALL,
     outgoingWorld,
-    incoming.color.cwiseProduct(scale)
+    beta.cwiseProduct(scale)
   );
 }
 

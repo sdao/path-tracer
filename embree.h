@@ -37,7 +37,7 @@ public:
   static void init();
   static void exit();
 
-  virtual const Geom* intersect(
+  virtual bool intersect(
     const Ray& r,
     Intersection* isectOut
   ) const override;
