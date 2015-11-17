@@ -48,50 +48,6 @@ struct Ray {
 };
 
 /**
- * A ray of light, i.e. a ray with an additional color component.
- */
-struct LightRay : public Ray {
-  Vec color; /**< The light color of the ray. */
-
-  /**
-   * Constructs a lightray with the given origin, direction, and color.
-   *
-   * @param o the ray's origin
-   * @param d the ray's direction (and magnitude, if desired)
-   * @param c the ray's light color
-   */
-  LightRay(const Vec& o, const Vec& d, const Vec& c) : Ray(o, d), color(c) {}
-
-  /**
-   * Constructs a white lightray with the given origin and direction.
-   *
-   * @param o the ray's origin
-   * @param d the ray's direction (and magnitude, if desired)
-   */
-  LightRay(const Vec& o, const Vec& d) : Ray(o, d), color(1, 1, 1) {}
-
-  /**
-   * Constructs a white lightray with origin at (0, 0, 0) and neither direction
-   * nor magnitude.
-   */
-  LightRay() : Ray(), color(1, 1, 1) {}
-
-  /**
-   * Determines whether the ray's color is black, within a small epsilon.
-   */
-  inline bool isBlack() const {
-    return math::isNearlyZero(color);
-  }
-
-  /**
-   * Returns the perceived luminance of the light's color, assuming it is RGB.
-   */
-  inline float luminance() const {
-    return 0.21f * color.x() + 0.71f * color.y() + 0.08f * color.z();
-  }
-};
-
-/**
  * An axis-aligned bounding box.
  */
 struct BBox {
@@ -258,4 +214,17 @@ struct Intersection {
   Intersection(const Vec& p, const Vec& n, const Ray& r, const Geom* g, float d)
     : position(p), normal(n), incomingRay(r), geom(g), distance(d) {}
 
+};
+
+/**
+ * Contains the information for a point along a rendering path.
+ */
+struct RenderVertex : public Intersection {
+  Vec beta; /**< The transmission throughput (e.g. of radiance). */
+
+  /**
+   * Creates an empty render vertex with the specified beta value.
+   * @param b the beta (transmission throughput)
+   */
+  RenderVertex(const Vec& b) : Intersection(), beta(b) {}
 };

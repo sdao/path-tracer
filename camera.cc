@@ -71,6 +71,9 @@ void Camera::renderOnce(
   // Trace paths in parallel using TBB.
   tbb::parallel_for(long(0), img.h, [&](long y) {
     Randomness rng(rowSeeds[size_t(y)]);
+    std::vector<RenderVertex> sharedEyePath;
+    sharedEyePath.reserve(INITIAL_PATH_LENGTH);
+
     for (long x = 0; x < img.w; ++x) {
       for (long samp = 0; samp < img.samplesPerPixel; ++samp) {
         float offsetY = rng.nextFloat(-img.filterWidth, img.filterWidth);
@@ -94,7 +97,7 @@ void Camera::renderOnce(
         Vec lookAtWorld = camToWorldXform * lookAt;
         Vec dir = (lookAtWorld - eyeWorld).normalized();
 
-        Vec L = trace(LightRay(eyeWorld, dir), rng);
+        Vec L = trace(rng, Ray(eyeWorld, dir), sharedEyePath);
         img.setSample(x, y, posX, posY, samp, L);
       }
     }
@@ -133,75 +136,41 @@ void Camera::renderMultiple(
 }
 
 Vec Camera::trace(
-  LightRay r,
-  Randomness& rng
+  Randomness& rng,
+  Ray r,
+  std::vector<RenderVertex>& sharedEyePath
 ) const {
+  sharedEyePath.clear();
+  randomWalk(rng, r, Vec(1, 1, 1), sharedEyePath);
+
   Vec L(0, 0, 0);
   bool didDirectIlluminate = false;
 
-  for (int depth = 0; ; ++depth) {
-    // Do Russian Roulette if this path is "old".
-    if (depth >= RUSSIAN_ROULETTE_DEPTH_1 || r.isBlack()) {
-      float rv = rng.nextUnitFloat();
-
-      float probLive;
-      if (depth >= RUSSIAN_ROULETTE_DEPTH_2) {
-        // More aggressive ray killing when ray is very old.
-        probLive = math::clampedLerp(0.25f, 0.75f, r.luminance());
-      } else {
-        // Less aggressive ray killing.
-        probLive = math::clampedLerp(0.25f, 1.00f, r.luminance());
-      }
-
-      if (rv < probLive) {
-        // The ray lives (more energy = more likely to live).
-        // Increase its energy to balance out probabilities.
-        r.color = r.color / probLive;
-      } else {
-        // The ray dies.
-        break;
-      }
-    }
-
-    // Bounce ray and kill if nothing hit.
-    Intersection isect;
-    if (!accel.intersect(r, &isect)) {
-      // End path in empty space.
-      break;
-    }
-
-    const Geom* g = isect.geom;
+  for (const RenderVertex& vtx : sharedEyePath) {
+    const Material* mat = vtx.geom->mat;
+    const AreaLight* light = vtx.geom->light;
 
     // Check for lighting.
-    if (g->light && !didDirectIlluminate) {
-      // Accumulate emission normally.
-      L += r.color.cwiseProduct(g->light->emit(isect));
-    } else if (g->light && didDirectIlluminate) {
-      // Skip emission accumulation because it was accumulated already
-      // in a direct lighting calculation. We don't want to double-count.
+    if (light && !didDirectIlluminate) {
+      // Accumulate emission normally if we did not direct-illuminate at the
+      // last vertex. For any _n_, we can only count one _n_-length path per
+      // sample trace.
+      L += vtx.beta.cwiseProduct(light->emit(vtx));
     }
 
-    // Check for scattering (reflection/transmission).
-    if (!g->mat) {
-      // Cannot continue path without a material.
-      break;
-    } else if (g->mat && !g->mat->shouldDirectIlluminate()) {
-      // Continue path normally.
-      r = g->mat->scatter(rng, isect, r.color);
-      didDirectIlluminate = false;
-    } else if (g->mat && g->mat->shouldDirectIlluminate()) {
+    // Direct-illuminate if possible.
+    if (mat && mat->shouldDirectIlluminate()) {
 #ifndef NO_DIRECT_ILLUM
       // Sample direct lighting and then continue path.
-      L += r.color.cwiseProduct(
-        uniformSampleOneLight(rng, isect)
+      L += vtx.beta.cwiseProduct(
+        uniformSampleOneLight(rng, vtx)
       );
-      r = g->mat->scatter(rng, isect, r.color);
       didDirectIlluminate = true;
 #else
-      // Continue path normally.
-      r = g->mat->scatter(rng, isect, r.color);
       didDirectIlluminate = false;
 #endif
+    } else {
+      didDirectIlluminate = false;
     }
   }
 
@@ -210,6 +179,55 @@ Vec Camera::trace(
   L[2] = math::clamp(L[2], 0.0f, BIASED_RADIANCE_CLAMPING);
 
   return L;
+}
+
+void Camera::randomWalk(
+  Randomness& rng,
+  Ray r,
+  Vec beta,
+  std::vector<RenderVertex>& path
+) const {
+  for (int depth = 0; ; ++depth) {
+    // Bounce ray and kill if nothing hit.
+    RenderVertex isect(beta);
+    if (accel.intersect(r, &isect)) {
+      path.push_back(isect);
+    } else {
+      // End path in empty space.
+      break;
+    }
+
+    // Check for scattering (reflection/transmission).
+    if (isect.geom->mat) {
+      isect.geom->mat->scatter(rng, isect, &r, &beta);
+    } else {
+      // Cannot continue path without a material.
+      break;
+    }
+
+    // Do Russian Roulette if this path is "old".
+    if (depth >= RUSSIAN_ROULETTE_DEPTH_1 || math::isNearlyZero(beta)) {
+      float rv = rng.nextUnitFloat();
+
+      float probLive;
+      if (depth >= RUSSIAN_ROULETTE_DEPTH_2) {
+        // More aggressive ray killing when ray is very old.
+        probLive = math::clampedLerp(0.25f, 0.75f, math::luminance(beta));
+      } else {
+        // Less aggressive ray killing.
+        probLive = math::clampedLerp(0.25f, 1.00f, math::luminance(beta));
+      }
+
+      if (rv < probLive) {
+        // The ray lives (more energy = more likely to live).
+        // Increase its energy to balance out probabilities.
+        beta = beta / probLive;
+      } else {
+        // The ray dies.
+        break;
+      }
+    }
+  }
 }
 
 Vec Camera::uniformSampleOneLight(

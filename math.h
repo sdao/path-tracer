@@ -134,7 +134,7 @@ namespace math {
    * specified offset from the pixel center. The values are not normalized,
    * i.e., the integral of the filter over the 1x1 square around the point.
    * Thus, you should only use the filter weights relative to other weights.
-   * 
+   *
    * In fact, Mathematica says that:
    * @code
    * In := Integrate[(0.5-Abs[x])*(0.5-Abs[y]), {x, -0.5, 0.5}, {y, -0.5, 0.5}]
@@ -220,6 +220,13 @@ namespace math {
    */
   inline bool isVectorExactlyZero(const Vec& v) {
     return v.x() == 0.0f && v.y() == 0.0f && v.z() == 0.0f;
+  }
+
+  /**
+   * Luminance of an RGB color stored in a vec.
+   */
+  inline float luminance(const Vec& v) {
+    return 0.21f * v.x() + 0.71f * v.y() + 0.08f * v.z();
   }
 
   /**
@@ -333,7 +340,7 @@ namespace math {
   }
 
   /**
-   * Determines if two vectors in the same local coordinate space are in the 
+   * Determines if two vectors in the same local coordinate space are in the
    * same hemisphere.
    */
   inline bool localSameHemisphere(const Vec& u, const Vec& v) {

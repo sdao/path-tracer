@@ -22,6 +22,10 @@ class Camera {
    */
   static constexpr int RUSSIAN_ROULETTE_DEPTH_2 = 50;
   /**
+   * The amount of memory to initially allocate for each path.
+   */
+  static constexpr int INITIAL_PATH_LENGTH = 50;
+  /**
    * Limits any given sample to the given amount of radiance. This helps to
    * reduce "fireflies" in the output. The lower this value, the more bias will
    * be introduced into the image. For unbiased rendering, set this to
@@ -51,13 +55,31 @@ class Camera {
    * Traces a path starting with the given ray, and returns the sampled
    * radiance.
    *
-   * @param r   the ray that starts the path
-   * @param rng the per-thread RNG in use
-   * @returns   the sampled radiance of the path
+   * @param rng                the per-thread RNG in use
+   * @param r                  the ray that starts the path
+   * @param sharedEyePath [in] a shared structure used to store the eye path
+   *                           while tracing the sample
+   * @returns                  the sampled radiance of the path
    */
-  Vec trace(
-    LightRay r,
-    Randomness& rng
+   Vec trace(
+     Randomness& rng,
+     Ray r,
+     std::vector<RenderVertex>& sharedEyePath
+   ) const;
+
+  /**
+   * Constructs a path by randomly walking the scene from the given initial ray.
+   *
+   * @param rng           the per-thread RNG in use
+   * @param r             the ray that starts the path
+   * @param beta          the throughput at the initial point in the path
+   * @param path [in,out] a shared structure used to store the constructed path
+   */
+  void randomWalk(
+    Randomness& rng,
+    Ray r,
+    Vec beta,
+    std::vector<RenderVertex>& path
   ) const;
 
   /**

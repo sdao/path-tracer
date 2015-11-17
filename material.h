@@ -34,18 +34,23 @@ public:
   virtual ~Material();
 
   /**
-   * Determines whether another ray should be cast as a consequence of a
-   * lightray hitting a surface.
+   * Calculates the transmittance and scatters another ray from an
+   * intersection.
    *
-   * @param isect    the intersection information for the incoming ray
-   * @param rng      the per-thread RNG in use
-   * @returns        a lightray to cast as a consequence; a zero-length ray will
-   *                 terminate the path
+   * @param rng                the per-thread RNG in use
+   * @param isect              the intersection information for the incoming ray
+   * @param rayOut    [out]    a ray to cast as a consequence;
+   *                           a zero-length ray will terminate the path
+   * @param betaInOut [in,out] the incoming beta (throughput), which will be
+   *                           adjusted based on the transmittance at the
+   *                           intersection, taking into account BSDF, PDF,
+   *                           and the geometry term
    */
-  LightRay scatter(
+  void scatter(
     Randomness& rng,
     const Intersection& isect,
-    const Vec& beta
+    Ray* rayOut,
+    Vec* betaInOut
   ) const;
 
   /**

@@ -2,10 +2,11 @@
 
 Material::~Material() {}
 
-LightRay Material::scatter(
+void Material::scatter(
   Randomness& rng,
   const Intersection& isect,
-  const Vec& beta
+  Ray* rayOut,
+  Vec* betaInOut
 ) const {
   Vec outgoingWorld;
   Vec bsdf;
@@ -19,11 +20,11 @@ LightRay Material::scatter(
     scale = Vec(0, 0, 0);
   }
 
-  return LightRay(
+  *rayOut = Ray(
     isect.position + outgoingWorld * math::VERY_SMALL,
-    outgoingWorld,
-    beta.cwiseProduct(scale)
+    outgoingWorld
   );
+  *betaInOut = betaInOut->cwiseProduct(scale);
 }
 
 float Material::evalPDFLocal(const Vec& incoming, const Vec& outgoing) const {
