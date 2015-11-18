@@ -7,10 +7,10 @@ compiler:
 before_install:
   - sudo apt-get update
   - sudo apt-get install -y libeigen3-dev libassimp-dev libboost-dev libboost-program-options-dev libtbb-dev
-  - wget https://github.com/embree/embree/releases/download/v2.7.1/$(EMBREE_TARBALL).tar.gz
-  - tar xzf $(EMBREE_TARBALL).tar.gz
-  - sudo cp -r $(EMBREE_TARBALL)/lib/* /usr/lib
-  - sudo cp -r $(EMBREE_TARBALL)/include/* /usr/include
+  - wget https://github.com/embree/embree/releases/download/v2.7.1/$EMBREE_TARBALL.tar.gz
+  - tar xzf $EMBREE_TARBALL.tar.gz
+  - sudo cp -r $EMBREE_TARBALL/lib/* /usr/lib
+  - sudo cp -r $EMBREE_TARBALL/include/* /usr/include
 
 script: make
 
