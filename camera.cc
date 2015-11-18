@@ -1,7 +1,15 @@
 #include "camera.h"
+#include "light.h"
 #include <iostream>
 #include <chrono>
-#include "light.h"
+
+#ifdef _WIN32
+  #include <ppl.h>
+  namespace parallel = Concurrency;
+#else
+  #include <tbb/tbb.h>
+  namespace parallel = tbb;
+#endif
 
 using std::max;
 using std::min;
@@ -68,8 +76,8 @@ void Camera::renderOnce(
     rowSeeds[size_t(y)] = masterRng.nextUnsigned();
   }
 
-  // Trace paths in parallel using TBB.
-  tbb::parallel_for(long(0), img.h, [&](long y) {
+  // Trace paths in parallel using TBB (Linux/Mac) or PPL (Windows).
+  parallel::parallel_for(long(0), img.h, [&](long y) {
     Randomness rng(rowSeeds[size_t(y)]);
     std::vector<RenderVertex> sharedEyePath;
     sharedEyePath.reserve(INITIAL_PATH_LENGTH);

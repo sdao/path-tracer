@@ -1,9 +1,9 @@
 #pragma once
+#include "core.h"
+#include "accelerator.h"
 #include <vector>
 #include <map>
 #include <functional>
-#include "core.h"
-#include "accelerator.h"
 
 class Geom;
 

@@ -1,12 +1,11 @@
 #include "embree.h"
+#include "debug.h"
+#include "geom.h"
 
 #ifdef __SSE3__
 #include <xmmintrin.h>
 #include <pmmintrin.h>
 #endif
-
-#include "debug.h"
-#include "geom.h"
 
 bool Embree::embreeInited = false;
 RTCDevice Embree::device = nullptr;

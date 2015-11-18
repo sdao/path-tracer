@@ -1,8 +1,8 @@
 #pragma once
 #include "../geom.h"
+#include "poly.h"
 #include <vector>
 #include <exception>
-#include "poly.h"
 
 namespace geoms {
 

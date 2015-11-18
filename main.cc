@@ -1,9 +1,9 @@
-#include <iostream>
-#include <boost/program_options.hpp>
 #include "scene.h"
 #include "camera.h"
 #include "debug.h"
 #include "embree.h"
+#include <iostream>
+#include <boost/program_options.hpp>
 
 int main(int argc, char* argv[]) {
   using namespace boost::program_options;

@@ -1,11 +1,10 @@
 #pragma once
-#include <tbb/tbb.h>
-#include <vector>
 #include "core.h"
 #include "geom.h"
 #include "image.h"
 #include "node.h"
 #include "embree.h"
+#include <vector>
 
 /**
  * Manages rendering by simulating the action of a physical pinhole camera.

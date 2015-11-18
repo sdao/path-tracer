@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\geoms">
+      <UniqueIdentifier>{2d933e88-24fa-4a6f-b201-a86f0944686a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\geoms">
+      <UniqueIdentifier>{0503f710-80e5-41d4-ad74-172169e21c4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\materials">
+      <UniqueIdentifier>{bbe30af6-dcba-417b-b510-a02c9a3916f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\materials">
+      <UniqueIdentifier>{ef4d68b7-eca8-4427-b192-148f32cd2a1b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="accelerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="embree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="geom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="randomness.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="geoms\poly.h">
+      <Filter>Header Files\geoms</Filter>
+    </ClInclude>
+    <ClInclude Include="geoms\mesh.h">
+      <Filter>Header Files\geoms</Filter>
+    </ClInclude>
+    <ClInclude Include="geoms\disc.h">
+      <Filter>Header Files\geoms</Filter>
+    </ClInclude>
+    <ClInclude Include="geoms\all.h">
+      <Filter>Header Files\geoms</Filter>
+    </ClInclude>
+    <ClInclude Include="geoms\sphere.h">
+      <Filter>Header Files\geoms</Filter>
+    </ClInclude>
+    <ClInclude Include="materials\all.h">
+      <Filter>Header Files\materials</Filter>
+    </ClInclude>
+    <ClInclude Include="materials\dielectric.h">
+      <Filter>Header Files\materials</Filter>
+    </ClInclude>
+    <ClInclude Include="materials\lambert.h">
+      <Filter>Header Files\materials</Filter>
+    </ClInclude>
+    <ClInclude Include="materials\phong.h">
+      <Filter>Header Files\materials</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="accelerator.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="embree.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="geom.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="image.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="light.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="material.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="node.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scene.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="geoms\sphere.cc">
+      <Filter>Source Files\geoms</Filter>
+    </ClCompile>
+    <ClCompile Include="geoms\poly.cc">
+      <Filter>Source Files\geoms</Filter>
+    </ClCompile>
+    <ClCompile Include="geoms\mesh.cc">
+      <Filter>Source Files\geoms</Filter>
+    </ClCompile>
+    <ClCompile Include="geoms\disc.cc">
+      <Filter>Source Files\geoms</Filter>
+    </ClCompile>
+    <ClCompile Include="materials\dielectric.cc">
+      <Filter>Source Files\materials</Filter>
+    </ClCompile>
+    <ClCompile Include="materials\lambert.cc">
+      <Filter>Source Files\materials</Filter>
+    </ClCompile>
+    <ClCompile Include="materials\phong.cc">
+      <Filter>Source Files\materials</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>

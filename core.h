@@ -1,8 +1,8 @@
 #pragma once
-#include <iostream>
-#include <boost/format.hpp>
 #include "math.h"
 #include "randomness.h"
+#include <iostream>
+#include <boost/format.hpp>
 
 using std::min;
 using std::max;

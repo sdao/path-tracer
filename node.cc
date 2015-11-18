@@ -1,8 +1,8 @@
 #include "node.h"
+#include "scene.h"
 #include <exception>
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
-#include "scene.h"
 
 using boost::format;
 

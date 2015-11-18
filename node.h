@@ -1,8 +1,8 @@
 #pragma once
+#include "core.h"
 #include <vector>
 #include <map>
 #include <boost/property_tree/ptree.hpp>
-#include "core.h"
 
 class AreaLight;
 class Material;

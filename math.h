@@ -1,13 +1,15 @@
 #pragma once
 
 #define EIGEN_NO_DEBUG
+#define _USE_MATH_DEFINES // Want math constants in VS.
+#define NOMINMAX // Don't want VS min/max macros.
 
+#include "randomness.h"
 #include <cmath>
 #include <limits>
 #include <vector>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
-#include "randomness.h"
 
 using std::min;
 using std::max;

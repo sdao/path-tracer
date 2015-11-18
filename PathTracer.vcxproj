@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AAC1BDC1-5CCD-4C1F-B3FC-6AA6B185D845}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>PathTracer</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PathTracerDependencies.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PathTracerDependencies.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ThirdParty)\tinyexr;$(Embree)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(Embree)\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ThirdParty)\tinyexr;$(Embree)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(Embree)\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>embree.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y /d  "$(Embree)\lib\*.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy DLLs</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>embree.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y /d  "$(Embree)\lib\*.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy DLLs</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="accelerator.h" />
+    <ClInclude Include="camera.h" />
+    <ClInclude Include="core.h" />
+    <ClInclude Include="debug.h" />
+    <ClInclude Include="embree.h" />
+    <ClInclude Include="geom.h" />
+    <ClInclude Include="geoms\all.h" />
+    <ClInclude Include="geoms\disc.h" />
+    <ClInclude Include="geoms\mesh.h" />
+    <ClInclude Include="geoms\poly.h" />
+    <ClInclude Include="geoms\sphere.h" />
+    <ClInclude Include="image.h" />
+    <ClInclude Include="light.h" />
+    <ClInclude Include="material.h" />
+    <ClInclude Include="materials\all.h" />
+    <ClInclude Include="materials\dielectric.h" />
+    <ClInclude Include="materials\lambert.h" />
+    <ClInclude Include="materials\phong.h" />
+    <ClInclude Include="math.h" />
+    <ClInclude Include="node.h" />
+    <ClInclude Include="randomness.h" />
+    <ClInclude Include="scene.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="accelerator.cc" />
+    <ClCompile Include="camera.cc" />
+    <ClCompile Include="embree.cc" />
+    <ClCompile Include="geom.cc" />
+    <ClCompile Include="geoms\disc.cc" />
+    <ClCompile Include="geoms\mesh.cc" />
+    <ClCompile Include="geoms\poly.cc" />
+    <ClCompile Include="geoms\sphere.cc" />
+    <ClCompile Include="image.cc" />
+    <ClCompile Include="light.cc" />
+    <ClCompile Include="main.cc" />
+    <ClCompile Include="material.cc" />
+    <ClCompile Include="materials\dielectric.cc" />
+    <ClCompile Include="materials\lambert.cc" />
+    <ClCompile Include="materials\phong.cc" />
+    <ClCompile Include="node.cc" />
+    <ClCompile Include="scene.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets" Condition="Exists('packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets')" />
+    <Import Project="packages\Assimp.3.0.0\build\native\Assimp.targets" Condition="Exists('packages\Assimp.3.0.0\build\native\Assimp.targets')" />
+    <Import Project="packages\boost.1.59.0.0\build\native\boost.targets" Condition="Exists('packages\boost.1.59.0.0\build\native\boost.targets')" />
+    <Import Project="packages\Eigen.3.2.7\build\native\Eigen.targets" Condition="Exists('packages\Eigen.3.2.7\build\native\Eigen.targets')" />
+    <Import Project="packages\boost_program_options-vc140.1.59.0.0\build\native\boost_program_options-vc140.targets" Condition="Exists('packages\boost_program_options-vc140.1.59.0.0\build\native\boost_program_options-vc140.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets'))" />
+    <Error Condition="!Exists('packages\Assimp.3.0.0\build\native\Assimp.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Assimp.3.0.0\build\native\Assimp.targets'))" />
+    <Error Condition="!Exists('packages\boost.1.59.0.0\build\native\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost.1.59.0.0\build\native\boost.targets'))" />
+    <Error Condition="!Exists('packages\Eigen.3.2.7\build\native\Eigen.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Eigen.3.2.7\build\native\Eigen.targets'))" />
+    <Error Condition="!Exists('packages\boost_program_options-vc140.1.59.0.0\build\native\boost_program_options-vc140.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_program_options-vc140.1.59.0.0\build\native\boost_program_options-vc140.targets'))" />
+  </Target>
+</Project>

@@ -1,8 +1,6 @@
 #pragma once
-#include <OpenEXR/ImfRgbaFile.h>
-#include <OpenEXR/ImfArray.h>
-#include <boost/multi_array.hpp>
 #include "math.h"
+#include <boost/multi_array.hpp>
 
 class Image {
 
@@ -23,7 +21,9 @@ class Image {
   PixelArray rawData;
 
   /** The array used for writing to an OpenEXR file. */
-  Imf::Array2D<Imf::Rgba> exrData;
+  std::vector<float> channelR;
+  std::vector<float> channelG;
+  std::vector<float> channelB;
 
 public:
   /**

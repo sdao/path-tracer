@@ -1,6 +1,4 @@
 #include "scene.h"
-#include <exception>
-#include <boost/format.hpp>
 #include "camera.h"
 #include "light.h"
 #include "material.h"
@@ -8,6 +6,8 @@
 #include "materials/all.h"
 #include "geoms/all.h"
 #include "node.h"
+#include <exception>
+#include <boost/format.hpp>
 
 using boost::property_tree::ptree;
 using boost::format;

@@ -1,9 +1,9 @@
 #include "mesh.h"
+#include "../debug.h"
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 #include <exception>
-#include "../debug.h"
 
 geoms::Mesh::Mesh(
   const Vec& o,

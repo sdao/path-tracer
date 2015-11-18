@@ -1,8 +1,8 @@
 #pragma once
+#include "math.h"
 #include <cmath>
 #include <cassert>
 #include <iostream>
-#include "math.h"
 
 namespace debug {
 

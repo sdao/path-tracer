@@ -1,18 +1,6 @@
-UNAME := $(shell uname)
-
 SOURCES = *.cc materials/*.cc geoms/*.cc
-LDLIBS = -lIlmImf -lHalf -ltbb -lassimp -lboost_program_options
-INCLUDES = -isystem /usr/local/include/eigen3 -isystem /usr/include/eigen3 \
-           -isystem /usr/local/include/OpenEXR -isystem /usr/include/OpenEXR
-
-# Choose specific Embree v2 library based on filename. Filename depends on OS.
-ifeq ($(UNAME), Linux)
-	LDLIBS += -l:libembree.so.2
-endif
-
-ifeq ($(UNAME), Darwin)
-	LDLIBS += -lembree.2
-endif
+LDLIBS = -ltbb -lassimp -lboost_program_options -l:libembree.so.2
+INCLUDES = -isystem /usr/include/eigen3 -isystem third_party/tinyexr
 
 ifeq ($(strip $(CXX)),clang++)
 	# Clang compiler: enable extra warnings
@@ -58,7 +46,3 @@ useprofile: $(SOURCES)
 
 clean:
 	rm -rf bin
-
-# Xcode-specific targets
-xcode: debug
-xcodeclean: clean

@@ -1,10 +1,10 @@
 #pragma once
+#include "core.h"
 #include <vector>
 #include <map>
 #include <functional>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-#include "core.h"
 
 class AreaLight;
 class Material;
