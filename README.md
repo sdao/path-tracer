@@ -5,6 +5,9 @@ Little global illumination Monte Carlo path tracer
 
 Ready to build on either Windows or Linux
 
+**This repository includes submodules.** In order to get everything when you
+clone, add the `--recursive` flag.
+
 [![Build Status](https://semaphoreapp.com/api/v1/projects/f17e953b-83a4-4364-a2e3-04e1f126be21/317820/shields_badge.svg)](https://semaphoreapp.com/sdao/path-tracer)
 
 Dependencies
