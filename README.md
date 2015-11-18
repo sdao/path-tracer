@@ -50,6 +50,8 @@ repository to point to your Embree installation.
 
 Linux Build (Makefile)
 ----------------------
+You should build using `g++`. Using `clang++` is not guaranteed to work.
+
 You will need to get the development versions of `eigen3`, `assimp`, `boost`,
 and `tbb` from your package manager (e.g. from `apt-get` or from `dnf`).
 _TinyExr_ is included in the project as a Git submodule and you will get the
