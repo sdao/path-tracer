@@ -1,8 +1,11 @@
 #pragma once
 
 #define EIGEN_NO_DEBUG
-#define _USE_MATH_DEFINES // Want math constants in VS.
-#define NOMINMAX // Don't want VS min/max macros.
+
+#ifdef _WIN32
+  #define _USE_MATH_DEFINES // Want math constants in VS.
+  #define NOMINMAX // Don't want VS min/max macros.
+#endif
 
 #include "randomness.h"
 #include <cmath>

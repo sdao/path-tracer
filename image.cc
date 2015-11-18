@@ -8,26 +8,28 @@
 
 using boost::format;
 
-Image::Image(long ww, long hh, long spp, float fw)
+Image::Image(int ww, int hh, int spp, float fw)
   : currentIteration(boost::extents[hh][ww][spp]),
     rawData(boost::extents[hh][ww]),
-    channelR(hh * ww), channelG(hh * ww), channelB(hh * ww),
+    channelR(size_t(hh * ww)),
+    channelG(size_t(hh * ww)),
+    channelB(size_t(hh * ww)),
     w(ww), h(hh), samplesPerPixel(spp), filterWidth(fw)
 {
   // Clear the data array.
-  for (long y = 0; y < h; ++y) {
-    for (long x = 0; x < w; ++x) {
+  for (int y = 0; y < h; ++y) {
+    for (int x = 0; x < w; ++x) {
       rawData[y][x] = Vec4(0, 0, 0, 0);
     }
   }
 }
 
 void Image::setSample(
-  long x,
-  long y,
+  int x,
+  int y,
   float ptX,
   float ptY,
-  long idx,
+  int idx,
   const Vec& color
 ) {
   Sample& s = currentIteration[y][x][idx];
@@ -42,13 +44,13 @@ void Image::commitSamples() {
         float posX = s.position.x();
         float posY = s.position.y();
 
-        long minX = math::clampAny(long(ceilf(posX - filterWidth)), 0l, w - 1);
-        long maxX = math::clampAny(long(floorf(posX + filterWidth)), 0l, w - 1);
-        long minY = math::clampAny(long(ceilf(posY - filterWidth)), 0l, h - 1);
-        long maxY = math::clampAny(long(floorf(posY + filterWidth)), 0l, h - 1);
+        int minX = math::clampAny(int(ceilf(posX - filterWidth)), 0, w - 1);
+        int maxX = math::clampAny(int(floorf(posX + filterWidth)), 0, w - 1);
+        int minY = math::clampAny(int(ceilf(posY - filterWidth)), 0, h - 1);
+        int maxY = math::clampAny(int(floorf(posY + filterWidth)), 0, h - 1);
 
-        for (long yy = minY; yy <= maxY; ++yy) {
-          for (long xx = minX; xx <= maxX; ++xx) {
+        for (int yy = minY; yy <= maxY; ++yy) {
+          for (int xx = minX; xx <= maxX; ++xx) {
             Vec4& px = rawData[yy][xx];
 
             float weight = math::mitchellFilter(
@@ -69,11 +71,11 @@ void Image::commitSamples() {
 }
 
 void Image::writeToEXR(std::string fileName) {
-  for (long y = 0; y != h; ++y) {
-    for (long x = 0; x != w; ++x) {
+  for (int y = 0; y != h; ++y) {
+    for (int x = 0; x != w; ++x) {
       Vec4& px = rawData[y][x];
 
-      long index = y * w + x;
+      size_t index = size_t(y * w + x);
       channelR[index] = px.x() / px.w();
       channelG[index] = px.y() / px.w();
       channelB[index] = px.z() / px.w();
@@ -82,7 +84,9 @@ void Image::writeToEXR(std::string fileName) {
 
   EXRImage image;
   InitEXRImage(&image);
-  image.num_channels = 3;
+
+  constexpr unsigned numChannels = 3;
+  image.num_channels = numChannels;
 
   // Must be BGR(A) order, since most EXR viewers expect this channel order.
   const char* channel_names[] = { "B", "G", "R" };
@@ -94,13 +98,13 @@ void Image::writeToEXR(std::string fileName) {
   };
 
   image.channel_names = channel_names;
-  image.images = (unsigned char**)image_ptr;
+  image.images = reinterpret_cast<unsigned char**>(image_ptr);
   image.width = w;
   image.height = h;
   image.compression = TINYEXR_COMPRESSIONTYPE_NONE;
 
-  image.pixel_types = new int[sizeof(int) * image.num_channels];
-  image.requested_pixel_types = new int[sizeof(int) * image.num_channels];
+  image.pixel_types = new int[sizeof(int) * numChannels];
+  image.requested_pixel_types = new int[sizeof(int) * numChannels];
   for (int i = 0; i < image.num_channels; i++) {
     image.pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT; // pixel type of input image
     image.requested_pixel_types[i] = TINYEXR_PIXELTYPE_HALF; // pixel type of output image to be stored in .EXR

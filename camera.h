@@ -111,8 +111,8 @@ public:
   Camera(
     const Transform& xform,
     const std::vector<const Geom*>& objs,
-    long ww,
-    long hh,
+    int ww,
+    int hh,
     float fov = math::PI_4,
     float len = 50.0f,
     float fStop = 16.0f

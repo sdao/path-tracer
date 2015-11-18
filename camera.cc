@@ -18,8 +18,8 @@ namespace chrono = std::chrono;
 Camera::Camera(
   const Transform& xform,
   const std::vector<const Geom*>& objs,
-  long ww,
-  long hh,
+  int ww,
+  int hh,
   float fov,
   float len,
   float fStop
@@ -72,18 +72,18 @@ void Camera::renderOnce(
   chrono::steady_clock::time_point startTime = chrono::steady_clock::now();
 
   // Seed the per-row RNGs.
-  for (long y = 0; y < img.h; ++y) {
+  for (int y = 0; y < img.h; ++y) {
     rowSeeds[size_t(y)] = masterRng.nextUnsigned();
   }
 
   // Trace paths in parallel using TBB (Linux/Mac) or PPL (Windows).
-  parallel::parallel_for(long(0), img.h, [&](long y) {
+  parallel::parallel_for(0, img.h, [&](int y) {
     Randomness rng(rowSeeds[size_t(y)]);
     std::vector<RenderVertex> sharedEyePath;
     sharedEyePath.reserve(INITIAL_PATH_LENGTH);
 
-    for (long x = 0; x < img.w; ++x) {
-      for (long samp = 0; samp < img.samplesPerPixel; ++samp) {
+    for (int x = 0; x < img.w; ++x) {
+      for (int samp = 0; samp < img.samplesPerPixel; ++samp) {
         float offsetY = rng.nextFloat(-img.filterWidth, img.filterWidth);
         float offsetX = rng.nextFloat(-img.filterWidth, img.filterWidth);
 

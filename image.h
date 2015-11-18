@@ -34,11 +34,11 @@ public:
   /**
    * The default number of samples to take per pixel per iteration.
    */
-  static constexpr long DEFAULT_SAMPLES_PER_PIXEL = 4;
+  static constexpr int DEFAULT_SAMPLES_PER_PIXEL = 4;
 
-  const long w; /**< The width of the output image. */
-  const long h; /**< The height of the output image. */
-  const long samplesPerPixel; /**< Samples per pixel per iteration. */
+  const int w; /**< The width of the output image. */
+  const int h; /**< The height of the output image. */
+  const int samplesPerPixel; /**< Samples per pixel per iteration. */
   const float filterWidth; /**< The width (radius) of the filter kernel. */
 
   /**
@@ -50,9 +50,9 @@ public:
    * @param fw  the width (radius) of the filter kernel
    */
   Image(
-    long ww,
-    long hh,
-    long spp = DEFAULT_SAMPLES_PER_PIXEL,
+    int ww,
+    int hh,
+    int spp = DEFAULT_SAMPLES_PER_PIXEL,
     float fw = DEFAULT_FILTER_WIDTH
   );
 
@@ -70,11 +70,11 @@ public:
    * @param color the color of the sample
    */
   void setSample(
-    long x,
-    long y,
+    int x,
+    int y,
     float ptX,
     float ptY,
-    long idx,
+    int idx,
     const Vec& color
   );
 
