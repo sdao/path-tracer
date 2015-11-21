@@ -145,7 +145,7 @@ void Camera::renderMultiple(
 
 Vec Camera::trace(
   Randomness& rng,
-  Ray r,
+  const Ray& r,
   std::vector<RenderVertex>& sharedEyePath
 ) const {
   sharedEyePath.clear();

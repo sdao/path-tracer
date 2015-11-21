@@ -62,7 +62,7 @@ class Camera {
    */
    Vec trace(
      Randomness& rng,
-     Ray r,
+     const Ray& r,
      std::vector<RenderVertex>& sharedEyePath
    ) const;
 
