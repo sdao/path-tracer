@@ -23,7 +23,7 @@ typedef Eigen::Vector4f Vec4; /**< A 4D single-precision vector. */
 typedef Eigen::Affine3f Transform; /**< An affine transformation in 3D space. */
 
 /** An enumeration of standard axes in 3D space. */
-enum axis { X_AXIS = 0, Y_AXIS = 1, Z_AXIS = 2, INVALID_AXIS = -1 };
+enum Axis { X_AXIS = 0, Y_AXIS = 1, Z_AXIS = 2, INVALID_AXIS = -1 };
 
 namespace math {
 
@@ -246,7 +246,7 @@ namespace math {
    * Returns the axis enumeration value for a given int, or INVALID_AXIS if the
    * int can't be converted.
    */
-  inline axis axisFromInt(int x) {
+  inline Axis axisFromInt(int x) {
     switch (x) {
       case 0:
         return X_AXIS;

@@ -119,7 +119,7 @@ struct BBox {
   /**
    * Return the longest axis of the bbox.
    */
-  inline axis maximumExtent() const {
+  inline Axis maximumExtent() const {
     Vec d = upper - lower;
     if (d.x() > d.y() && d.x() > d.z()) {
       return X_AXIS;
