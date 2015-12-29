@@ -118,7 +118,7 @@ void Image::writeToEXR(std::string fileName) {
 
   if (ret != 0) {
     throw std::runtime_error(
-      str(format("Cannot read string property '%1%'") % std::string(err))
+      str(format("Error writing EXR file: '%1%'") % std::string(err))
     );
   }
 }
